@@ -1,0 +1,30 @@
+{
+  "name": "@guessir/backend",
+  "scripts": {
+    "clean": "rimraf ./build",
+    "build": "npm run clean && tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "lint:fix": "npm run lint -- --fix",
+    "start": "node ./build/index.js",
+    "start:ts": "ts-node ./src/index.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "^8.4.2",
+    "@nestjs/core": "^8.4.2",
+    "@nestjs/platform-fastify": "^8.4.2",
+    "@nestjs/typeorm": "^8.0.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.13.2",
+    "fastify-helmet": "^7.0.1",
+    "nanoid": "^3.3.1",
+    "pg": "^8.7.3",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.2.45",
+    "umzug": "^3.0.0"
+  },
+  "devDependencies": {
+    "@typed/node": "^6.7.0",
+    "@types/validator": "^13.7.2",
+    "sqlite3": "^5.0.2"
+  }
+}
