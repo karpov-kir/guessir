@@ -10,10 +10,6 @@ export class PubSub<T> {
     this.subscribers.forEach((subscriber) => subscriber(data));
   }
 
-  public get subscriberCount() {
-    return this.subscribers.size;
-  }
-
   private subscribe(subscriber: (data: T) => void) {
     if (this.subscribers.has(subscriber)) {
       throw new Error('Provided subscriber is already subscribed');

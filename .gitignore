@@ -1,6 +1,7 @@
 .idea
-dist
+build
 node_modules
+coverage
 
 *.orig
 *.DS_Store

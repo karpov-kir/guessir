@@ -1,11 +1,8 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
     "sourceMap": true,
     "strict": true,
     "target": "es5",
-    "downlevelIteration": true,
-    "types": [],
-    "lib": ["es2015", "es2017", "dom"]
+    "downlevelIteration": true
   }
 }
