@@ -1,10 +1,7 @@
 module.exports = {
   preset: 'ts-jest',
-  roots: ['<rootDir>/src'],
   testMatch: ['<rootDir>/src/**/*.(test|spec|e2e-spec).*'],
-  testEnvironment: 'node',
   collectCoverage: true,
-  coveragePathIgnorePatterns: ['<rootDir>/build/', '<rootDir>/dist/', '<rootDir>/node_modules/'],
-  coverageDirectory: '<rootDir>/coverage/',
+  coverageDirectory: '<rootDir>/coverage',
   verbose: true,
 };
