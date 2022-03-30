@@ -1,8 +1,10 @@
 module.exports = {
-  'sonar.typescript.lcov.reportPaths': 'coverage/lcov.info',
+  'sonar.typescript.lcov.reportPaths': '/github/workspace/coverage/lcov.info',
   'sonar.language': 'ts',
-  'sonar.sources': ['packages/src/backend', 'packages/src/web'].join(','),
-  'sonar.tests': ['packages/src/backend', 'packages/src/web'].join(','),
+
+  'sonar.sources': ['**/packages/**/src'].join(','),
+
+  'sonar.test.inclusions': ['**/*.(test|spec|e2e-spec).*'].join(','),
   'sonar.exclusions': [].join(','),
   'sonar.coverage.exclusions': [].join(','),
 };
