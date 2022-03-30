@@ -3,8 +3,6 @@
   "scripts": {
     "clean": "rimraf ./build",
     "build": "npm run clean && tsc -p tsconfig.json",
-    "lint": "eslint .",
-    "lint:fix": "npm run lint -- --fix",
     "start": "node ./build/index.js",
     "start:ts": "ts-node ./src/index.ts"
   },

@@ -1,9 +1,8 @@
 {
   "name": "@guessir/web",
   "scripts": {
+    "clean": "rimraf ./build",
     "build": "webpack-cli build",
-    "lint": "eslint .",
-    "lint:fix": "npm run lint -- --fix",
     "start": "webpack-cli serve"
   },
   "devDependencies": {
