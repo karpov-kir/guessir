@@ -2,5 +2,5 @@
 // the DOM library we can provide this interface.
 // TODO remove it once the @nestjs/common package does not need AbortSignal anymore (check package-lock.json).
 interface AbortSignal {
-  [key: string | number | symbol]: any;
+  [key: string | number | symbol]: unknown;
 }
