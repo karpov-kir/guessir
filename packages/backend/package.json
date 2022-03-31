@@ -1,10 +1,8 @@
 {
   "name": "@guessir/backend",
   "scripts": {
-    "clean": "rimraf ./build",
     "build": "npm run clean && tsc -p tsconfig.json",
-    "lint": "eslint .",
-    "lint:fix": "npm run lint -- --fix",
+    "clean": "rimraf ./build",
     "start": "node ./build/index.js",
     "start:ts": "ts-node ./src/index.ts"
   },

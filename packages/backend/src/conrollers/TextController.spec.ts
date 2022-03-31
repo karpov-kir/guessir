@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 
 import { CreateTextDto } from '../dto';
 import { Text } from '../entities';
-import { mockRepository } from '../textUtils/mockRepository';
+import { mockRepository } from '../testUtils/mockRepository';
 import { TextsController } from './TextsController';
 
 const text: Text = {

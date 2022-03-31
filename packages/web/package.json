@@ -2,9 +2,11 @@
   "name": "@guessir/web",
   "scripts": {
     "build": "webpack-cli build",
-    "lint": "eslint .",
-    "lint:fix": "npm run lint -- --fix",
+    "clean": "rimraf ./build",
     "start": "webpack-cli serve"
+  },
+  "dependencies": {
+    "url-join": "^5.0.0"
   },
   "devDependencies": {
     "css-loader": "^6.7.1",
@@ -15,8 +17,5 @@
     "webpack": "^5.70.0",
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.7.4"
-  },
-  "dependencies": {
-    "url-join": "^5.0.0"
   }
 }
