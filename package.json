@@ -6,10 +6,10 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces",
-    "start:ts:backend": "npm run start:ts -w @guessir/backend",
-    "start:ts:web": "npm run start -w @guessir/web",
     "lint": "eslint packages/**/src/**/*.ts",
     "lint:fix": "npm run lint -- --fix",
+    "start:ts:backend": "npm run start:ts -w @guessir/backend",
+    "start:ts:web": "npm run start -w @guessir/web",
     "test": "jest",
     "test:watch": "jest --watch"
   },
