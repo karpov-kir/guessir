@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
-const baseConfig = require('./jest.config.base');
-
 module.exports = {
-  ...baseConfig,
-  projects: ['<rootDir>/packages/backend', '<rootDir>/packages/web'],
+  testMatch: ['<rootDir>/src/**/*.(test|spec|e2e-spec).*'],
+  collectCoverage: true,
+  coverageDirectory: '<rootDir>/coverage',
+  verbose: true,
+  projects: ['<rootDir>/packages/*'],
 };
