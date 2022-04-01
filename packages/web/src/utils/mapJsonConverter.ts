@@ -3,6 +3,7 @@ type ConvertedMap = {
   convertedMap: Array<[unknown, unknown]>;
 };
 
+// Usage example:
 // JSON.stringify(originalValue, mapToJsonReplacer);
 // JSON.parse(json, mapFromJsonReviver);
 

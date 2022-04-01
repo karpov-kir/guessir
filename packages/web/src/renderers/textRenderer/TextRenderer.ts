@@ -97,7 +97,7 @@ export class TextRenderer implements ChildrenRenderer {
       } else {
         const wordRenderer = new WordRenderer(lexeme);
 
-        wordRenderer.userWordShowEvent.subscribe((lexeme) => this.handleUserWordShow(lexeme));
+        wordRenderer.userWordShowEvent.subscribe((shownLexeme) => this.handleUserWordShow(shownLexeme));
         this.wordRenderers.set(index, wordRenderer);
         this.containerElement.appendChild(wordRenderer.getElement());
       }

@@ -401,10 +401,6 @@ input[type="checkbox"]:checked:disabled:before {
   color: var(--textPrimary);
 }
 
-#text-container {
-  margin-bottom: 30px;
-}
-
 #text-container.show-text .lexeme {
   visibility: visible;
 }

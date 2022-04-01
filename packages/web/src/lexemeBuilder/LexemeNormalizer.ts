@@ -144,13 +144,13 @@ export class LexemeNormalizer {
   public static getGroupingWords(normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal): GroupWordLikeNominal[] {
     const length = normalizedPrimitiveLexeme.length;
     // Keep as lower-cased for easy access
-    const GroupWordLikeNominal = normalizedPrimitiveLexeme.toLowerCase() as GroupWordLikeNominal;
+    const groupWordLikeNominal = normalizedPrimitiveLexeme.toLowerCase() as GroupWordLikeNominal;
 
     // Separate words that end with `'s, ''d`, e.g. `she's`
-    if (['s', 'd'].includes(GroupWordLikeNominal[length - 1]) && GroupWordLikeNominal[length - 2] === "'") {
-      return [GroupWordLikeNominal.slice(0, -2) as GroupWordLikeNominal, GroupWordLikeNominal];
+    if (['s', 'd'].includes(groupWordLikeNominal[length - 1]) && groupWordLikeNominal[length - 2] === "'") {
+      return [groupWordLikeNominal.slice(0, -2) as GroupWordLikeNominal, groupWordLikeNominal];
     }
 
-    return [GroupWordLikeNominal];
+    return [groupWordLikeNominal];
   }
 }

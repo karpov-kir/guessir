@@ -21,9 +21,8 @@ export function generateRemoteTextUrl({
     rUrl: remoteTextUrl,
   };
   const base64Data = btoa(JSON.stringify(data));
-  const url = `${window.location.origin}?text=${encodeURIComponent(base64Data)}`;
 
-  return url;
+  return `${window.location.origin}?text=${encodeURIComponent(base64Data)}`;
 }
 
 export function hasRemoteTextParametersInUrl() {

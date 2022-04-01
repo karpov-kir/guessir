@@ -31,9 +31,9 @@ export class LexemeBuilder {
     let primitiveLexeme: PrimitiveLexemeNominal = '' as PrimitiveLexemeNominal;
     let normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal = '' as NormalizedPrimitiveLexemeNominal;
     let startIndex: number | undefined = undefined;
-    let shouldProcessPrimitiveLexeme = false;
 
     for (let i = 0, l = text.length; i < l; i++) {
+      let shouldProcessPrimitiveLexeme = false;
       const character = text[i];
       const normalizedCharacter = LexemeNormalizer.normalizeCharacter(character);
 
@@ -69,7 +69,6 @@ export class LexemeBuilder {
         startIndex = undefined;
         primitiveLexeme = '' as PrimitiveLexemeNominal;
         normalizedPrimitiveLexeme = '' as NormalizedPrimitiveLexemeNominal;
-        shouldProcessPrimitiveLexeme = false;
       }
     }
 
@@ -141,10 +140,10 @@ export class LexemeBuilder {
       } else {
         this.wordLikeCount++;
 
-        LexemeNormalizer.getGroupingWords(newLexeme.normalized).forEach((GroupWordLikeNominal) => {
-          const lexemesByWordLike = this.lexemesByWordLike.get(GroupWordLikeNominal) || new Map<number, Lexeme>();
+        LexemeNormalizer.getGroupingWords(newLexeme.normalized).forEach((groupWordLikeNominal) => {
+          const lexemesByWordLike = this.lexemesByWordLike.get(groupWordLikeNominal) || new Map<number, Lexeme>();
           lexemesByWordLike.set(newLexemeIndex, newLexeme);
-          this.lexemesByWordLike.set(GroupWordLikeNominal, lexemesByWordLike);
+          this.lexemesByWordLike.set(groupWordLikeNominal, lexemesByWordLike);
         });
       }
 
@@ -228,12 +227,12 @@ export class LexemeBuilder {
       } else {
         this.wordLikeCount--;
 
-        LexemeNormalizer.getGroupingWords(lexeme.normalized).forEach((GroupWordLikeNominal) => {
-          const lexemes = this.lexemesByWordLike.get(GroupWordLikeNominal) || new Map<number, Lexeme>();
+        LexemeNormalizer.getGroupingWords(lexeme.normalized).forEach((groupWordLikeNominal) => {
+          const lexemes = this.lexemesByWordLike.get(groupWordLikeNominal) || new Map<number, Lexeme>();
           lexemes.delete(this.lastLexemeIndex);
 
           if (!lexemes.size) {
-            this.lexemesByWordLike.delete(GroupWordLikeNominal);
+            this.lexemesByWordLike.delete(groupWordLikeNominal);
           }
         });
       }
