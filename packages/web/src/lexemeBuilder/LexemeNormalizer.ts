@@ -56,19 +56,27 @@ export class LexemeNormalizer {
     // I'd, She'd, He'd, He's, She's covered in `getGroupingWords`, read more there.
   ]);
 
+  // Convert word to the title case if the original word is started from a capital letter
+  public static syncCase(
+    originalLexeme: PrimitiveLexemeNominal | NormalizedPrimitiveLexemeNominal,
+    newNormalizedLexeme: NormalizedPrimitiveLexemeNominal,
+  ) {
+    if (newNormalizedLexeme[0] !== originalLexeme[0] && newNormalizedLexeme[0].toUpperCase() === originalLexeme[0]) {
+      newNormalizedLexeme = (newNormalizedLexeme[0].toUpperCase() +
+        newNormalizedLexeme.substring(1)) as NormalizedPrimitiveLexemeNominal;
+    }
+
+    return newNormalizedLexeme;
+  }
+
   public static normalizeWord(
     primitiveLexeme: PrimitiveLexemeNominal,
     normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal,
   ) {
-    let converted =
+    const converted =
       LexemeNormalizer.NORMALIZED_WORDS_TO_NORMALIZED_WORDS.get(normalizedPrimitiveLexeme) || normalizedPrimitiveLexeme;
 
-    // Convert word to the title case of the original word is started from a capital letter
-    if (converted[0] !== primitiveLexeme[0] && converted[0].toUpperCase() === primitiveLexeme[0]) {
-      converted = (converted[0].toUpperCase() + converted.substring(1)) as NormalizedPrimitiveLexemeNominal;
-    }
-
-    return converted;
+    return this.syncCase(primitiveLexeme, converted);
   }
 
   public static normalizeCharacter(character: string) {
@@ -81,8 +89,15 @@ export class LexemeNormalizer {
   }
 
   public static uncontractPrimitiveLexeme(normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal) {
-    return (LexemeNormalizer.NORMALIZED_CONTRACTION_TO_NORMALIZED_NORMAL.get(normalizedPrimitiveLexeme) ||
-      normalizedPrimitiveLexeme) as NormalizedPrimitiveLexemeNominal;
+    const converted = LexemeNormalizer.NORMALIZED_CONTRACTION_TO_NORMALIZED_NORMAL.get(
+      normalizedPrimitiveLexeme.toLowerCase(),
+    ) as NormalizedPrimitiveLexemeNominal;
+
+    if (converted) {
+      return this.syncCase(normalizedPrimitiveLexeme, converted);
+    }
+
+    return normalizedPrimitiveLexeme;
   }
 
   public static isWordCharacter(normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal) {
@@ -131,8 +146,8 @@ export class LexemeNormalizer {
     // Keep as lower-cased for easy access
     const GroupWordLikeNominal = normalizedPrimitiveLexeme.toLowerCase() as GroupWordLikeNominal;
 
-    // Separate words that end with `'s`, e.g. `
-    if (GroupWordLikeNominal[length - 1] === 's' && GroupWordLikeNominal[length - 2] === "'") {
+    // Separate words that end with `'s, ''d`, e.g. `she's`
+    if (['s', 'd'].includes(GroupWordLikeNominal[length - 1]) && GroupWordLikeNominal[length - 2] === "'") {
       return [GroupWordLikeNominal.slice(0, -2) as GroupWordLikeNominal, GroupWordLikeNominal];
     }
 

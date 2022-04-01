@@ -17,6 +17,15 @@ export class LexemeBuilder {
 
   private static PUNCTUATION_CHARACTERS = [',', '.', '!', '?', ';'];
 
+  // Should apply the following rules:
+  // - No more than 2 new line characters in a row
+  // - No more than 1 space
+  // - Keep only the first letter upper case if this letter is upper case in the original word
+  // - Split contractions (constructions like `I'm/We'll/they've`) to individual lexemes
+  //   - Add an additional group for words that cannot be uncotracted (read more in `getGroupingWords`)
+  // - Replace trailing spaces followed by a punctuation with just punctuation
+  // - Replace trailing spaces followed by a new line with just new line
+  // - Allow the very first lexeme only if it's a word or a letter
   public buildLexemes(rawText: string): LexemeAnalysis {
     const text = rawText.trim();
     let primitiveLexeme: PrimitiveLexemeNominal = '' as PrimitiveLexemeNominal;
@@ -89,7 +98,9 @@ export class LexemeBuilder {
     normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal,
     startIndex: number,
     endIndex: number,
+    options: { onCreated?: (lexeme: Lexeme) => void } = {},
   ) {
+    const { onCreated } = options;
     const newBaseLexeme = {
       endIndex,
       startIndex: startIndex,
@@ -113,9 +124,9 @@ export class LexemeBuilder {
     const isCurrentNewLine = newLexeme.normalized === '\n';
 
     if (
-      // Replace trailing space followed by a punctuation with this punctuation
+      // Replace trailing spaces followed by a punctuation with just punctuation
       (isLastSpace && isCurrentPunctuation) ||
-      // Replace trailing space followed by a new line with this new line
+      // Replace trailing spaces followed by a new line with just new line
       (isLastSpace && isCurrentNewLine)
     ) {
       this.deleteLastLexemes((lexeme) => lexeme.normalized === ' ');
@@ -136,11 +147,16 @@ export class LexemeBuilder {
           this.lexemesByWordLike.set(GroupWordLikeNominal, lexemesByWordLike);
         });
       }
+
+      if (onCreated) {
+        onCreated(newLexeme);
+      }
     }
   }
 
   private splitToLexemes(lexeme: Lexeme, startIndex: number, endIndex: number) {
     const newNormalizedPrimitiveLexemes = lexeme.uncontracted.split(' ') as NormalizedPrimitiveLexemeNominal[];
+    const restoreOriginalUncotructedLexeme = (newLexeme: Lexeme) => (newLexeme.uncontracted = lexeme.uncontracted);
 
     newNormalizedPrimitiveLexemes.forEach((newNormalizedPrimitiveLexeme, index) => {
       this.processPrimitiveLexeme(
@@ -148,14 +164,17 @@ export class LexemeBuilder {
         LexemeNormalizer.normalizeWord(lexeme.original, newNormalizedPrimitiveLexeme),
         startIndex,
         endIndex,
+        { onCreated: restoreOriginalUncotructedLexeme },
       );
 
+      // Add spaces between uncontracted lexemes
       if (index < newNormalizedPrimitiveLexemes.length - 1) {
         this.processPrimitiveLexeme(
           ' ' as PrimitiveLexemeNominal,
           ' ' as NormalizedPrimitiveLexemeNominal,
           startIndex,
           endIndex,
+          { onCreated: restoreOriginalUncotructedLexeme },
         );
       }
     });
@@ -174,7 +193,7 @@ export class LexemeBuilder {
         return false;
       }
 
-      // No more than one ` ` in a row
+      // No more than one space in a row
       if (newLexeme.normalized === ' ' && this.isLastLexemesMatch(1, (lexeme) => lexeme.normalized === ' ')) {
         return false;
       }
