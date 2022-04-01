@@ -4,4 +4,5 @@ module.exports = {
   coverageDirectory: '<rootDir>/coverage',
   verbose: true,
   projects: ['<rootDir>/packages/*'],
+  testResultsProcessor: 'jest-sonar-reporter',
 };
