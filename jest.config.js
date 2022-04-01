@@ -1,5 +1,5 @@
 module.exports = {
-  testMatch: ['<rootDir>/src/**/*.(test|spec|e2e-spec).*'],
+  testMatch: ['<rootDir>/src/**/*.*(test|spec|e2e-spec).*'],
   collectCoverage: true,
   coverageDirectory: '<rootDir>/coverage',
   verbose: true,
