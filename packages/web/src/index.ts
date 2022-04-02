@@ -2,7 +2,7 @@ import './styles.css';
 
 import { LexemeBuilder } from './lexemeBuilder';
 import { RenderManager } from './renderers';
-import { hasApiTextParametersInUrl, loadApiText, parseApiTextIdFromUrl } from './utils';
+import { hasTextParametersInUrl, loadText, parseTextIdFromUrl } from './utils';
 
 const defaultTitle = 'Hello!';
 
@@ -21,12 +21,12 @@ async function boot() {
   let allowShowingText = true;
   let allowShowingFirstLetters = true;
 
-  if (hasApiTextParametersInUrl()) {
+  if (hasTextParametersInUrl()) {
     try {
       console.log('Trying to load API text');
 
-      const id = parseApiTextIdFromUrl();
-      const apiText = await loadApiText(id);
+      const id = parseTextIdFromUrl();
+      const apiText = await loadText(id);
 
       console.log('API text has been loaded', apiText);
 

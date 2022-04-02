@@ -5,6 +5,6 @@
     "module": "commonjs",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "types": ["./src/typings", "jest"]
+    "types": ["./src/typings/", "jest"]
   }
 }

@@ -11,7 +11,8 @@ module.exports = {
     // keywords inside `url-join`. To fix it we need to tell Jest to transform `url-join` via `ts-jest`. By default
     // Jest does not transform modules in the `node_modules` folder. This also requires to set `allowJs` to true in
     // the `tsconfig.json` as `url-join` has only a JS version in the NPM package.
-    // TODO remove it and `allowJs` once `url-join` has a CJS version.
+    // TODO remove it and `allowJs` once `url-join` has a CJS version or Node.js supports ESM.
+    // https://github.com/jfromaniello/url-join/issues/78#issuecomment-1084281904
     'node_modules/(?!url-join)',
   ],
 };

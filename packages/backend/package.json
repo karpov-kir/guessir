@@ -2,11 +2,13 @@
   "name": "@guessir/backend",
   "scripts": {
     "build": "npm run clean && tsc -p tsconfig.json",
-    "clean": "rimraf ./build",
+    "clean": "rimraf ./build/",
     "start": "node ./build/index.js",
-    "start:ts": "ts-node ./src/index.ts"
+    "start:ts": "ts-node -r tsconfig-paths/register cli.ts",
+    "start:ts:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register cli.ts"
   },
   "dependencies": {
+    "@guessir/shared": "^1.0.0",
     "@nestjs/common": "^8.4.3",
     "@nestjs/core": "^8.4.3",
     "@nestjs/platform-fastify": "^8.4.3",

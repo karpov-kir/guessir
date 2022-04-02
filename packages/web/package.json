@@ -2,13 +2,14 @@
   "name": "@guessir/web",
   "scripts": {
     "build": "webpack-cli build",
-    "clean": "rimraf ./build",
+    "clean": "rimraf ./build/",
     "start": "webpack-cli serve"
   },
   "dependencies": {
     "url-join": "^5.0.0"
   },
   "devDependencies": {
+    "@guessir/shared": "^1.0.0",
     "css-loader": "^6.7.1",
     "dotenv-webpack": "^7.1.0",
     "html-webpack-plugin": "^5.5.0",
