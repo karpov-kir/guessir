@@ -1,7 +1,7 @@
 import './styles.css';
 
 import { LexemeBuilder } from './lexemeBuilder';
-import { RenderManager } from './renderers';
+import { RenderController } from './renderers';
 import { hasTextParametersInUrl, loadText, parseTextIdFromUrl } from './utils';
 
 const defaultTitle = 'Hello!';
@@ -39,7 +39,7 @@ async function boot() {
   }
 
   const lexemeAnalysis = new LexemeBuilder().buildLexemes(text);
-  const renderManager = new RenderManager(
+  const renderController = new RenderController(
     lexemeAnalysis,
     title,
     description,
@@ -47,7 +47,7 @@ async function boot() {
     allowShowingFirstLetters,
   );
 
-  renderManager.init(document.body);
+  renderController.init(document.body);
 }
 
 boot();

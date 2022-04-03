@@ -1,1 +1,1 @@
-export * from './RenderManager';
+export * from './RenderController';
