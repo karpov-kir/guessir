@@ -22,7 +22,7 @@ export class ScoreRenderer implements ChildrenRenderer {
 
     const currentScoreElement = this.containerElement.querySelector('#current-score') as HTMLElement;
 
-    currentScoreElement.innerText = this.score.toString();
+    currentScoreElement.textContent = this.score.toString();
   }
 
   private initElement() {

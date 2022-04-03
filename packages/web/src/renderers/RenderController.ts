@@ -4,7 +4,7 @@ import { CreateTextRenderer } from './CreateTextRenderer';
 import { ScoreRenderer } from './ScoreRenderer';
 import { TextRenderer } from './textRenderer';
 
-export class RenderManager {
+export class RenderController {
   private guessirContainer: HTMLElement;
 
   private textRenderer: TextRenderer;

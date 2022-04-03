@@ -10,7 +10,7 @@ export class CreateTextRenderer implements ChildrenRenderer {
     this.containerElement = document.createElement('div');
     this.containerElement.id = 'utils-container';
 
-    this.copiedAlertElement.innerText = '(copied)';
+    this.copiedAlertElement.textContent = '(copied)';
 
     this.initElement();
   }
@@ -271,13 +271,13 @@ export class CreateTextRenderer implements ChildrenRenderer {
 
           generatedUrlContainerElement.classList.remove('hide');
 
-          generatedUrlElement.innerText = this.generatedUrl;
+          generatedUrlElement.textContent = this.generatedUrl;
           generatedUrlElement.href = this.generatedUrl;
         })
         .catch((error: Error) => {
           console.error(error);
           errorElement.classList.remove('hide');
-          errorElement.innerText = error.message;
+          errorElement.textContent = error.message;
         })
         .finally(() => {
           this.blockForm(false);

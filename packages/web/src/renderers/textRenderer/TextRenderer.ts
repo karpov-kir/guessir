@@ -81,13 +81,13 @@ export class TextRenderer implements ChildrenRenderer {
   private initElement() {
     if (this.title) {
       const titleElement = document.createElement('h1');
-      titleElement.innerText = this.title;
+      titleElement.textContent = this.title;
       this.containerElement.appendChild(titleElement);
     }
 
     if (this.description) {
       const descriptionElement = document.createElement('p');
-      descriptionElement.innerText = this.description;
+      descriptionElement.textContent = this.description;
       this.containerElement.appendChild(descriptionElement);
     }
 
