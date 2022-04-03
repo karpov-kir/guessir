@@ -20,7 +20,7 @@ export class ScoreRenderer implements ChildrenRenderer {
   public addScore(value: number) {
     this.score += value;
 
-    const currentScoreElement = this.containerElement.querySelector('#current-score') as HTMLElement;
+    const { currentScoreElement } = this.getElements();
 
     currentScoreElement.textContent = this.score.toString();
   }
@@ -32,5 +32,11 @@ export class ScoreRenderer implements ChildrenRenderer {
       /
       <div id="total-score">${this.wordLikeCount}</div>
     `;
+  }
+
+  private getElements() {
+    const currentScoreElement = this.containerElement.querySelector('#current-score') as HTMLElement;
+
+    return { currentScoreElement };
   }
 }

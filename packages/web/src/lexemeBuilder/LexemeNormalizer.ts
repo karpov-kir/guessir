@@ -69,14 +69,14 @@ export class LexemeNormalizer {
     return newNormalizedLexeme;
   }
 
-  public static normalizeWord(
-    primitiveLexeme: PrimitiveLexemeNominal,
+  public static convertNormalizedPrimitiveLexeme(
+    originalPrimitiveLexeme: PrimitiveLexemeNominal,
     normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal,
   ) {
     const converted =
       LexemeNormalizer.NORMALIZED_WORDS_TO_NORMALIZED_WORDS.get(normalizedPrimitiveLexeme) || normalizedPrimitiveLexeme;
 
-    return this.syncCase(primitiveLexeme, converted);
+    return this.syncCase(originalPrimitiveLexeme, converted);
   }
 
   public static normalizeCharacter(character: string) {

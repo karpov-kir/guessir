@@ -56,7 +56,10 @@ export class LexemeBuilder {
         shouldProcessPrimitiveLexeme = isWordBoundary;
 
         if (isWordBoundary) {
-          normalizedPrimitiveLexeme = LexemeNormalizer.normalizeWord(primitiveLexeme, normalizedPrimitiveLexeme);
+          normalizedPrimitiveLexeme = LexemeNormalizer.convertNormalizedPrimitiveLexeme(
+            primitiveLexeme,
+            normalizedPrimitiveLexeme,
+          );
         }
       } else {
         primitiveLexeme = character as PrimitiveLexemeNominal;
@@ -160,7 +163,7 @@ export class LexemeBuilder {
     newNormalizedPrimitiveLexemes.forEach((newNormalizedPrimitiveLexeme, index) => {
       this.processPrimitiveLexeme(
         lexeme.original,
-        LexemeNormalizer.normalizeWord(lexeme.original, newNormalizedPrimitiveLexeme),
+        LexemeNormalizer.convertNormalizedPrimitiveLexeme(lexeme.original, newNormalizedPrimitiveLexeme),
         startIndex,
         endIndex,
         { onCreated: restoreOriginalUncotructedLexeme },

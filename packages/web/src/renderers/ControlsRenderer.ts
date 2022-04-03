@@ -28,11 +28,12 @@ export class ControlsRenderer implements ChildrenRenderer {
     return this.containerElement;
   }
 
+  // istanbul ignore next: no logic
   public cleanAndFocusGuessInput() {
-    const inputElement = this.containerElement.querySelector('#guess-input') as HTMLInputElement;
+    const { guessInputElement } = this.getElements();
 
-    inputElement.value = '';
-    inputElement.focus();
+    guessInputElement.value = '';
+    guessInputElement.focus();
   }
 
   private initElement(allowShowingText: boolean, allowShowingFirstLetters: boolean) {
@@ -47,10 +48,7 @@ export class ControlsRenderer implements ChildrenRenderer {
       </label>
     `;
 
-    const showTextCheckboxElement = this.containerElement.querySelector('#show-text-checkbox') as HTMLInputElement;
-    const showFirstLettersCheckboxElement = this.containerElement.querySelector(
-      '#show-first-letters-checkbox',
-    ) as HTMLButtonElement;
+    const { showTextCheckboxElement, showFirstLettersCheckboxElement } = this.getElements();
 
     if (!allowShowingText) {
       showTextCheckboxElement.parentElement?.classList.add('hide');
@@ -65,12 +63,21 @@ export class ControlsRenderer implements ChildrenRenderer {
     this.attachShowTextHandler();
   }
 
-  private attachGuessHandler() {
-    const buttonElement = this.containerElement.querySelector('#guess-button') as HTMLButtonElement;
-    const inputElement = this.containerElement.querySelector('#guess-input') as HTMLInputElement;
+  private getElements() {
+    const showTextCheckboxElement = this.containerElement.querySelector('#show-text-checkbox') as HTMLInputElement;
+    const showFirstLettersCheckboxElement = this.containerElement.querySelector(
+      '#show-first-letters-checkbox',
+    ) as HTMLInputElement;
+    const guessButtonElement = this.containerElement.querySelector('#guess-button') as HTMLButtonElement;
+    const guessInputElement = this.containerElement.querySelector('#guess-input') as HTMLInputElement;
 
+    return { showTextCheckboxElement, showFirstLettersCheckboxElement, guessButtonElement, guessInputElement };
+  }
+
+  private attachGuessHandler() {
+    const { guessButtonElement, guessInputElement } = this.getElements();
     const guessHandler = () => {
-      const word = inputElement.value.trim().toLowerCase();
+      const word = guessInputElement.value.trim().toLowerCase();
 
       if (!word) {
         return;
@@ -81,19 +88,16 @@ export class ControlsRenderer implements ChildrenRenderer {
       });
     };
 
-    buttonElement.addEventListener('click', guessHandler);
-    onEnter(inputElement, guessHandler);
+    guessButtonElement.addEventListener('click', guessHandler);
+    onEnter(guessInputElement, guessHandler);
   }
 
   private attachShowTextHandler() {
-    const showTextCheckboxElement = this.containerElement.querySelector('#show-text-checkbox') as HTMLInputElement;
-    const showFirstLettersCheckboxElement = this.containerElement.querySelector(
-      '#show-first-letters-checkbox',
-    ) as HTMLInputElement;
+    const { showTextCheckboxElement, showFirstLettersCheckboxElement } = this.getElements();
 
     onChangeAndEnter(showTextCheckboxElement, () => {
       if (this.isFirstLettersShown) {
-        showFirstLettersCheckboxElement.click();
+        showFirstLettersCheckboxElement.dispatchEvent(new Event('change'));
       }
 
       this.isTextShown = !this.isTextShown;
@@ -103,14 +107,11 @@ export class ControlsRenderer implements ChildrenRenderer {
   }
 
   private attachShowFirstLettersHandler() {
-    const showTextCheckboxElement = this.containerElement.querySelector('#show-text-checkbox') as HTMLInputElement;
-    const showFirstLettersCheckboxElement = this.containerElement.querySelector(
-      '#show-first-letters-checkbox',
-    ) as HTMLInputElement;
+    const { showTextCheckboxElement, showFirstLettersCheckboxElement } = this.getElements();
 
     onChangeAndEnter(showFirstLettersCheckboxElement, () => {
       if (this.isTextShown) {
-        showTextCheckboxElement.click();
+        showTextCheckboxElement.dispatchEvent(new Event('change'));
       }
 
       this.isFirstLettersShown = !this.isFirstLettersShown;
