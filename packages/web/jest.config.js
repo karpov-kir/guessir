@@ -15,4 +15,5 @@ module.exports = {
     // https://github.com/jfromaniello/url-join/issues/78#issuecomment-1084281904
     'node_modules/(?!url-join)',
   ],
+  testEnvironment: 'jsdom',
 };
