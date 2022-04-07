@@ -4,8 +4,8 @@
     "build": "npm run clean && tsc -p tsconfig.json",
     "clean": "rimraf ./build/",
     "start": "node ./build/index.js",
-    "start:ts": "ts-node -r tsconfig-paths/register cli.ts",
-    "start:ts:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register cli.ts"
+    "start:ts": "ts-node ./src/index.ts",
+    "start:ts:debug": "ts-node --inspect-brk ./src/index.ts"
   },
   "dependencies": {
     "@guessir/shared": "^1.0.0",
@@ -23,7 +23,6 @@
     "umzug": "^3.1.0"
   },
   "devDependencies": {
-    "@typed/node": "^6.7.0",
     "@types/validator": "^13.7.2",
     "sqlite3": "^5.0.2"
   }

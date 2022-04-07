@@ -3,7 +3,7 @@
 const packageJson = require('./package');
 
 module.exports = {
-  // Preset must be set at the project level so the nearest tsconfig.json is used
+  // Preset must be set at the project level so the nearest tsconfig.json is used instead of the root one
   preset: 'ts-jest/presets/js-with-ts',
   displayName: packageJson.name,
   transformIgnorePatterns: [
