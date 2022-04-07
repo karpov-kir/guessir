@@ -301,8 +301,8 @@ input[type="checkbox"]:checked:after {
   left: 0;
   top: 0;
 
-  -webkit-mask: url(./icons/check-icon.svg) no-repeat 50% 50%;
-  mask: url(./icons/check-icon.svg) no-repeat 50% 50%;
+  -webkit-mask: url('./icons/checkIcon.svg') no-repeat 50% 50%;
+  mask: url('./icons/checkIcon.svg') no-repeat 50% 50%;
   -webkit-mask-size: cover;
   mask-size: cover;
 
@@ -461,8 +461,8 @@ summary {
 
 summary:before {
   content: '';
-  -webkit-mask: url(./icons/arrow-right-icon.svg) no-repeat 50% 50%;
-  mask: url(./icons/arrow-right-icon.svg) no-repeat 50% 50%;
+  -webkit-mask: url('./icons/arrowRightIcon.svg') no-repeat 50% 50%;
+  mask: url('./icons/arrowRightIcon.svg') no-repeat 50% 50%;
   -webkit-mask-size: cover;
   mask-size: cover;
 

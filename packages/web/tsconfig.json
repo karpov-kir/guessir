@@ -6,6 +6,7 @@
     "target": "es5",
     "moduleResolution": "node",
     "outDir": "./build/",
-    "lib": ["dom"]
+    "lib": ["dom", "es2021"],
+    "types": ["./src/@types", "jest", "node"]
   }
 }
