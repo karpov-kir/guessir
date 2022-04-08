@@ -2,14 +2,29 @@ import { copyIcon } from '../icons';
 import { createText, generateTextUrl, onChangeAndEnter } from '../utils';
 import { ChildrenRenderer } from './types';
 
+interface CreateTextRendererOptions {
+  maxTitleLength?: number;
+  maxDescriptionLength?: number;
+  maxTextLength?: number;
+}
+
 export class CreateTextRenderer implements ChildrenRenderer {
   private containerElement: HTMLElement;
   private generatedUrl = '';
   private copiedAlertElement = document.createElement('div');
+  private maxTitleLength = 0;
+  private maxDescriptionLength = 0;
+  private maxTextLength = 0;
 
-  constructor() {
+  constructor(options: CreateTextRendererOptions = {}) {
+    const { maxTitleLength = 500, maxDescriptionLength = 4000, maxTextLength = 4000 } = options;
+
     this.containerElement = document.createElement('div');
     this.containerElement.id = 'utils-container';
+
+    this.maxTitleLength = maxTitleLength;
+    this.maxDescriptionLength = maxDescriptionLength;
+    this.maxTextLength = maxTextLength;
 
     this.copiedAlertElement.textContent = '(copied)';
 
@@ -70,35 +85,7 @@ export class CreateTextRenderer implements ChildrenRenderer {
   }
 
   private getElements() {
-    const titleInputElement = this.containerElement.querySelector('#title-input') as HTMLInputElement;
-    const descriptionInputElement = this.containerElement.querySelector('#description-input') as HTMLInputElement;
-    const textInputElement = this.containerElement.querySelector('#text-input') as HTMLInputElement;
-    const allowShowingFirstLettersCheckboxElement = this.containerElement.querySelector(
-      '#allow-showing-first-letters-checkbox',
-    ) as HTMLInputElement;
-    const allowShowingTextCheckboxElement = this.containerElement.querySelector(
-      '#allow-showing-text-checkbox',
-    ) as HTMLInputElement;
-    const generateUrlButtonElement = this.containerElement.querySelector('#generate-url-button') as HTMLButtonElement;
-    const errorElement = this.containerElement.querySelector('#generate-url-error') as HTMLButtonElement;
-    const generatedUrlContainerElement = this.containerElement.querySelector('#generated-url-container') as HTMLElement;
-    const generatedUrlElement = this.containerElement.querySelector('#generated-url') as HTMLAnchorElement;
-    const copyGeneratedUrlButtonElement = this.containerElement.querySelector(
-      '#copy-generated-url-button',
-    ) as HTMLAnchorElement;
-
-    return {
-      titleInputElement,
-      descriptionInputElement,
-      textInputElement,
-      allowShowingFirstLettersCheckboxElement,
-      allowShowingTextCheckboxElement,
-      generateUrlButtonElement,
-      errorElement,
-      generatedUrlContainerElement,
-      generatedUrlElement,
-      copyGeneratedUrlButtonElement,
-    };
+    return getElements(this.containerElement);
   }
 
   private getValues() {
@@ -137,9 +124,9 @@ export class CreateTextRenderer implements ChildrenRenderer {
       }
     };
 
-    limitLength(titleInputElement, 500);
-    limitLength(descriptionInputElement, 4000);
-    limitLength(textInputElement, 4000);
+    limitLength(titleInputElement, this.maxTitleLength);
+    limitLength(descriptionInputElement, this.maxDescriptionLength);
+    limitLength(textInputElement, this.maxTextLength);
   }
 
   private validateForm(limitToElement?: HTMLElement) {
@@ -307,4 +294,36 @@ export class CreateTextRenderer implements ChildrenRenderer {
       }, 5000);
     });
   }
+}
+
+export function getElements(containerElement: HTMLElement) {
+  const titleInputElement = containerElement.querySelector('#title-input') as HTMLInputElement;
+  const descriptionInputElement = containerElement.querySelector('#description-input') as HTMLInputElement;
+  const textInputElement = containerElement.querySelector('#text-input') as HTMLInputElement;
+  const allowShowingFirstLettersCheckboxElement = containerElement.querySelector(
+    '#allow-showing-first-letters-checkbox',
+  ) as HTMLInputElement;
+  const allowShowingTextCheckboxElement = containerElement.querySelector(
+    '#allow-showing-text-checkbox',
+  ) as HTMLInputElement;
+  const generateUrlButtonElement = containerElement.querySelector('#generate-url-button') as HTMLButtonElement;
+  const errorElement = containerElement.querySelector('#generate-url-error') as HTMLButtonElement;
+  const generatedUrlContainerElement = containerElement.querySelector('#generated-url-container') as HTMLElement;
+  const generatedUrlElement = containerElement.querySelector('#generated-url') as HTMLAnchorElement;
+  const copyGeneratedUrlButtonElement = containerElement.querySelector(
+    '#copy-generated-url-button',
+  ) as HTMLAnchorElement;
+
+  return {
+    titleInputElement,
+    descriptionInputElement,
+    textInputElement,
+    allowShowingFirstLettersCheckboxElement,
+    allowShowingTextCheckboxElement,
+    generateUrlButtonElement,
+    errorElement,
+    generatedUrlContainerElement,
+    generatedUrlElement,
+    copyGeneratedUrlButtonElement,
+  };
 }
