@@ -11,6 +11,10 @@ export class Deferred<T> implements Promise<T> {
     return this._state;
   }
 
+  public get promise() {
+    return this._promise;
+  }
+
   constructor() {
     this._promise = new Promise<T>((resolve, reject) => {
       this._resolve = resolve;
@@ -41,9 +45,5 @@ export class Deferred<T> implements Promise<T> {
   public reject(reason: unknown): void {
     this._reject(reason);
     this._state = 'rejected';
-  }
-
-  public get promise() {
-    return this._promise;
   }
 }
