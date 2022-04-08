@@ -16,4 +16,7 @@ module.exports = {
     'node_modules/(?!url-join)',
   ],
   testEnvironment: 'jsdom',
+  moduleNameMapper: {
+    '\\.svg$': '<rootDir>/src/testUtils/fileMock.ts',
+  },
 };
