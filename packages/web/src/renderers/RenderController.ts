@@ -1,4 +1,4 @@
-import { Lexeme, LexemeAnalysis } from '../lexemeBuilder';
+import { Lexeme, LexemeAnalysis } from '../lexemeAnalyzer';
 import { ControlsRenderer, GuessEvent } from './ControlsRenderer';
 import { CreateTextRenderer } from './CreateTextRenderer';
 import { ScoreRenderer } from './ScoreRenderer';

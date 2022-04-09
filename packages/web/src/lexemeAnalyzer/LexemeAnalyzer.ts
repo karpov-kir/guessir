@@ -8,7 +8,7 @@ import {
   PrimitiveLexemeNominal,
 } from './types';
 
-export class LexemeBuilder {
+export class LexemeAnalyzer {
   private lexemes = new Map<number, Lexeme>();
   private lexemesByWordLike = new Map<GroupWordLikeNominal, Map<number, Lexeme>>();
   private wordLikeCount = 0;
@@ -29,7 +29,7 @@ export class LexemeBuilder {
   // - Replace specific special characters with more appropriate ones (e.g. `—` with `-`), check `CHARACTERS_TO_NORMALIZED_CHARACTERS`
   // - Replace some words (e.g. `i` -> `I`), check `NORMALIZED_WORDS_TO_NORMALIZED_WORDS`
   // - Treat word separation characters as a part of a word (e.g. `re-generate`)
-  public buildLexemes(rawText: string): LexemeAnalysis {
+  public analyze(rawText: string): LexemeAnalysis {
     const text = rawText.trim();
     let primitiveLexeme: PrimitiveLexemeNominal = '' as PrimitiveLexemeNominal;
     let normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal = '' as NormalizedPrimitiveLexemeNominal;
@@ -126,7 +126,7 @@ export class LexemeBuilder {
     }
 
     const isLastSpace = this.isLastLexemesMatch(1, (lexeme) => lexeme.normalized === ' ');
-    const isCurrentPunctuation = LexemeBuilder.PUNCTUATION_CHARACTERS.includes(newLexeme.normalized);
+    const isCurrentPunctuation = LexemeAnalyzer.PUNCTUATION_CHARACTERS.includes(newLexeme.normalized);
     const isCurrentNewLine = newLexeme.normalized === '\n';
 
     if (

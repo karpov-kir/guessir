@@ -1,6 +1,6 @@
 import './styles.css';
 
-import { LexemeBuilder } from './lexemeBuilder';
+import { LexemeAnalyzer } from './lexemeAnalyzer';
 import { RenderController } from './renderers';
 import { hasTextParametersInUrl, loadText, parseTextIdFromUrl } from './utils';
 
@@ -38,7 +38,7 @@ async function boot() {
     }
   }
 
-  const lexemeAnalysis = new LexemeBuilder().buildLexemes(text);
+  const lexemeAnalysis = new LexemeAnalyzer().analyze(text);
   const renderController = new RenderController(
     lexemeAnalysis,
     title,

@@ -1,4 +1,4 @@
-import { Lexeme } from '../../lexemeBuilder';
+import { Lexeme } from '../../lexemeAnalyzer';
 import { PubSub } from '../../pubSub';
 import { ChildrenRenderer } from '../types';
 

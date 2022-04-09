@@ -1,5 +1,5 @@
-import { Lexeme, LexemeAnalysis } from '../../lexemeBuilder';
-import { LexemeNormalizer } from '../../lexemeBuilder/LexemeNormalizer';
+import { Lexeme, LexemeAnalysis } from '../../lexemeAnalyzer';
+import { LexemeNormalizer } from '../../lexemeAnalyzer/LexemeNormalizer';
 import { PubSub } from '../../pubSub';
 import { ChildrenRenderer } from '../types';
 import { WordRenderer } from './WordRenderer';
