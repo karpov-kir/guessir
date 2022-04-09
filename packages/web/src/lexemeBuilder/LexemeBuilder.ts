@@ -115,9 +115,10 @@ export class LexemeBuilder {
       type: LexemeNormalizer.getLexemeType(newBaseLexeme),
     };
 
-    // Split constructions like `I'm/We'll/they've` to different lexemes
+    // Uncontraction is applied after normalization. Therefor if `uncontracted` is not equal `normalized` then
+    // we need to split the new primitive uncontracted lexeme (e.g. `do not`) to separate lexemes (e.g. to `do` and `not).
     if (newLexeme.uncontracted !== newLexeme.normalized) {
-      this.splitToLexemes(newLexeme, startIndex, endIndex);
+      this.splitUncontractedLexeme(newLexeme, startIndex, endIndex);
       return;
     }
 
@@ -156,17 +157,22 @@ export class LexemeBuilder {
     }
   }
 
-  private splitToLexemes(lexeme: Lexeme, startIndex: number, endIndex: number) {
-    const newNormalizedPrimitiveLexemes = lexeme.uncontracted.split(' ') as NormalizedPrimitiveLexemeNominal[];
-    const restoreOriginalUncotructedLexeme = (newLexeme: Lexeme) => (newLexeme.uncontracted = lexeme.uncontracted);
+  // Split constructions like `I am/we will/they have` to separate lexemes
+  private splitUncontractedLexeme(lexemeToSplit: Lexeme, startIndex: number, endIndex: number) {
+    const newNormalizedPrimitiveLexemes = lexemeToSplit.uncontracted.split(' ') as NormalizedPrimitiveLexemeNominal[];
+    const restoreOriginalUncontructedLexeme = (newLexeme: Lexeme) =>
+      // As lexeme is split to separate ones (e.g. 'I am' to 'I' and 'am') we need to know the whole uncontracted
+      // lexeme in each new (lexeme). Otherwise, each new lexeme would have the same `normalized` and `uncontracted`
+      // fields. This overrides e.g. `am` in a new lexeme to `I am`.
+      (newLexeme.uncontracted = lexemeToSplit.uncontracted);
 
     newNormalizedPrimitiveLexemes.forEach((newNormalizedPrimitiveLexeme, index) => {
       this.processPrimitiveLexeme(
-        lexeme.original,
-        LexemeNormalizer.convertNormalizedPrimitiveLexeme(lexeme.original, newNormalizedPrimitiveLexeme),
+        lexemeToSplit.original,
+        LexemeNormalizer.convertNormalizedPrimitiveLexeme(lexemeToSplit.original, newNormalizedPrimitiveLexeme),
         startIndex,
         endIndex,
-        { onCreated: restoreOriginalUncotructedLexeme },
+        { onCreated: restoreOriginalUncontructedLexeme },
       );
 
       // Add spaces between uncontracted lexemes
@@ -176,7 +182,7 @@ export class LexemeBuilder {
           ' ' as NormalizedPrimitiveLexemeNominal,
           startIndex,
           endIndex,
-          { onCreated: restoreOriginalUncotructedLexeme },
+          { onCreated: restoreOriginalUncontructedLexeme },
         );
       }
     });

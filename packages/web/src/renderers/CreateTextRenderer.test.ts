@@ -122,7 +122,7 @@ describe(CreateTextRenderer, () => {
     expect(mockedCreateText).not.toBeCalled();
   });
 
-  it('should render inputs without validation classes by default', () => {
+  it('should initialize inputs without validation classes', () => {
     const { textInputElement, titleInputElement } = getElements(createTextRenderer.getElement());
 
     expect(!titleInputElement.classList.contains('invalid'));
@@ -164,7 +164,7 @@ describe(CreateTextRenderer, () => {
     });
   });
 
-  it('should copy link on click', async () => {
+  it('should copy a generated URL on click', async () => {
     const mockedWriteText = jest.fn();
     const { copyGeneratedUrlButtonElement } = getElements(createTextRenderer.getElement());
 
@@ -180,7 +180,7 @@ describe(CreateTextRenderer, () => {
     expect(mockedWriteText).toBeCalledWith('http://mocked-url');
   });
 
-  it('should hide copied alert text on timeout', async () => {
+  it('should hide the alert that a generated URL was copied on a timeout', async () => {
     const { copyGeneratedUrlButtonElement } = getElements(createTextRenderer.getElement());
 
     jest.useFakeTimers();
