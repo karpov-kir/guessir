@@ -1,4 +1,5 @@
-import { Lexeme, LexemeAnalysis, LexemeType } from '../../lexemeBuilder';
+import { Lexeme, LexemeAnalysis } from '../../lexemeBuilder';
+import { LexemeNormalizer } from '../../lexemeBuilder/LexemeNormalizer';
 import { PubSub } from '../../pubSub';
 import { ChildrenRenderer } from '../types';
 import { WordRenderer } from './WordRenderer';
@@ -92,7 +93,7 @@ export class TextRenderer implements ChildrenRenderer {
     }
 
     for (const [index, lexeme] of this.lexemesAnalysis.lexemes) {
-      if (lexeme.type === LexemeType.SpecialCharacter) {
+      if (LexemeNormalizer.isLexemeOtherCharacter(lexeme)) {
         this.containerElement.append(this.wrapSpecialCharacter(lexeme));
       } else {
         const wordRenderer = new WordRenderer(lexeme);

@@ -1,6 +1,7 @@
 import {
   BaseLexeme,
   GroupWordLikeNominal,
+  Lexeme,
   LexemeType,
   NormalizedPrimitiveLexemeNominal,
   PrimitiveLexemeNominal,
@@ -152,5 +153,9 @@ export class LexemeNormalizer {
     }
 
     return [groupWordLikeNominal];
+  }
+
+  public static isLexemeOtherCharacter(lexeme: Lexeme) {
+    return lexeme.type === LexemeType.SpecialCharacter || lexeme.type === LexemeType.WordHelping;
   }
 }

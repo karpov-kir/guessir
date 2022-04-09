@@ -9,7 +9,7 @@ describe(LexemeBuilder, () => {
       
       
       
-      DoN'T! he, she'd  i re—g .
+      DoN'T! he, she'd  i - re—g .
     `);
 
     expect(lexemes).toEqual({
@@ -37,8 +37,10 @@ describe(LexemeBuilder, () => {
         [17, { endIndex: 63, startIndex: 63, original: ' ', normalized: ' ', uncontracted: ' ', type: 'sc' }],
         [18, { endIndex: 65, startIndex: 65, original: 'i', normalized: 'I', uncontracted: 'I', type: 'l' }],
         [19, { endIndex: 66, startIndex: 66, original: ' ', normalized: ' ', uncontracted: ' ', type: 'sc' }],
-        [20, { endIndex: 70, startIndex: 67, original: 're—g', normalized: 're-g', uncontracted: 're-g', type: 'w' }],
-        [21, { endIndex: 72, startIndex: 72, original: '.', normalized: '.', uncontracted: '.', type: 'sc' }],
+        [20, { endIndex: 67, startIndex: 67, original: '-', normalized: '-', uncontracted: '-', type: 'wh' }],
+        [21, { endIndex: 68, startIndex: 68, original: ' ', normalized: ' ', uncontracted: ' ', type: 'sc' }],
+        [22, { endIndex: 72, startIndex: 69, original: 're—g', normalized: 're-g', uncontracted: 're-g', type: 'w' }],
+        [23, { endIndex: 74, startIndex: 74, original: '.', normalized: '.', uncontracted: '.', type: 'sc' }],
       ]),
       lexemesByWordLike: new Map([
         [
@@ -133,10 +135,10 @@ describe(LexemeBuilder, () => {
           're-g',
           new Map([
             [
-              20,
+              22,
               {
-                endIndex: 70,
-                startIndex: 67,
+                endIndex: 72,
+                startIndex: 69,
                 original: 're—g',
                 normalized: 're-g',
                 uncontracted: 're-g',
@@ -147,7 +149,7 @@ describe(LexemeBuilder, () => {
         ],
       ]),
       wordLikeCount: 8,
-      specialCharacterCount: 14,
+      otherCharacterCount: 16,
     });
   });
 });

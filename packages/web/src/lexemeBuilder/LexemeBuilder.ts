@@ -12,7 +12,7 @@ export class LexemeBuilder {
   private lexemes = new Map<number, Lexeme>();
   private lexemesByWordLike = new Map<GroupWordLikeNominal, Map<number, Lexeme>>();
   private wordLikeCount = 0;
-  private specialCharacterCount = 0;
+  private otherCharacterCount = 0;
   private lastLexemeIndex = -1;
 
   private static PUNCTUATION_CHARACTERS = [',', '.', '!', '?', ';'];
@@ -81,20 +81,20 @@ export class LexemeBuilder {
     const lexemes = this.lexemes;
     const lexemesByWordLike = this.lexemesByWordLike;
     const wordLikeCount = this.wordLikeCount;
-    const specialCharacterCount = this.specialCharacterCount;
+    const otherCharacterCount = this.otherCharacterCount;
 
     // Clean up
     this.lexemes = new Map<number, Lexeme>();
     this.lexemesByWordLike = new Map<GroupWordLikeNominal, Map<number, Lexeme>>();
     this.wordLikeCount = 0;
-    this.specialCharacterCount = 0;
+    this.otherCharacterCount = 0;
     this.lastLexemeIndex = -1;
 
     return {
       lexemes,
       lexemesByWordLike,
       wordLikeCount,
-      specialCharacterCount,
+      otherCharacterCount,
     };
   }
 
@@ -142,8 +142,8 @@ export class LexemeBuilder {
       const newLexemeIndex = ++this.lastLexemeIndex;
       this.lexemes.set(newLexemeIndex, newLexeme);
 
-      if (newLexeme.type === LexemeType.SpecialCharacter) {
-        this.specialCharacterCount++;
+      if (LexemeNormalizer.isLexemeOtherCharacter(newLexeme)) {
+        this.otherCharacterCount++;
       } else {
         this.wordLikeCount++;
 
@@ -234,8 +234,8 @@ export class LexemeBuilder {
     let lexeme = this.lexemes.get(this.lastLexemeIndex);
 
     while (lexeme && filter(lexeme)) {
-      if (lexeme.type === LexemeType.SpecialCharacter) {
-        this.specialCharacterCount--;
+      if (LexemeNormalizer.isLexemeOtherCharacter(lexeme)) {
+        this.otherCharacterCount--;
       } else {
         this.wordLikeCount--;
 
