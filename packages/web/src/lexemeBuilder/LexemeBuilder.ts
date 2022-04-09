@@ -26,6 +26,9 @@ export class LexemeBuilder {
   // - Replace trailing spaces followed by a punctuation with just punctuation
   // - Replace trailing spaces followed by a new line with just new line
   // - Allow the very first lexeme only if it's a word or a letter
+  // - Replace specific special characters with more appropriate ones (e.g. `—` with `-`), check `CHARACTERS_TO_NORMALIZED_CHARACTERS`
+  // - Replace some words (e.g. `i` -> `I`), check `NORMALIZED_WORDS_TO_NORMALIZED_WORDS`
+  // - Treat word separation characters as a part of a word (e.g. `re-generate`)
   public buildLexemes(rawText: string): LexemeAnalysis {
     const text = rawText.trim();
     let primitiveLexeme: PrimitiveLexemeNominal = '' as PrimitiveLexemeNominal;

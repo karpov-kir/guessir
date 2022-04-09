@@ -2,13 +2,14 @@ import { LexemeBuilder } from './LexemeBuilder';
 
 describe(LexemeBuilder, () => {
   it('should build lexemes', () => {
+    // This text covers all cases described in `buildLexeme`
     const lexemes = new LexemeBuilder().buildLexemes(`
     
       ^One;   two#       
       
       
       
-      DoN'T! he he'S, she'd   .
+      DoN'T! he, she'd  i re—g .
     `);
 
     expect(lexemes).toEqual({
@@ -27,15 +28,17 @@ describe(LexemeBuilder, () => {
         [11, { endIndex: 52, startIndex: 52, original: '!', normalized: '!', uncontracted: '!', type: 'sc' }],
         [12, { endIndex: 53, startIndex: 53, original: ' ', normalized: ' ', uncontracted: ' ', type: 'sc' }],
         [13, { endIndex: 55, startIndex: 54, original: 'he', normalized: 'he', uncontracted: 'he', type: 'w' }],
-        [14, { endIndex: 56, startIndex: 56, original: ' ', normalized: ' ', uncontracted: ' ', type: 'sc' }],
-        [15, { endIndex: 60, startIndex: 57, original: "he'S", normalized: "he's", uncontracted: "he's", type: 'w' }],
-        [16, { endIndex: 61, startIndex: 61, original: ',', normalized: ',', uncontracted: ',', type: 'sc' }],
-        [17, { endIndex: 62, startIndex: 62, original: ' ', normalized: ' ', uncontracted: ' ', type: 'sc' }],
+        [14, { endIndex: 56, startIndex: 56, original: ',', normalized: ',', uncontracted: ',', type: 'sc' }],
+        [15, { endIndex: 57, startIndex: 57, original: ' ', normalized: ' ', uncontracted: ' ', type: 'sc' }],
         [
-          18,
-          { endIndex: 67, startIndex: 63, original: "she'd", normalized: "she'd", uncontracted: "she'd", type: 'w' },
+          16,
+          { endIndex: 62, startIndex: 58, original: "she'd", normalized: "she'd", uncontracted: "she'd", type: 'w' },
         ],
-        [19, { endIndex: 71, startIndex: 71, original: '.', normalized: '.', uncontracted: '.', type: 'sc' }],
+        [17, { endIndex: 63, startIndex: 63, original: ' ', normalized: ' ', uncontracted: ' ', type: 'sc' }],
+        [18, { endIndex: 65, startIndex: 65, original: 'i', normalized: 'I', uncontracted: 'I', type: 'l' }],
+        [19, { endIndex: 66, startIndex: 66, original: ' ', normalized: ' ', uncontracted: ' ', type: 'sc' }],
+        [20, { endIndex: 70, startIndex: 67, original: 're—g', normalized: 're-g', uncontracted: 're-g', type: 'w' }],
+        [21, { endIndex: 72, startIndex: 72, original: '.', normalized: '.', uncontracted: '.', type: 'sc' }],
       ]),
       lexemesByWordLike: new Map([
         [
@@ -86,43 +89,16 @@ describe(LexemeBuilder, () => {
           'he',
           new Map([
             [13, { endIndex: 55, startIndex: 54, original: 'he', normalized: 'he', uncontracted: 'he', type: 'w' }],
-            [
-              15,
-              {
-                endIndex: 60,
-                startIndex: 57,
-                original: "he'S",
-                normalized: "he's",
-                uncontracted: "he's",
-                type: 'w',
-              },
-            ],
-          ]),
-        ],
-        [
-          "he's",
-          new Map([
-            [
-              15,
-              {
-                endIndex: 60,
-                startIndex: 57,
-                original: "he'S",
-                normalized: "he's",
-                uncontracted: "he's",
-                type: 'w',
-              },
-            ],
           ]),
         ],
         [
           'she',
           new Map([
             [
-              18,
+              16,
               {
-                endIndex: 67,
-                startIndex: 63,
+                endIndex: 62,
+                startIndex: 58,
                 original: "she'd",
                 normalized: "she'd",
                 uncontracted: "she'd",
@@ -135,10 +111,10 @@ describe(LexemeBuilder, () => {
           "she'd",
           new Map([
             [
-              18,
+              16,
               {
-                endIndex: 67,
-                startIndex: 63,
+                endIndex: 62,
+                startIndex: 58,
                 original: "she'd",
                 normalized: "she'd",
                 uncontracted: "she'd",
@@ -147,9 +123,31 @@ describe(LexemeBuilder, () => {
             ],
           ]),
         ],
+        [
+          'i',
+          new Map([
+            [18, { endIndex: 65, startIndex: 65, original: 'i', normalized: 'I', uncontracted: 'I', type: 'l' }],
+          ]),
+        ],
+        [
+          're-g',
+          new Map([
+            [
+              20,
+              {
+                endIndex: 70,
+                startIndex: 67,
+                original: 're—g',
+                normalized: 're-g',
+                uncontracted: 're-g',
+                type: 'w',
+              },
+            ],
+          ]),
+        ],
       ]),
-      wordLikeCount: 7,
-      specialCharacterCount: 13,
+      wordLikeCount: 8,
+      specialCharacterCount: 14,
     });
   });
 });
