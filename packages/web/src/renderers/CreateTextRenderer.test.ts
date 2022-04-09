@@ -18,6 +18,8 @@ let createTextRenderer: CreateTextRenderer;
 
 describe(CreateTextRenderer, () => {
   beforeEach(() => {
+    jest.clearAllMocks();
+
     createTextRenderer = new CreateTextRenderer({ maxTitleLength: 2, maxDescriptionLength: 2, maxTextLength: 2 });
   });
 
@@ -28,6 +30,8 @@ describe(CreateTextRenderer, () => {
       descriptionInputElement,
       allowShowingFirstLettersCheckboxElement,
       generateUrlButtonElement,
+      generatedUrlElement,
+      generatedUrlContainerElement,
     } = getElements(createTextRenderer.getElement());
     const deferred = new Deferred<TextInterface>();
 
@@ -37,6 +41,8 @@ describe(CreateTextRenderer, () => {
     titleInputElement.value = 'Test title';
     descriptionInputElement.value = 'Test description';
     allowShowingFirstLettersCheckboxElement.checked = false;
+
+    expect(generatedUrlContainerElement.classList).toContain('hide');
 
     generateUrlButtonElement.click();
     deferred.resolve(mockedText);
@@ -49,6 +55,66 @@ describe(CreateTextRenderer, () => {
       text: 'Text text',
       title: 'Test title',
     });
+    expect(generatedUrlElement.textContent).toBe('http://mocked-url');
+    expect(generatedUrlElement.href).toBe('http://mocked-url/');
+    expect(generatedUrlContainerElement.classList).not.toContain('hide');
+  });
+
+  it('should render an error if text creation fails', async () => {
+    const deferred = new Deferred<TextInterface>();
+    const { errorElement, generateUrlButtonElement, textInputElement, titleInputElement } = getElements(
+      createTextRenderer.getElement(),
+    );
+
+    mockedCreateText.mockReturnValue(deferred.promise);
+
+    // Set required fields
+    textInputElement.value = 'Text text';
+    titleInputElement.value = 'Test title';
+
+    expect(errorElement.classList).toContain('hide');
+
+    generateUrlButtonElement.click();
+    deferred.reject(new Error('Test error'));
+    await deferred.promise.catch(() => void 0);
+
+    expect(errorElement.textContent).toBe('Test error');
+    expect(errorElement.classList).not.toContain('hide');
+  });
+
+  it('should disable form while a request is executing', async () => {
+    const deferred = new Deferred<TextInterface>();
+    const { textInputElement, titleInputElement, generateUrlButtonElement } = getElements(
+      createTextRenderer.getElement(),
+    );
+    const containerElement = createTextRenderer.getElement();
+    const getDisabledElements = () => containerElement.querySelectorAll('input:disabled, textarea:disabled');
+
+    mockedCreateText.mockReturnValue(deferred.promise);
+
+    // Set required fields
+    textInputElement.value = 'Text text';
+    titleInputElement.value = 'Test title';
+
+    expect(getDisabledElements()).toHaveLength(0);
+
+    generateUrlButtonElement.click();
+
+    expect(getDisabledElements()).toHaveLength(5);
+
+    deferred.resolve(mockedText);
+    // Wait for `finally` as the form is unblocked in the finally block
+    await deferred.promise.finally(() => void 0);
+
+    expect(getDisabledElements()).toHaveLength(0);
+  });
+
+  it('should not submit an invalid form', () => {
+    const { generateUrlButtonElement } = getElements(createTextRenderer.getElement());
+
+    generateUrlButtonElement.click();
+
+    expect(mockedCreateText).not.toBeCalled();
   });
 
   it('should render inputs without validation classes by default', () => {
