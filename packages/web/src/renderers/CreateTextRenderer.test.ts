@@ -16,37 +16,42 @@ jest.mock('../utils', () => ({
 
 let createTextRenderer: CreateTextRenderer;
 
+const createText = async () => {
+  const {
+    textInputElement,
+    titleInputElement,
+    descriptionInputElement,
+    allowShowingFirstLettersCheckboxElement,
+    generateUrlButtonElement,
+  } = getElements(createTextRenderer.getElement());
+  const deferred = new Deferred<TextInterface>();
+
+  mockedCreateText.mockReturnValue(deferred.promise);
+
+  textInputElement.value = 'Text text';
+  titleInputElement.value = 'Test title';
+  descriptionInputElement.value = 'Test description';
+  allowShowingFirstLettersCheckboxElement.checked = false;
+
+  generateUrlButtonElement.click();
+  deferred.resolve(mockedText);
+  await deferred.promise;
+};
+
 describe(CreateTextRenderer, () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useRealTimers();
 
     createTextRenderer = new CreateTextRenderer({ maxTitleLength: 2, maxDescriptionLength: 2, maxTextLength: 2 });
   });
 
   it('should create a text when the form is submitted', async () => {
-    const {
-      textInputElement,
-      titleInputElement,
-      descriptionInputElement,
-      allowShowingFirstLettersCheckboxElement,
-      generateUrlButtonElement,
-      generatedUrlElement,
-      generatedUrlContainerElement,
-    } = getElements(createTextRenderer.getElement());
-    const deferred = new Deferred<TextInterface>();
-
-    mockedCreateText.mockReturnValue(deferred.promise);
-
-    textInputElement.value = 'Text text';
-    titleInputElement.value = 'Test title';
-    descriptionInputElement.value = 'Test description';
-    allowShowingFirstLettersCheckboxElement.checked = false;
+    const { generatedUrlElement, generatedUrlContainerElement } = getElements(createTextRenderer.getElement());
 
     expect(generatedUrlContainerElement.classList).toContain('hide');
 
-    generateUrlButtonElement.click();
-    deferred.resolve(mockedText);
-    await deferred.promise;
+    await createText();
 
     expect(mockedCreateText).toBeCalledWith({
       allowShowingFirstLetters: false,
@@ -157,5 +162,36 @@ describe(CreateTextRenderer, () => {
 
       expect(element.parentElement?.querySelector('.limit-text')?.textContent).toBe('2/2');
     });
+  });
+
+  it('should copy link on click', async () => {
+    const mockedWriteText = jest.fn();
+    const { copyGeneratedUrlButtonElement } = getElements(createTextRenderer.getElement());
+
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: mockedWriteText,
+      },
+    });
+
+    await createText();
+    copyGeneratedUrlButtonElement.click();
+
+    expect(mockedWriteText).toBeCalledWith('http://mocked-url');
+  });
+
+  it('should hide copied alert text on timeout', async () => {
+    const { copyGeneratedUrlButtonElement } = getElements(createTextRenderer.getElement());
+
+    jest.useFakeTimers();
+
+    await createText();
+    copyGeneratedUrlButtonElement.click();
+
+    expect(copyGeneratedUrlButtonElement.querySelector('div')?.textContent).toBe('(copied)');
+
+    jest.runAllTimers();
+
+    expect(copyGeneratedUrlButtonElement.querySelector('div')).toBe(null);
   });
 });
