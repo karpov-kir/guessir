@@ -24,7 +24,7 @@ export class WordRenderer implements ChildrenRenderer {
 
   public show() {
     this.isShown = true;
-    this.containerElement?.classList.add('show');
+    this.containerElement.classList.add('show');
   }
 
   private initElement() {
@@ -37,7 +37,7 @@ export class WordRenderer implements ChildrenRenderer {
   }
 
   private attachClickHandler() {
-    this.containerElement?.addEventListener('click', () => {
+    this.containerElement.addEventListener('click', () => {
       if (this.isShown) {
         return;
       }
