@@ -358,11 +358,11 @@ input[type="checkbox"]:checked:disabled:before {
   margin-bottom: 30px;
 }
 
-#text-container h1 {
+#text-container #title {
   margin-bottom: 6px;
 }
 
-#text-container p {
+#text-container #description {
   margin-bottom: 30px;
 }
 

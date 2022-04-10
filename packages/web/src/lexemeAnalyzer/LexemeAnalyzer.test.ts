@@ -1,9 +1,10 @@
-import { LexemeBuilder } from './LexemeBuilder';
+import { LexemeAnalyzer } from './LexemeAnalyzer';
 
-describe(LexemeBuilder, () => {
+describe(LexemeAnalyzer, () => {
   it('should build lexemes', () => {
     // This text covers all cases described in `buildLexeme`
-    const lexemes = new LexemeBuilder().buildLexemes(`
+    // TODO maybe split to individual cases
+    const lexemeAnalysis = new LexemeAnalyzer().analyze(`
     
       ^One;   two#       
       
@@ -12,7 +13,7 @@ describe(LexemeBuilder, () => {
       DoN'T! he, she'd  i - re—g .
     `);
 
-    expect(lexemes).toEqual({
+    expect(lexemeAnalysis).toEqual({
       lexemes: new Map([
         [0, { endIndex: 3, startIndex: 1, original: 'One', normalized: 'One', uncontracted: 'One', type: 'w' }],
         [1, { endIndex: 4, startIndex: 4, original: ';', normalized: ';', uncontracted: ';', type: 'sc' }],

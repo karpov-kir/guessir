@@ -8,7 +8,7 @@ const defaultTitle = 'Hello!';
 
 const defaultDescription = `I am a simple tool to turn any English text into a word guessing game.`;
 
-const defaultText = `In order to create your own text check the instructions below.`;
+const defaultText = `In order to create your own text find the form below.`;
 
 const couldNotLoadRemoteTextText = `
   I could not load the remote text. Please, verify your URL or create a new text.
