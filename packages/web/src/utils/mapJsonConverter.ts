@@ -28,5 +28,5 @@ export function mapFromJsonReviver(key: string, value: unknown) {
 }
 
 function isConvertedMap(value: any): value is ConvertedMap {
-  return value?.convertedMap === 'Map';
+  return value?.dataType === 'Map';
 }
