@@ -4,6 +4,12 @@ import { PubSub } from '../../pubSub';
 import { ChildrenRenderer } from '../types';
 import { WordRenderer } from './WordRenderer';
 
+type TextRendererOptions = {
+  lexemesAnalysis: LexemeAnalysis;
+  title?: string;
+  description?: string;
+};
+
 export class TextRenderer implements ChildrenRenderer {
   private containerElement: HTMLElement;
   private lexemesAnalysis: LexemeAnalysis;
@@ -18,7 +24,9 @@ export class TextRenderer implements ChildrenRenderer {
 
   public userWordShowEvent = this.userWordShowPubSub.event;
 
-  constructor(lexemesAnalysis: LexemeAnalysis, title?: string, description?: string) {
+  constructor(options: TextRendererOptions) {
+    const { lexemesAnalysis, title, description } = options;
+
     this.lexemesAnalysis = lexemesAnalysis;
     this.title = title;
     this.description = description;
@@ -104,7 +112,7 @@ export class TextRenderer implements ChildrenRenderer {
       if (LexemeNormalizer.isLexemeOtherCharacter(lexeme)) {
         lexemesElement.append(this.wrapSpecialCharacter(lexeme));
       } else {
-        const wordRenderer = new WordRenderer(lexeme);
+        const wordRenderer = new WordRenderer({ lexeme });
 
         wordRenderer.userWordShowEvent.subscribe((shownLexeme) => this.handleUserWordShow(shownLexeme));
         this.wordRenderers.set(index, wordRenderer);

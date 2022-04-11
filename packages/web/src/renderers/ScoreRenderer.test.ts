@@ -5,7 +5,9 @@ let scoreRenderer: ScoreRenderer;
 
 describe(ScoreRenderer, () => {
   beforeEach(() => {
-    scoreRenderer = new ScoreRenderer(10);
+    scoreRenderer = new ScoreRenderer({
+      wordLikeCount: 10,
+    });
   });
 
   it('should set the total score', () => {

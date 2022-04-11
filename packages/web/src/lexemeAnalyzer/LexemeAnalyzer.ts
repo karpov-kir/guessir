@@ -17,18 +17,18 @@ export class LexemeAnalyzer {
 
   private static PUNCTUATION_CHARACTERS = [',', '.', '!', '?', ';'];
 
-  // Should apply the following rules:
+  // Applies the following rules:
   // - No more than 2 new line characters in a row
   // - No more than 1 space
-  // - Keep only the first letter upper case if this letter is upper case in the original word
-  // - Split contractions (constructions like `I'm/We'll/they've`) to individual lexemes
-  //   - Add an additional group for words that cannot be uncotracted (read more in `getGroupingWords`)
-  // - Replace trailing spaces followed by a punctuation with just punctuation
-  // - Replace trailing spaces followed by a new line with just new line
-  // - Allow the very first lexeme only if it's a word or a letter
-  // - Replace specific special characters with more appropriate ones (e.g. `—` with `-`), check `CHARACTERS_TO_NORMALIZED_CHARACTERS`
-  // - Replace some words (e.g. `i` -> `I`), check `NORMALIZED_WORDS_TO_NORMALIZED_WORDS`
-  // - Treat word separation characters as a part of a word (e.g. `re-generate`)
+  // - Keeps only the first letter upper case if this letter is upper case in the original word
+  // - Splits contractions (constructions like `I'm/We'll/they've`) to individual lexemes
+  //   - Adds an additional group for words that cannot be uncotracted (read more in `getGroupingWords`)
+  // - Replaces trailing spaces followed by a punctuation with just punctuation
+  // - Replaces trailing spaces followed by a new line with just new line
+  // - Allows the very first lexeme only if it's a word or a letter
+  // - Replaces specific special characters with more appropriate ones (e.g. `—` with `-`), check `CHARACTERS_TO_NORMALIZED_CHARACTERS`
+  // - Replaces some words (e.g. `i` -> `I`), check `NORMALIZED_WORDS_TO_NORMALIZED_WORDS`
+  // - Treats word separation characters as a part of a word (e.g. `re-generate`)
   public analyze(rawText: string): LexemeAnalysis {
     const text = rawText.trim();
     let primitiveLexeme: PrimitiveLexemeNominal = '' as PrimitiveLexemeNominal;
@@ -44,6 +44,7 @@ export class LexemeAnalyzer {
         startIndex = i;
       }
 
+      // Processes words letter by letter
       if (LexemeNormalizer.isWordCharacter(normalizedCharacter)) {
         const nextNormalizedCharacter =
           // Can be undefined if this is beyond the text
@@ -64,7 +65,9 @@ export class LexemeAnalyzer {
             normalizedPrimitiveLexeme,
           );
         }
-      } else {
+      }
+      // Processes everything else
+      else {
         primitiveLexeme = character as PrimitiveLexemeNominal;
         normalizedPrimitiveLexeme = normalizedCharacter;
         shouldProcessPrimitiveLexeme = true;

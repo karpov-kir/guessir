@@ -38,14 +38,14 @@ async function boot() {
     }
   }
 
-  const lexemeAnalysis = new LexemeAnalyzer().analyze(text);
-  const renderController = new RenderController(
-    lexemeAnalysis,
+  const lexemesAnalysis = new LexemeAnalyzer().analyze(text);
+  const renderController = new RenderController({
+    lexemesAnalysis,
     title,
     description,
     allowShowingText,
     allowShowingFirstLetters,
-  );
+  });
 
   renderController.init(document.body);
 }

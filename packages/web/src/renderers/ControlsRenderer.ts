@@ -6,6 +6,11 @@ export type GuessEvent = {
   word: string;
 };
 
+type ControlsRendererOptions = {
+  allowShowingText?: boolean;
+  allowShowingFirstLetters?: boolean;
+};
+
 export class ControlsRenderer implements ChildrenRenderer {
   private containerElement: HTMLElement;
   private guessPubSub = new PubSub<GuessEvent>();
@@ -18,7 +23,9 @@ export class ControlsRenderer implements ChildrenRenderer {
   public readonly showFirstLettersEvent = this.showFirstLettersPubSub.event;
   public readonly showTextEvent = this.showTextPubSub.event;
 
-  constructor(allowShowingText: boolean, allowShowingFirstLetters: boolean) {
+  constructor(options: ControlsRendererOptions = {}) {
+    const { allowShowingFirstLetters, allowShowingText } = options;
+
     this.containerElement = document.createElement('div');
     this.containerElement.id = 'controls-container';
     this.initElement(allowShowingText, allowShowingFirstLetters);
@@ -36,7 +43,7 @@ export class ControlsRenderer implements ChildrenRenderer {
     guessInputElement.focus();
   }
 
-  private initElement(allowShowingText: boolean, allowShowingFirstLetters: boolean) {
+  private initElement(allowShowingText?: boolean, allowShowingFirstLetters?: boolean) {
     this.containerElement.innerHTML = `
       <input id="guess-input" type="text" />
       <button id="guess-button" type="button">Guess</button>

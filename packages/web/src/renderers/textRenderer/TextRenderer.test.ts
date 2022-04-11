@@ -1,7 +1,7 @@
 import { LexemeAnalyzer } from '../../lexemeAnalyzer';
 import { getElements, TextRenderer } from './TextRenderer';
 
-const lexemeAnalysis = new LexemeAnalyzer().analyze(`
+const lexemesAnalysis = new LexemeAnalyzer().analyze(`
   One
   
   one, @ she's we'd!
@@ -14,7 +14,11 @@ const getShownLexemeElements = () =>
 
 describe(TextRenderer, () => {
   beforeEach(() => {
-    textRenderer = new TextRenderer(lexemeAnalysis, 'Test title', 'Test description');
+    textRenderer = new TextRenderer({
+      lexemesAnalysis,
+      title: 'Test title',
+      description: 'Test description',
+    });
   });
 
   it('should render text', () => {
@@ -32,7 +36,11 @@ describe(TextRenderer, () => {
   });
 
   it('should not render the title and description if they are empty', () => {
-    const { titleElement, descriptionElement } = getElements(new TextRenderer(lexemeAnalysis).getElement());
+    const { titleElement, descriptionElement } = getElements(
+      new TextRenderer({
+        lexemesAnalysis,
+      }).getElement(),
+    );
 
     expect(titleElement.classList).toContain('hide');
     expect(descriptionElement.classList).toContain('hide');

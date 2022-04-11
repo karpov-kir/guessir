@@ -2,6 +2,10 @@ import { Lexeme } from '../../lexemeAnalyzer';
 import { PubSub } from '../../pubSub';
 import { ChildrenRenderer } from '../types';
 
+type WordRendererOptions = {
+  lexeme: Lexeme;
+};
+
 export class WordRenderer implements ChildrenRenderer {
   private lexeme: Lexeme;
   private containerElement: HTMLElement;
@@ -10,7 +14,9 @@ export class WordRenderer implements ChildrenRenderer {
   public isShown = false;
   public readonly userWordShowEvent = this.userWordShowPubSub.event;
 
-  constructor(lexeme: Lexeme) {
+  constructor(options: WordRendererOptions) {
+    const { lexeme } = options;
+
     this.lexeme = lexeme;
     this.containerElement = document.createElement('button');
     this.containerElement.classList.add('lexeme-container');

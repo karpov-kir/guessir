@@ -11,7 +11,9 @@ const getLexemeFirstLetterElement = () =>
 
 describe(WordRenderer, () => {
   beforeEach(() => {
-    wordRenderer = new WordRenderer(mockedLexeme);
+    wordRenderer = new WordRenderer({
+      lexeme: mockedLexeme,
+    });
   });
 
   it('should render the word', () => {

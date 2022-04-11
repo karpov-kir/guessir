@@ -7,7 +7,10 @@ describe(ControlsRenderer, () => {
   });
 
   it('should be initialized with default values', () => {
-    const controlsRenderer = new ControlsRenderer(true, true);
+    const controlsRenderer = new ControlsRenderer({
+      allowShowingFirstLetters: true,
+      allowShowingText: true,
+    });
     const showTextCheckboxElement = controlsRenderer
       .getElement()
       .querySelector('#show-text-checkbox') as HTMLInputElement;
@@ -20,15 +23,21 @@ describe(ControlsRenderer, () => {
   });
 
   it('should be initialized with disabled showing first letters checkbox', () => {
-    const controlsRenderer = new ControlsRenderer(true, false);
+    const controlsRenderer = new ControlsRenderer({
+      allowShowingFirstLetters: false,
+      allowShowingText: true,
+    });
     const hiddenElements = controlsRenderer.getElement().querySelectorAll('.hide');
 
     expect(hiddenElements).toHaveLength(1);
     expect(hiddenElements?.[0].querySelector('#show-first-letters-checkbox')).toEqual(expect.any(HTMLElement));
   });
 
-  it('should be initialized with disabled showing first letters checkbox', () => {
-    const controlsRenderer = new ControlsRenderer(false, true);
+  it('should be initialized with disabled showing text checkbox', () => {
+    const controlsRenderer = new ControlsRenderer({
+      allowShowingFirstLetters: true,
+      allowShowingText: false,
+    });
     const hiddenElements = controlsRenderer.getElement().querySelectorAll('.hide');
 
     expect(hiddenElements).toHaveLength(1);
@@ -36,7 +45,10 @@ describe(ControlsRenderer, () => {
   });
 
   it('should publish a guess event with a sanitized word', () => {
-    const controlsRenderer = new ControlsRenderer(true, true);
+    const controlsRenderer = new ControlsRenderer({
+      allowShowingFirstLetters: true,
+      allowShowingText: true,
+    });
     const guessButtonElement = controlsRenderer.getElement().querySelector('#guess-button') as HTMLButtonElement;
     const guessInputElement = controlsRenderer.getElement().querySelector('#guess-input') as HTMLInputElement;
 
@@ -65,7 +77,10 @@ describe(ControlsRenderer, () => {
   });
 
   it('should not publish a guess event if the word is empty', () => {
-    const controlsRenderer = new ControlsRenderer(true, true);
+    const controlsRenderer = new ControlsRenderer({
+      allowShowingFirstLetters: true,
+      allowShowingText: true,
+    });
     const guessButtonElement = controlsRenderer.getElement().querySelector('#guess-button') as HTMLButtonElement;
     const guessInputElement = controlsRenderer.getElement().querySelector('#guess-input') as HTMLInputElement;
 
@@ -79,7 +94,10 @@ describe(ControlsRenderer, () => {
   });
 
   it('should show first letters on a click', () => {
-    const controlsRenderer = new ControlsRenderer(true, true);
+    const controlsRenderer = new ControlsRenderer({
+      allowShowingFirstLetters: true,
+      allowShowingText: true,
+    });
     const showFirstLettersCheckboxElement = controlsRenderer
       .getElement()
       .querySelector('#show-first-letters-checkbox') as HTMLInputElement;
@@ -91,7 +109,10 @@ describe(ControlsRenderer, () => {
     { name: 'first letters', selector: '#show-first-letters-checkbox' },
     { name: 'text', selector: '#show-text-checkbox' },
   ])('should toggle $name', ({ selector }) => {
-    const controlsRenderer = new ControlsRenderer(true, true);
+    const controlsRenderer = new ControlsRenderer({
+      allowShowingFirstLetters: true,
+      allowShowingText: true,
+    });
     const checkboxElement = controlsRenderer.getElement().querySelector(selector) as HTMLInputElement;
 
     jest.spyOn(PubSub.prototype, 'publish');
@@ -129,7 +150,10 @@ describe(ControlsRenderer, () => {
       selectorB: '#show-first-letters-checkbox',
     },
   ])('should disable $nameB when $nameA is enabled', ({ selectorA, selectorB }) => {
-    const controlsRenderer = new ControlsRenderer(true, true);
+    const controlsRenderer = new ControlsRenderer({
+      allowShowingFirstLetters: true,
+      allowShowingText: true,
+    });
     const checkboxA = controlsRenderer.getElement().querySelector(selectorA) as HTMLInputElement;
     const checkboxB = controlsRenderer.getElement().querySelector(selectorB) as HTMLInputElement;
 

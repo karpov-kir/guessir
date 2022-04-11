@@ -1,11 +1,17 @@
 import { ChildrenRenderer } from './types';
 
+type ScoreRendererOptions = {
+  wordLikeCount: number;
+};
+
 export class ScoreRenderer implements ChildrenRenderer {
   private wordLikeCount = 0;
   private score = 0;
   private containerElement: HTMLElement;
 
-  constructor(wordLikeCount: number) {
+  constructor(options: ScoreRendererOptions) {
+    const { wordLikeCount } = options;
+
     this.wordLikeCount = wordLikeCount;
     this.containerElement = document.createElement('div');
     this.containerElement.id = 'score-container';
