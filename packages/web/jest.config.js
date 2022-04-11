@@ -18,5 +18,6 @@ module.exports = {
   testEnvironment: 'jsdom',
   moduleNameMapper: {
     '\\.svg$': '<rootDir>/src/testUtils/fileMock.ts',
+    '\\.css$': '<rootDir>/src/testUtils/fileMock.ts',
   },
 };
