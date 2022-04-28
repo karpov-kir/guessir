@@ -2,10 +2,9 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./build/",
-    "lib": ["es2015", "es2017", "dom"],
+    "module": "commonjs",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "declaration": true,
-    "types": ["./src/typings", "jest"]
+    "types": ["./src/@types/", "jest"]
   }
 }

@@ -1,3 +1,4 @@
-export * from './apiText';
+export * from './Deferred';
 export * from './dom';
-export * from './remoteText';
+export * from './mapJsonConverter';
+export * from './text';

@@ -1,13 +1,20 @@
-import { Lexeme, LexemeAnalysis, LexemeType } from '../../lexemeBuilder';
+import { Lexeme, LexemeAnalysis } from '../../lexemeAnalyzer';
+import { LexemeNormalizer } from '../../lexemeAnalyzer/LexemeNormalizer';
 import { PubSub } from '../../pubSub';
 import { ChildrenRenderer } from '../types';
 import { WordRenderer } from './WordRenderer';
 
+type TextRendererOptions = {
+  lexemesAnalysis: LexemeAnalysis;
+  title?: string;
+  description?: string;
+};
+
 export class TextRenderer implements ChildrenRenderer {
   private containerElement: HTMLElement;
   private lexemesAnalysis: LexemeAnalysis;
-  private title = '';
-  private description?;
+  private title?: string;
+  private description?: string;
   private userWordShowPubSub = new PubSub<Lexeme>();
   private wordRenderers = new Map<
     // Lexeme index
@@ -17,7 +24,9 @@ export class TextRenderer implements ChildrenRenderer {
 
   public userWordShowEvent = this.userWordShowPubSub.event;
 
-  constructor(lexemesAnalysis: LexemeAnalysis, title: string, description?: string) {
+  constructor(options: TextRendererOptions) {
+    const { lexemesAnalysis, title, description } = options;
+
     this.lexemesAnalysis = lexemesAnalysis;
     this.title = title;
     this.description = description;
@@ -79,27 +88,35 @@ export class TextRenderer implements ChildrenRenderer {
   }
 
   private initElement() {
+    this.containerElement.innerHTML = `
+      <h1 id="title" class="hide"></h1>
+      <p id="description" class="hide"></p>
+      <div id="lexemes"></div>
+    `;
+
+    const { titleElement, descriptionElement, lexemesElement } = getElements(this.containerElement);
+
     if (this.title) {
-      const titleElement = document.createElement('h1');
-      titleElement.innerText = this.title;
-      this.containerElement.appendChild(titleElement);
+      titleElement.classList.remove('hide');
+      // XSS safe
+      titleElement.textContent = this.title;
     }
 
     if (this.description) {
-      const descriptionElement = document.createElement('p');
-      descriptionElement.innerText = this.description;
-      this.containerElement.appendChild(descriptionElement);
+      descriptionElement.classList.remove('hide');
+      // XSS safe
+      descriptionElement.textContent = this.description;
     }
 
     for (const [index, lexeme] of this.lexemesAnalysis.lexemes) {
-      if (lexeme.type === LexemeType.SpecialCharacter) {
-        this.containerElement.append(this.wrapSpecialCharacter(lexeme));
+      if (LexemeNormalizer.isLexemeOtherCharacter(lexeme)) {
+        lexemesElement.append(this.wrapSpecialCharacter(lexeme));
       } else {
-        const wordRenderer = new WordRenderer(lexeme);
+        const wordRenderer = new WordRenderer({ lexeme });
 
-        wordRenderer.userWordShowEvent.subscribe((lexeme) => this.handleUserWordShow(lexeme));
+        wordRenderer.userWordShowEvent.subscribe((shownLexeme) => this.handleUserWordShow(shownLexeme));
         this.wordRenderers.set(index, wordRenderer);
-        this.containerElement.appendChild(wordRenderer.getElement());
+        lexemesElement.appendChild(wordRenderer.getElement());
       }
     }
   }
@@ -115,4 +132,12 @@ export class TextRenderer implements ChildrenRenderer {
   private handleUserWordShow(lexeme: Lexeme) {
     this.userWordShowPubSub.publish(lexeme);
   }
+}
+
+export function getElements(containerElement: HTMLElement) {
+  const titleElement = containerElement.querySelector('#title') as HTMLElement;
+  const descriptionElement = containerElement.querySelector('#description') as HTMLElement;
+  const lexemesElement = containerElement.querySelector('#lexemes') as HTMLElement;
+
+  return { titleElement, descriptionElement, lexemesElement };
 }

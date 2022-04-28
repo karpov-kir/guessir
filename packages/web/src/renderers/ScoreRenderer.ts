@@ -1,11 +1,17 @@
 import { ChildrenRenderer } from './types';
 
+type ScoreRendererOptions = {
+  wordLikeCount: number;
+};
+
 export class ScoreRenderer implements ChildrenRenderer {
   private wordLikeCount = 0;
   private score = 0;
   private containerElement: HTMLElement;
 
-  constructor(wordLikeCount: number) {
+  constructor(options: ScoreRendererOptions) {
+    const { wordLikeCount } = options;
+
     this.wordLikeCount = wordLikeCount;
     this.containerElement = document.createElement('div');
     this.containerElement.id = 'score-container';
@@ -20,9 +26,9 @@ export class ScoreRenderer implements ChildrenRenderer {
   public addScore(value: number) {
     this.score += value;
 
-    const currentScoreElement = this.containerElement.querySelector('#current-score') as HTMLElement;
+    const { currentScoreElement } = this.getElements();
 
-    currentScoreElement.innerText = this.score.toString();
+    currentScoreElement.textContent = this.score.toString();
   }
 
   private initElement() {
@@ -32,5 +38,11 @@ export class ScoreRenderer implements ChildrenRenderer {
       /
       <div id="total-score">${this.wordLikeCount}</div>
     `;
+  }
+
+  private getElements() {
+    const currentScoreElement = this.containerElement.querySelector('#current-score') as HTMLElement;
+
+    return { currentScoreElement };
   }
 }

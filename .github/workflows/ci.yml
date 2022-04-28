@@ -54,6 +54,10 @@ jobs:
         with:
           args: >
             -D sonar.branch.name=${{ github.ref_name }}
+            -D sonar.pullrequest.key=${{ github.event.number }}
+            -D sonar.pullrequest.branch=${{ github.head_ref }}
+            -D sonar.pullrequest.base=${{ github.base_ref }}
+            -D sonar.pullrequest.github.repository=${{ github.repository }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}

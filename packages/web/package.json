@@ -2,20 +2,22 @@
   "name": "@guessir/web",
   "scripts": {
     "build": "webpack-cli build",
-    "clean": "rimraf ./build",
-    "start": "webpack-cli serve"
+    "clean": "rimraf ./build/",
+    "start:ts": "webpack-cli serve"
   },
   "dependencies": {
     "url-join": "^5.0.0"
   },
   "devDependencies": {
+    "@guessir/shared": "^1.0.0",
+    "@types/node": "^17.0.23",
     "css-loader": "^6.7.1",
     "dotenv-webpack": "^7.1.0",
     "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.6.0",
     "ts-loader": "^9.2.8",
-    "webpack": "^5.70.0",
+    "webpack": "^5.72.0",
     "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.7.4"
+    "webpack-dev-server": "^4.8.1"
   }
 }

@@ -8,23 +8,35 @@ import {
   PrimitiveLexemeNominal,
 } from './types';
 
-export class LexemeBuilder {
+export class LexemeAnalyzer {
   private lexemes = new Map<number, Lexeme>();
   private lexemesByWordLike = new Map<GroupWordLikeNominal, Map<number, Lexeme>>();
   private wordLikeCount = 0;
-  private specialCharacterCount = 0;
+  private otherCharacterCount = 0;
   private lastLexemeIndex = -1;
 
   private static PUNCTUATION_CHARACTERS = [',', '.', '!', '?', ';'];
 
-  public buildLexemes(rawText: string): LexemeAnalysis {
+  // Applies the following rules:
+  // - No more than 2 new line characters in a row
+  // - No more than 1 space
+  // - Keeps only the first letter upper case if this letter is upper case in the original word
+  // - Splits contractions (constructions like `I'm/We'll/they've`) to individual lexemes
+  //   - Adds an additional group for words that cannot be uncotracted (read more in `getGroupingWords`)
+  // - Replaces trailing spaces followed by a punctuation with just punctuation
+  // - Replaces trailing spaces followed by a new line with just new line
+  // - Allows the very first lexeme only if it's a word or a letter
+  // - Replaces specific special characters with more appropriate ones (e.g. `—` with `-`), check `CHARACTERS_TO_NORMALIZED_CHARACTERS`
+  // - Replaces some words (e.g. `i` -> `I`), check `NORMALIZED_WORDS_TO_NORMALIZED_WORDS`
+  // - Treats word separation characters as a part of a word (e.g. `re-generate`)
+  public analyze(rawText: string): LexemeAnalysis {
     const text = rawText.trim();
     let primitiveLexeme: PrimitiveLexemeNominal = '' as PrimitiveLexemeNominal;
     let normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal = '' as NormalizedPrimitiveLexemeNominal;
     let startIndex: number | undefined = undefined;
-    let shouldProcessPrimitiveLexeme = false;
 
     for (let i = 0, l = text.length; i < l; i++) {
+      let shouldProcessPrimitiveLexeme = false;
       const character = text[i];
       const normalizedCharacter = LexemeNormalizer.normalizeCharacter(character);
 
@@ -32,6 +44,7 @@ export class LexemeBuilder {
         startIndex = i;
       }
 
+      // Processes words letter by letter
       if (LexemeNormalizer.isWordCharacter(normalizedCharacter)) {
         const nextNormalizedCharacter =
           // Can be undefined if this is beyond the text
@@ -47,9 +60,14 @@ export class LexemeBuilder {
         shouldProcessPrimitiveLexeme = isWordBoundary;
 
         if (isWordBoundary) {
-          normalizedPrimitiveLexeme = LexemeNormalizer.normalizeWord(primitiveLexeme, normalizedPrimitiveLexeme);
+          normalizedPrimitiveLexeme = LexemeNormalizer.convertNormalizedPrimitiveLexeme(
+            primitiveLexeme,
+            normalizedPrimitiveLexeme,
+          );
         }
-      } else {
+      }
+      // Processes everything else
+      else {
         primitiveLexeme = character as PrimitiveLexemeNominal;
         normalizedPrimitiveLexeme = normalizedCharacter;
         shouldProcessPrimitiveLexeme = true;
@@ -60,27 +78,26 @@ export class LexemeBuilder {
         startIndex = undefined;
         primitiveLexeme = '' as PrimitiveLexemeNominal;
         normalizedPrimitiveLexeme = '' as NormalizedPrimitiveLexemeNominal;
-        shouldProcessPrimitiveLexeme = false;
       }
     }
 
     const lexemes = this.lexemes;
     const lexemesByWordLike = this.lexemesByWordLike;
     const wordLikeCount = this.wordLikeCount;
-    const specialCharacterCount = this.specialCharacterCount;
+    const otherCharacterCount = this.otherCharacterCount;
 
     // Clean up
     this.lexemes = new Map<number, Lexeme>();
     this.lexemesByWordLike = new Map<GroupWordLikeNominal, Map<number, Lexeme>>();
     this.wordLikeCount = 0;
-    this.specialCharacterCount = 0;
+    this.otherCharacterCount = 0;
     this.lastLexemeIndex = -1;
 
     return {
       lexemes,
       lexemesByWordLike,
       wordLikeCount,
-      specialCharacterCount,
+      otherCharacterCount,
     };
   }
 
@@ -89,7 +106,9 @@ export class LexemeBuilder {
     normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal,
     startIndex: number,
     endIndex: number,
+    options: { onCreated?: (lexeme: Lexeme) => void } = {},
   ) {
+    const { onCreated } = options;
     const newBaseLexeme = {
       endIndex,
       startIndex: startIndex,
@@ -102,20 +121,21 @@ export class LexemeBuilder {
       type: LexemeNormalizer.getLexemeType(newBaseLexeme),
     };
 
-    // Split constructions like `I'm/We'll/they've` to different lexemes
+    // Uncontraction is applied after normalization. Therefor if `uncontracted` is not equal `normalized` then
+    // we need to split the new primitive uncontracted lexeme (e.g. `do not`) to separate lexemes (e.g. to `do` and `not).
     if (newLexeme.uncontracted !== newLexeme.normalized) {
-      this.splitToLexemes(newLexeme, startIndex, endIndex);
+      this.splitUncontractedLexeme(newLexeme, startIndex, endIndex);
       return;
     }
 
     const isLastSpace = this.isLastLexemesMatch(1, (lexeme) => lexeme.normalized === ' ');
-    const isCurrentPunctuation = LexemeBuilder.PUNCTUATION_CHARACTERS.includes(newLexeme.normalized);
+    const isCurrentPunctuation = LexemeAnalyzer.PUNCTUATION_CHARACTERS.includes(newLexeme.normalized);
     const isCurrentNewLine = newLexeme.normalized === '\n';
 
     if (
-      // Replace trailing space followed by a punctuation with this punctuation
+      // Replace trailing spaces followed by a punctuation with just punctuation
       (isLastSpace && isCurrentPunctuation) ||
-      // Replace trailing space followed by a new line with this new line
+      // Replace trailing spaces followed by a new line with just new line
       (isLastSpace && isCurrentNewLine)
     ) {
       this.deleteLastLexemes((lexeme) => lexeme.normalized === ' ');
@@ -125,37 +145,50 @@ export class LexemeBuilder {
       const newLexemeIndex = ++this.lastLexemeIndex;
       this.lexemes.set(newLexemeIndex, newLexeme);
 
-      if (newLexeme.type === LexemeType.SpecialCharacter) {
-        this.specialCharacterCount++;
+      if (LexemeNormalizer.isLexemeOtherCharacter(newLexeme)) {
+        this.otherCharacterCount++;
       } else {
         this.wordLikeCount++;
 
-        LexemeNormalizer.getGroupingWords(newLexeme.normalized).forEach((GroupWordLikeNominal) => {
-          const lexemesByWordLike = this.lexemesByWordLike.get(GroupWordLikeNominal) || new Map<number, Lexeme>();
+        LexemeNormalizer.getGroupingWords(newLexeme.normalized).forEach((groupWordLikeNominal) => {
+          const lexemesByWordLike = this.lexemesByWordLike.get(groupWordLikeNominal) || new Map<number, Lexeme>();
           lexemesByWordLike.set(newLexemeIndex, newLexeme);
-          this.lexemesByWordLike.set(GroupWordLikeNominal, lexemesByWordLike);
+          this.lexemesByWordLike.set(groupWordLikeNominal, lexemesByWordLike);
         });
+      }
+
+      if (onCreated) {
+        onCreated(newLexeme);
       }
     }
   }
 
-  private splitToLexemes(lexeme: Lexeme, startIndex: number, endIndex: number) {
-    const newNormalizedPrimitiveLexemes = lexeme.uncontracted.split(' ') as NormalizedPrimitiveLexemeNominal[];
+  // Split constructions like `I am/we will/they have` to separate lexemes
+  private splitUncontractedLexeme(lexemeToSplit: Lexeme, startIndex: number, endIndex: number) {
+    const newNormalizedPrimitiveLexemes = lexemeToSplit.uncontracted.split(' ') as NormalizedPrimitiveLexemeNominal[];
+    const restoreOriginalUncontructedLexeme = (newLexeme: Lexeme) =>
+      // As lexeme is split to separate ones (e.g. 'I am' to 'I' and 'am') we need to know the whole uncontracted
+      // lexeme in each new (lexeme). Otherwise, each new lexeme would have the same `normalized` and `uncontracted`
+      // fields. This overrides e.g. `am` in a new lexeme to `I am`.
+      (newLexeme.uncontracted = lexemeToSplit.uncontracted);
 
     newNormalizedPrimitiveLexemes.forEach((newNormalizedPrimitiveLexeme, index) => {
       this.processPrimitiveLexeme(
-        lexeme.original,
-        LexemeNormalizer.normalizeWord(lexeme.original, newNormalizedPrimitiveLexeme),
+        lexemeToSplit.original,
+        LexemeNormalizer.convertNormalizedPrimitiveLexeme(lexemeToSplit.original, newNormalizedPrimitiveLexeme),
         startIndex,
         endIndex,
+        { onCreated: restoreOriginalUncontructedLexeme },
       );
 
+      // Add spaces between uncontracted lexemes
       if (index < newNormalizedPrimitiveLexemes.length - 1) {
         this.processPrimitiveLexeme(
           ' ' as PrimitiveLexemeNominal,
           ' ' as NormalizedPrimitiveLexemeNominal,
           startIndex,
           endIndex,
+          { onCreated: restoreOriginalUncontructedLexeme },
         );
       }
     });
@@ -174,7 +207,7 @@ export class LexemeBuilder {
         return false;
       }
 
-      // No more than one ` ` in a row
+      // No more than one space in a row
       if (newLexeme.normalized === ' ' && this.isLastLexemesMatch(1, (lexeme) => lexeme.normalized === ' ')) {
         return false;
       }
@@ -204,17 +237,17 @@ export class LexemeBuilder {
     let lexeme = this.lexemes.get(this.lastLexemeIndex);
 
     while (lexeme && filter(lexeme)) {
-      if (lexeme.type === LexemeType.SpecialCharacter) {
-        this.specialCharacterCount--;
+      if (LexemeNormalizer.isLexemeOtherCharacter(lexeme)) {
+        this.otherCharacterCount--;
       } else {
         this.wordLikeCount--;
 
-        LexemeNormalizer.getGroupingWords(lexeme.normalized).forEach((GroupWordLikeNominal) => {
-          const lexemes = this.lexemesByWordLike.get(GroupWordLikeNominal) || new Map<number, Lexeme>();
+        LexemeNormalizer.getGroupingWords(lexeme.normalized).forEach((groupWordLikeNominal) => {
+          const lexemes = this.lexemesByWordLike.get(groupWordLikeNominal) || new Map<number, Lexeme>();
           lexemes.delete(this.lastLexemeIndex);
 
           if (!lexemes.size) {
-            this.lexemesByWordLike.delete(GroupWordLikeNominal);
+            this.lexemesByWordLike.delete(groupWordLikeNominal);
           }
         });
       }

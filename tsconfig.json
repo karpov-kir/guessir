@@ -2,7 +2,15 @@
   "compilerOptions": {
     "sourceMap": true,
     "strict": true,
-    "target": "es5",
-    "downlevelIteration": true
+    "module": "esnext",
+    "target": "es2021",
+    "lib": ["es2021"],
+    "downlevelIteration": true,
+    "esModuleInterop": true,
+    "baseUrl": "./",
+    "paths": {
+      "@guessir/shared/dist/*": ["./packages/shared/src/*"],
+      "@guessir/shared": ["./packages/shared/src/"]
+    }
   }
 }

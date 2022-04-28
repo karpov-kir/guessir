@@ -4,7 +4,7 @@ type OnEnterOptions = {
 
 export const onEnter = (element: HTMLInputElement, callback: (event: Event) => void, options: OnEnterOptions = {}) => {
   element.addEventListener('keypress', (event) => {
-    if (event.key !== 'Enter' && event.code !== 'NumpadEnter') {
+    if (event.key !== 'Enter' && event.key !== 'NumpadEnter') {
       return;
     }
 

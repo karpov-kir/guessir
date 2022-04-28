@@ -1,25 +1,7 @@
+import { CreateTextDtoInterface, TextInterface } from '@guessir/shared';
 import urlJoin from 'url-join';
 
-interface ApiTextPayload {
-  title: string;
-  description?: string;
-  text: string;
-  allowShowingFirstLetters: boolean;
-  allowShowingText: boolean;
-}
-
-interface ApiText {
-  title: string;
-  description?: string;
-  text: string;
-  allowShowingFirstLetters: boolean;
-  allowShowingText: boolean;
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export async function createApiText(payload: ApiTextPayload) {
+export async function createText(payload: CreateTextDtoInterface) {
   try {
     const response = await fetch(urlJoin(process.env.GUESSIR_API_BASE_URL || '', `texts`), {
       method: 'POST',
@@ -33,28 +15,24 @@ export async function createApiText(payload: ApiTextPayload) {
       throw new Error('Request failed');
     }
 
-    const data = await response.json();
-
-    if (!data) {
-      throw new Error('Could not parse response');
-    }
-
-    return data as ApiText;
+    return (await response.json()) as TextInterface;
   } catch (error) {
     throw new Error('Could not create text');
   }
 }
 
-export function generateApiTextUrl(apiText: ApiText) {
+// istanbul ignore next: nothing worth testing (no logic)
+export function generateTextUrl(apiText: TextInterface) {
   return `${window.location.origin}?textId=${apiText.id}`;
 }
 
-export function hasApiTextParametersInUrl() {
+// istanbul ignore next: nothing worth testing
+export function hasTextParametersInUrl() {
   const urlParams = new URLSearchParams(window.location.search);
   return !!urlParams.get('textId');
 }
 
-export function parseApiTextIdFromUrl(): string {
+export function parseTextIdFromUrl(): string {
   const urlParams = new URLSearchParams(window.location.search);
   const textId = urlParams.get('textId');
 
@@ -65,7 +43,7 @@ export function parseApiTextIdFromUrl(): string {
   return textId;
 }
 
-export async function loadApiText(id: string) {
+export async function loadText(id: string) {
   const response = await fetch(urlJoin(process.env.GUESSIR_API_BASE_URL || '', `texts/${id}`), {
     method: 'GET',
   });
@@ -74,11 +52,5 @@ export async function loadApiText(id: string) {
     throw new Error('Could not load text');
   }
 
-  const data = await response.json();
-
-  if (!data) {
-    throw new Error('Could not parse response');
-  }
-
-  return data as ApiText;
+  return (await response.json()) as TextInterface;
 }

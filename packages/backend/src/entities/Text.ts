@@ -1,8 +1,9 @@
+import { TextInterface } from '@guessir/shared';
 import { Exclude } from 'class-transformer';
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('texts')
-export class Text {
+export class Text implements TextInterface {
   @PrimaryGeneratedColumn()
   @Exclude()
   pk!: number;
