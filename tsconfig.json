@@ -10,7 +10,7 @@
     "baseUrl": "./",
     "paths": {
       "@guessir/shared/dist/*": ["./packages/shared/src/*"],
-      "@guessir/shared": ["./packages/shared/src/"]
+      "@guessir/shared": ["./packages/shared/src"]
     }
   }
 }
