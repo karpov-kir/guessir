@@ -1,6 +1,7 @@
+import { CreateTextDtoInterface } from '@guessir/shared';
 import { IsBoolean, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
 
-export class CreateTextDto {
+export class CreateTextDto implements CreateTextDtoInterface {
   @IsNotEmpty()
   @MaxLength(500)
   title!: string;

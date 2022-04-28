@@ -1,6 +1,7 @@
 import {
   BaseLexeme,
   GroupWordLikeNominal,
+  Lexeme,
   LexemeType,
   NormalizedPrimitiveLexemeNominal,
   PrimitiveLexemeNominal,
@@ -56,19 +57,27 @@ export class LexemeNormalizer {
     // I'd, She'd, He'd, He's, She's covered in `getGroupingWords`, read more there.
   ]);
 
-  public static normalizeWord(
-    primitiveLexeme: PrimitiveLexemeNominal,
-    normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal,
+  // Convert word to the title case if the original word is started from a capital letter
+  public static syncCase(
+    originalLexeme: PrimitiveLexemeNominal | NormalizedPrimitiveLexemeNominal,
+    newNormalizedLexeme: NormalizedPrimitiveLexemeNominal,
   ) {
-    let converted =
-      LexemeNormalizer.NORMALIZED_WORDS_TO_NORMALIZED_WORDS.get(normalizedPrimitiveLexeme) || normalizedPrimitiveLexeme;
-
-    // Convert word to the title case of the original word is started from a capital letter
-    if (converted[0] !== primitiveLexeme[0] && converted[0].toUpperCase() === primitiveLexeme[0]) {
-      converted = (converted[0].toUpperCase() + converted.substring(1)) as NormalizedPrimitiveLexemeNominal;
+    if (newNormalizedLexeme[0] !== originalLexeme[0] && newNormalizedLexeme[0].toUpperCase() === originalLexeme[0]) {
+      newNormalizedLexeme = (newNormalizedLexeme[0].toUpperCase() +
+        newNormalizedLexeme.substring(1)) as NormalizedPrimitiveLexemeNominal;
     }
 
-    return converted;
+    return newNormalizedLexeme;
+  }
+
+  public static convertNormalizedPrimitiveLexeme(
+    originalPrimitiveLexeme: PrimitiveLexemeNominal,
+    normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal,
+  ) {
+    const converted =
+      LexemeNormalizer.NORMALIZED_WORDS_TO_NORMALIZED_WORDS.get(normalizedPrimitiveLexeme) || normalizedPrimitiveLexeme;
+
+    return this.syncCase(originalPrimitiveLexeme, converted);
   }
 
   public static normalizeCharacter(character: string) {
@@ -81,8 +90,15 @@ export class LexemeNormalizer {
   }
 
   public static uncontractPrimitiveLexeme(normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal) {
-    return (LexemeNormalizer.NORMALIZED_CONTRACTION_TO_NORMALIZED_NORMAL.get(normalizedPrimitiveLexeme) ||
-      normalizedPrimitiveLexeme) as NormalizedPrimitiveLexemeNominal;
+    const converted = LexemeNormalizer.NORMALIZED_CONTRACTION_TO_NORMALIZED_NORMAL.get(
+      normalizedPrimitiveLexeme.toLowerCase(),
+    ) as NormalizedPrimitiveLexemeNominal;
+
+    if (converted) {
+      return this.syncCase(normalizedPrimitiveLexeme, converted);
+    }
+
+    return normalizedPrimitiveLexeme;
   }
 
   public static isWordCharacter(normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal) {
@@ -124,18 +140,22 @@ export class LexemeNormalizer {
   }
 
   // To workaround words like `Item's/I'd/She'd/He'd/He's/She's`. We cannot uncontract them, as they can be
-  // uncontracted in multiple ways (e.g. she's - she is / she has), so we can simply
-  // let the user to use just e.g. `she` and count it as `she's` and as `she`.
+  // uncontracted in multiple ways (e.g. she's - she is / she has or it can be a possessive ’s), so we can simply
+  // let the user use just e.g. `she` and count it as `she's` and as `she`.
   public static getGroupingWords(normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal): GroupWordLikeNominal[] {
     const length = normalizedPrimitiveLexeme.length;
     // Keep as lower-cased for easy access
-    const GroupWordLikeNominal = normalizedPrimitiveLexeme.toLowerCase() as GroupWordLikeNominal;
+    const groupWordLikeNominal = normalizedPrimitiveLexeme.toLowerCase() as GroupWordLikeNominal;
 
-    // Separate words that end with `'s`, e.g. `
-    if (GroupWordLikeNominal[length - 1] === 's' && GroupWordLikeNominal[length - 2] === "'") {
-      return [GroupWordLikeNominal.slice(0, -2) as GroupWordLikeNominal, GroupWordLikeNominal];
+    // Separate words that end with `'s, 'd`, e.g. `she's`
+    if (['s', 'd'].includes(groupWordLikeNominal[length - 1]) && groupWordLikeNominal[length - 2] === "'") {
+      return [groupWordLikeNominal.slice(0, -2) as GroupWordLikeNominal, groupWordLikeNominal];
     }
 
-    return [GroupWordLikeNominal];
+    return [groupWordLikeNominal];
+  }
+
+  public static isLexemeOtherCharacter(lexeme: Lexeme) {
+    return lexeme.type === LexemeType.SpecialCharacter || lexeme.type === LexemeType.WordHelping;
   }
 }

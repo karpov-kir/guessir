@@ -21,7 +21,17 @@ module.exports = () => {
           exclude: /node_modules/,
         },
         {
-          test: /\.css$/i,
+          issuer: /\.css$/,
+          test: /\.svg/,
+          type: 'asset/inline',
+        },
+        {
+          issuer: /\.(js|ts)$/,
+          test: /\.svg/,
+          type: 'asset/source',
+        },
+        {
+          test: /\.css$/,
           use: [MiniCssExtractPlugin.loader, 'css-loader'],
         },
       ],

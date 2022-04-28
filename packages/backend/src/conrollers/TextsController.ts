@@ -26,7 +26,7 @@ export class TextsController {
 
   @Get('')
   async find(): Promise<Text[]> {
-    return await this.textsRepository.find({
+    return this.textsRepository.find({
       take: 100,
     });
   }

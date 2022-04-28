@@ -1,7 +1,12 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "allowJs": true,
+    "module": "es6",
+    "target": "es5",
+    "moduleResolution": "node",
     "outDir": "./build/",
-    "lib": ["es2015", "es2017", "dom"]
+    "lib": ["dom", "es2021"],
+    "types": ["./src/@types", "jest", "node"]
   }
 }
