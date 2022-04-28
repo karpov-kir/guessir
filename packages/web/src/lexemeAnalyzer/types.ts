@@ -30,7 +30,7 @@ export interface LexemeAnalysis {
     >
   >;
   wordLikeCount: number;
-  specialCharacterCount: number;
+  otherCharacterCount: number;
 }
 
 export interface Lexeme extends BaseLexeme {

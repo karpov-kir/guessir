@@ -1,6 +1,10 @@
-import { Lexeme } from '../../lexemeBuilder';
+import { Lexeme } from '../../lexemeAnalyzer';
 import { PubSub } from '../../pubSub';
 import { ChildrenRenderer } from '../types';
+
+type WordRendererOptions = {
+  lexeme: Lexeme;
+};
 
 export class WordRenderer implements ChildrenRenderer {
   private lexeme: Lexeme;
@@ -10,7 +14,9 @@ export class WordRenderer implements ChildrenRenderer {
   public isShown = false;
   public readonly userWordShowEvent = this.userWordShowPubSub.event;
 
-  constructor(lexeme: Lexeme) {
+  constructor(options: WordRendererOptions) {
+    const { lexeme } = options;
+
     this.lexeme = lexeme;
     this.containerElement = document.createElement('button');
     this.containerElement.classList.add('lexeme-container');
@@ -24,7 +30,7 @@ export class WordRenderer implements ChildrenRenderer {
 
   public show() {
     this.isShown = true;
-    this.containerElement?.classList.add('show');
+    this.containerElement.classList.add('show');
   }
 
   private initElement() {
@@ -37,7 +43,7 @@ export class WordRenderer implements ChildrenRenderer {
   }
 
   private attachClickHandler() {
-    this.containerElement?.addEventListener('click', () => {
+    this.containerElement.addEventListener('click', () => {
       if (this.isShown) {
         return;
       }
