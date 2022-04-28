@@ -2,7 +2,7 @@
   "name": "@guessir/web",
   "scripts": {
     "build": "webpack-cli build",
-    "clean": "rimraf ./build/",
+    "clean": "rimraf ./build",
     "start:ts": "webpack-cli serve"
   },
   "dependencies": {

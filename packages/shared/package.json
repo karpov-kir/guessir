@@ -1,7 +1,11 @@
 {
   "name": "@guessir/shared",
   "version": "1.0.0",
-  "scripts": {},
+  "main": "./build/index.js",
+  "scripts": {
+    "build": "npm run clean && tsc -p tsconfig.json",
+    "clean": "rimraf ./build"
+  },
   "dependencies": {},
   "devDependencies": {}
 }
