@@ -2,7 +2,7 @@
   "name": "@guessir/backend",
   "scripts": {
     "build": "npm run clean && tsc -p tsconfig.json",
-    "clean": "rimraf ./build/",
+    "clean": "rimraf ./build",
     "start": "node ./build/index.js",
     "start:ts": "ts-node ./src/index.ts",
     "start:ts:debug": "ts-node --inspect-brk ./src/index.ts"

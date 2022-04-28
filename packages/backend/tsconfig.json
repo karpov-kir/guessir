@@ -1,10 +1,16 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "./build/",
+    "rootDir": "./src",
+    "outDir": "./build",
     "module": "commonjs",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "types": ["./src/@types/", "jest"]
-  }
+    "types": ["./src/@types", "jest"]
+  },
+  "references": [
+    {
+      "path": "../shared"
+    }
+  ]
 }
