@@ -71,7 +71,7 @@ jobs:
       - run: mv ./karpov-kir-github-actions ../karpov-kir-github-actions
 
       - name: SonarQube scan
-          uses: ./../karpov-kir-github-actions/sonarqube-scan
-          with:
-            sonar-token: ${{ secrets.SONAR_TOKEN }}
-            sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
+        uses: ./../karpov-kir-github-actions/sonarqube-scan
+        with:
+          sonar-token: ${{ secrets.SONAR_TOKEN }}
+          sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
