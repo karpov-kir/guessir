@@ -20,6 +20,8 @@ jobs:
     needs: install
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - uses: actions/cache@v3
         with:
@@ -55,6 +57,8 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - uses: actions/cache@v3
         with:
@@ -66,6 +70,7 @@ jobs:
         with:
           repository: karpov-kir/github-actions
           path: ./karpov-kir-github-actions
+          fetch-depth: 0
 
       # Move outside of the root project folder to not mess up the project with redundant files
       - run: mv ./karpov-kir-github-actions ../karpov-kir-github-actions
