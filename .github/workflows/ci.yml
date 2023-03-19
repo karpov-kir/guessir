@@ -65,18 +65,8 @@ jobs:
           path: ./coverage
           key: ${{ runner.os }}-coverage-${{ github.sha }}
 
-      - name: Checkout karpov-kir GitHub actions
-        uses: actions/checkout@v3
-        with:
-          repository: karpov-kir/github-actions
-          path: ./karpov-kir-github-actions
-          fetch-depth: 0
-
-      # Move outside of the root project folder to not mess up the project with redundant files
-      - run: mv ./karpov-kir-github-actions ../karpov-kir-github-actions
-
       - name: SonarQube scan
-        uses: ./../karpov-kir-github-actions/sonarqube-scan
+        uses: karpov-kir/github-actions/sonarqube-scan@main
         with:
           sonar-token: ${{ secrets.SONAR_TOKEN }}
           sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
