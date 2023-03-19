@@ -1,7 +1,7 @@
 {
   "name": "@guessir/backend",
   "scripts": {
-    "build": "npm run clean && tsc -p tsconfig.json",
+    "build": "npm run clean && tsc -b tsconfig.json",
     "clean": "rimraf ./build",
     "start": "node ./build/index.js",
     "start:ts": "ts-node ./src/index.ts",

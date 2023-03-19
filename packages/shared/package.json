@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "./build/index.js",
   "scripts": {
-    "build": "npm run clean && tsc -p tsconfig.json",
+    "build": "npm run clean && tsc -b tsconfig.json",
     "clean": "rimraf ./build"
   },
   "dependencies": {},
