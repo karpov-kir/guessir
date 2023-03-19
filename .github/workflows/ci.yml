@@ -7,10 +7,12 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
       - uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+
       - run: npm ci
 
   lint:
@@ -18,11 +20,14 @@ jobs:
     needs: install
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+
       - run: npm ci
+
       - run: npm run lint
 
   test:
@@ -30,15 +35,19 @@ jobs:
     needs: install
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+
       - uses: actions/cache@v3
         with:
           path: ./coverage
           key: ${{ runner.os }}-coverage-${{ github.sha }}
+
       - run: npm ci
+
       - run: npm run test
 
   analyze:
@@ -46,24 +55,23 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/cache@v3
         with:
           path: ./coverage
           key: ${{ runner.os }}-coverage-${{ github.sha }}
-      - uses: sonarsource/sonarqube-scan-action@master
+
+      - name: Checkout karpov-kir GitHub actions
+        uses: actions/checkout@v3
         with:
-          args: >
-            -D sonar.branch.name=${{ github.ref_name }}
-            -D sonar.pullrequest.key=${{ github.event.number }}
-            -D sonar.pullrequest.branch=${{ github.head_ref }}
-            -D sonar.pullrequest.base=${{ github.base_ref }}
-            -D sonar.pullrequest.github.repository=${{ github.repository }}
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      # If you wish to fail / not fail your job when the Quality Gate is red, uncomment / comment the
-      # following lines.
-      - uses: sonarsource/sonarqube-quality-gate-action@master
-        timeout-minutes: 5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          repository: karpov-kir/github-actions
+          path: ./karpov-kir-github-actions
+
+      # Move outside of the root project folder to not mess up the project with redundant files
+      - run: mv ./karpov-kir-github-actions ../karpov-kir-github-actions
+
+      - name: SonarQube scan
+          uses: ./../karpov-kir-github-actions/sonarqube-scan
+          with:
+            sonar-token: ${{ secrets.SONAR_TOKEN }}
+            sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
