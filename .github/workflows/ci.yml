@@ -4,63 +4,61 @@ jobs:
   install:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-
-      - run: npm ci
+      - name: Install packages
+        uses: karpov-kir/github-actions/cached-npm-ci@main
 
   lint:
     runs-on: ubuntu-latest
     needs: install
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+      - name: Install packages
+        uses: karpov-kir/github-actions/cached-npm-ci@main
 
-      - run: npm ci
-
-      - run: npm run lint
+      - name: Lint
+        run: npm run lint
 
   test:
     runs-on: ubuntu-latest
     needs: install
     steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/cache@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          fetch-depth: 0
 
-      - uses: actions/cache@v3
+      - name: Install packages
+        uses: karpov-kir/github-actions/cached-npm-ci@main
+
+      - name: Initialize coverage cache
+        uses: actions/cache@v3
         with:
           path: ./coverage
           key: ${{ runner.os }}-coverage-${{ github.sha }}
 
-      - run: npm ci
-
-      - run: npm run test
+      - name: Test
+        run: npm run test
 
   analyze:
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - uses: actions/cache@v3
+      - name: Restore coverage cache 
+        uses: actions/cache@v3
         with:
           path: ./coverage
           key: ${{ runner.os }}-coverage-${{ github.sha }}
