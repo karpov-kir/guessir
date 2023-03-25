@@ -9,8 +9,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install packages
-        uses: karpov-kir/github-actions/cached-npm-ci@main
+      - name: NPM prepare
+        uses: karpov-kir/github-actions/npm-prepare@main
 
   build:
     runs-on: ubuntu-22.04
@@ -21,8 +21,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install packages
-        uses: karpov-kir/github-actions/cached-npm-ci@main
+      - name: NPM prepare
+        uses: karpov-kir/github-actions/npm-prepare@main
 
       - name: Build
         run: npm run build
@@ -36,8 +36,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install packages
-        uses: karpov-kir/github-actions/cached-npm-ci@main
+      - name: NPM prepare
+        uses: karpov-kir/github-actions/npm-prepare@main
 
       - name: Lint
         run: npm run lint
@@ -51,8 +51,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install packages
-        uses: karpov-kir/github-actions/cached-npm-ci@main
+      - name: NPM prepare
+        uses: karpov-kir/github-actions/npm-prepare@main
 
       - name: Initialize coverage cache
         uses: actions/cache@v3
