@@ -1,11 +1,11 @@
-import { TextInterface } from '@guessir/shared/dist/TextInterface';
+import { Text } from '@guessir/shared/dist/Text';
 
 import { Deferred } from '../utils/Deferred';
 import { CreateTextRenderer, getElements } from './CreateTextRenderer';
 
 const mockedText = {
   id: 'mocked-id',
-} as TextInterface;
+} as Text;
 const mockedCreateText = jest.fn().mockResolvedValue(mockedText);
 
 jest.mock('../utils/text', () => ({
@@ -24,7 +24,7 @@ const createText = async () => {
     allowShowingFirstLettersCheckboxElement,
     generateUrlButtonElement,
   } = getElements(createTextRenderer.getElement());
-  const deferred = new Deferred<TextInterface>();
+  const deferred = new Deferred<Text>();
 
   mockedCreateText.mockReturnValue(deferred.promise);
 
@@ -66,7 +66,7 @@ describe(CreateTextRenderer, () => {
   });
 
   it('should render an error if text creation fails', async () => {
-    const deferred = new Deferred<TextInterface>();
+    const deferred = new Deferred<Text>();
     const { errorElement, generateUrlButtonElement, textInputElement, titleInputElement } = getElements(
       createTextRenderer.getElement(),
     );
@@ -88,7 +88,7 @@ describe(CreateTextRenderer, () => {
   });
 
   it('should disable form while a request is executing', async () => {
-    const deferred = new Deferred<TextInterface>();
+    const deferred = new Deferred<Text>();
     const { textInputElement, titleInputElement, generateUrlButtonElement } = getElements(
       createTextRenderer.getElement(),
     );

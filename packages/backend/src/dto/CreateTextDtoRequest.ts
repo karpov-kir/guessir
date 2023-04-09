@@ -1,7 +1,7 @@
-import { CreateTextDtoInterface } from '@guessir/shared/dist/CreateTextDtoInterface';
+import { CreateTextDto } from '@guessir/shared/dist/CreateTextDto';
 import { IsBoolean, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
 
-export class CreateTextDto implements CreateTextDtoInterface {
+export class CreateTextDtoRequest implements CreateTextDto {
   @IsNotEmpty()
   @MaxLength(500)
   title!: string;

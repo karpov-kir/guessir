@@ -13,26 +13,26 @@ import { plainToClass } from 'class-transformer';
 import { nanoid } from 'nanoid';
 import { Repository } from 'typeorm';
 
-import { CreateTextDto } from '../dto/CreateTextDto';
-import { Text } from '../entities/Text';
+import { CreateTextDtoRequest } from '../dto/CreateTextDtoRequest';
+import { TextEntity } from '../entities/TextEntity';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('texts')
 export class TextsController {
   constructor(
-    @InjectRepository(Text)
-    private readonly textsRepository: Repository<Text>,
+    @InjectRepository(TextEntity)
+    private readonly textsRepository: Repository<TextEntity>,
   ) {}
 
   @Get('')
-  async find(): Promise<Text[]> {
+  async find(): Promise<TextEntity[]> {
     return this.textsRepository.find({
       take: 100,
     });
   }
 
   @Get('/:id')
-  async findById(@Param('id') id: string): Promise<Text> {
+  async findById(@Param('id') id: string): Promise<TextEntity> {
     const text = await this.textsRepository.findOne({
       where: { id },
     });
@@ -45,12 +45,12 @@ export class TextsController {
   }
 
   @Post()
-  async create(@Body() newTextDto: CreateTextDto): Promise<Text> {
+  async create(@Body() newTextDto: CreateTextDtoRequest): Promise<TextEntity> {
     const newText = await this.textsRepository.save({
       ...newTextDto,
       id: nanoid(20),
     });
 
-    return plainToClass(Text, newText);
+    return plainToClass(TextEntity, newText);
   }
 }

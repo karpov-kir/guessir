@@ -1,11 +1,11 @@
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 
-import { CreateTextDto } from './CreateTextDto';
+import { CreateTextDtoRequest } from './CreateTextDtoRequest';
 
-describe(CreateTextDto, () => {
+describe(CreateTextDtoRequest, () => {
   it('should throw correct validation errors', async () => {
-    expect(await validate(plainToInstance(CreateTextDto, {}))).toEqual([
+    expect(await validate(plainToInstance(CreateTextDtoRequest, {}))).toEqual([
       expect.objectContaining({
         constraints: {
           isNotEmpty: 'title should not be empty',
@@ -22,7 +22,7 @@ describe(CreateTextDto, () => {
 
     expect(
       await validate(
-        plainToInstance(CreateTextDto, {
+        plainToInstance(CreateTextDtoRequest, {
           allowShowingFirstLetters: 'test',
           allowShowingText: 'test',
           description: {},

@@ -4,10 +4,10 @@ import { Connection } from 'typeorm';
 
 import { TextsController } from './conrollers/TextsController';
 import { applyDbMigrations, isDbEnabled } from './dbUtils';
-import { Text } from './entities/Text';
+import { TextEntity } from './entities/TextEntity';
 
 @Module({
-  imports: [getTypeOrmModule(), TypeOrmModule.forFeature([Text])],
+  imports: [getTypeOrmModule(), TypeOrmModule.forFeature([TextEntity])],
   controllers: [TextsController],
   providers: [],
 })
@@ -22,7 +22,7 @@ export class MainModule implements OnApplicationBootstrap {
 }
 
 function getTypeOrmModule() {
-  const entities = [Text];
+  const entities = [TextEntity];
 
   if (isDbEnabled()) {
     return TypeOrmModule.forRoot({

@@ -2,12 +2,12 @@ import { NotFoundException } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
 
-import { CreateTextDto } from '../dto/CreateTextDto';
-import { Text } from '../entities/Text';
+import { CreateTextDtoRequest } from '../dto/CreateTextDtoRequest';
+import { TextEntity } from '../entities/TextEntity';
 import { mockRepository } from '../testUtils/mockRepository';
 import { TextsController } from './TextsController';
 
-const text: Text = {
+const text: TextEntity = {
   pk: 1,
   id: 'id',
   title: 'Title',
@@ -22,16 +22,16 @@ const { pk: _pk, ...serializedText } = text;
 
 describe(TextsController, () => {
   let textsController: TextsController;
-  let textsRepository: Repository<Text>;
+  let textsRepository: Repository<TextEntity>;
 
   beforeEach(() => {
-    textsRepository = mockRepository<Text>();
+    textsRepository = mockRepository<TextEntity>();
     textsController = new TextsController(textsRepository);
   });
 
   describe('find', () => {
     it('should return an array of serialized texts', async () => {
-      const result = [plainToInstance(Text, text)];
+      const result = [plainToInstance(TextEntity, text)];
 
       jest.spyOn(textsRepository, 'find').mockResolvedValue(result);
 
@@ -41,7 +41,7 @@ describe(TextsController, () => {
 
   describe('findById', () => {
     it('should find and return a sanitized text by id', async () => {
-      jest.spyOn(textsRepository, 'findOne').mockResolvedValue(plainToInstance(Text, text));
+      jest.spyOn(textsRepository, 'findOne').mockResolvedValue(plainToInstance(TextEntity, text));
 
       expect(await textsController.findById('test')).toEqual(serializedText);
     });
@@ -63,7 +63,7 @@ describe(TextsController, () => {
     it('should return a serialized text', async () => {
       jest.spyOn(textsRepository, 'save').mockResolvedValue(text);
 
-      expect(await textsController.create({} as CreateTextDto)).toEqual(serializedText);
+      expect(await textsController.create({} as CreateTextDtoRequest)).toEqual(serializedText);
     });
   });
 });

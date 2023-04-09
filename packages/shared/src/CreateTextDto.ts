@@ -1,4 +1,4 @@
-export interface CreateTextDtoInterface {
+export interface CreateTextDto {
   title: string;
   description?: string;
   text: string;

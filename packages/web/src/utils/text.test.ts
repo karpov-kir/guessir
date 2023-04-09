@@ -1,11 +1,11 @@
-import { TextInterface } from '@guessir/shared/dist/TextInterface';
+import { Text } from '@guessir/shared/dist/Text';
 
 import { createText, loadText, parseTextIdFromUrl } from './text';
 
 let mockedFetch: jest.Mock;
 const mockedText = {
   id: 'test-id',
-} as TextInterface;
+} as Text;
 
 beforeEach(() => {
   mockedFetch = jest.fn().mockResolvedValue({
