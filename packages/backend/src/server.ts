@@ -18,7 +18,7 @@ export async function boot(host = '0.0.0.0', port = 3020) {
     logger.log('Using an in memory DB');
   }
 
-  const allowedOrigins = ['http://localhost:3010', 'http://guessir.k-k.local', 'https://guessir.k-k.io'];
+  const allowedOrigins = ['http://localhost:5173', 'http://guessir.k-k.local', 'https://guessir.k-k.io'];
   const app = await NestFactory.create<NestFastifyApplication>(
     MainModule,
     new FastifyAdapter({
