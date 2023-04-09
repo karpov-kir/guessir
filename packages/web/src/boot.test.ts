@@ -1,8 +1,8 @@
-import { TextInterface } from '@guessir/shared';
+import { TextInterface } from '@guessir/shared/dist/TextInterface';
 
 import { boot } from './boot';
-import { LexemeAnalyzer } from './lexemeAnalyzer';
-import { RenderController } from './renderers';
+import { LexemeAnalyzer } from './lexemeAnalyzer/LexemeAnalyzer';
+import { RenderController } from './renderers/RenderController';
 
 const mockedText = {
   id: 'text-id',
@@ -14,12 +14,11 @@ const mockedText = {
 } as TextInterface;
 const mockedLoadText = jest.fn();
 
-jest.mock('./utils', () => ({
-  ...jest.requireActual('./utils'),
-  loadText: (...args: unknown[]) => mockedLoadText(...args),
+jest.mock('./utils/text', () => ({
+  ...jest.requireActual<Record<string, unknown>>('./utils/text'),
+  loadText: (id: string) => mockedLoadText(id),
 }));
-
-jest.mock('./renderers');
+jest.mock('./renderers/RenderController');
 
 Object.defineProperty(window, 'location', {
   value: {

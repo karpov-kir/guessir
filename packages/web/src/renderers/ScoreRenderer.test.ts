@@ -1,4 +1,4 @@
-import { getElementText } from '../testUtils';
+import { getElementText } from '../testUtils/dom';
 import { ScoreRenderer } from './ScoreRenderer';
 
 let scoreRenderer: ScoreRenderer;

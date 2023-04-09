@@ -1,6 +1,6 @@
-import { Lexeme, LexemeAnalysis } from '../../lexemeAnalyzer';
 import { LexemeNormalizer } from '../../lexemeAnalyzer/LexemeNormalizer';
-import { PubSub } from '../../pubSub';
+import { Lexeme, LexemeAnalysis } from '../../lexemeAnalyzer/types';
+import { PubSub } from '../../pubSub/PubSub';
 import { ChildrenRenderer } from '../types';
 import { WordRenderer } from './WordRenderer';
 

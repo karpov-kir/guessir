@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   'sonar.projectKey': 'Guessir',
 
   'sonar.javascript.lcov.reportPaths': 'coverage/lcov.info',

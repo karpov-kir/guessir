@@ -2,15 +2,21 @@
   "compilerOptions": {
     "sourceMap": true,
     "strict": true,
-    "module": "esnext",
-    "target": "es2021",
-    "lib": ["es2021"],
-    "downlevelIteration": true,
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "Node",
+    "lib": ["ESNext"],
+    "resolveJsonModule": true,
     "esModuleInterop": true,
     "baseUrl": "./",
     "paths": {
-      "@guessir/shared/dist/*": ["./packages/shared/src/*"],
-      "@guessir/shared": ["./packages/shared/src"]
+      "@guessir/shared/dist/*": ["./packages/shared/src/*"]
     }
-  }
+  },
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/*.e2e-spec.ts",
+    "**/jest.config.ts"
+  ]
 }

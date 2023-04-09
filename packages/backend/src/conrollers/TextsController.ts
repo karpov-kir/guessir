@@ -13,8 +13,8 @@ import { plainToClass } from 'class-transformer';
 import { nanoid } from 'nanoid';
 import { Repository } from 'typeorm';
 
-import { CreateTextDto } from '../dto';
-import { Text } from '../entities';
+import { CreateTextDto } from '../dto/CreateTextDto';
+import { Text } from '../entities/Text';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('texts')
@@ -34,7 +34,7 @@ export class TextsController {
   @Get('/:id')
   async findById(@Param('id') id: string): Promise<Text> {
     const text = await this.textsRepository.findOne({
-      id,
+      where: { id },
     });
 
     if (!text) {

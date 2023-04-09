@@ -1,23 +1,19 @@
 {
   "name": "@guessir/web",
+  "type": "module",
   "scripts": {
-    "build": "webpack-cli build",
-    "clean": "rimraf ./build",
-    "start:ts": "webpack-cli serve"
+    "build": "npm run clean && tsc && vite build",
+    "clean": "del-cli ./dist",
+    "start:dev": "vite",
+    "start:preview": "vite preview"
   },
   "dependencies": {
     "@guessir/shared": "^1.0.0",
     "url-join": "^5.0.0"
   },
   "devDependencies": {
-    "@types/node": "^17.0.23",
-    "css-loader": "^6.7.1",
-    "dotenv-webpack": "^7.1.0",
-    "html-webpack-plugin": "^5.5.0",
-    "mini-css-extract-plugin": "^2.6.0",
-    "ts-loader": "^9.2.8",
-    "webpack": "^5.72.0",
-    "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.8.1"
+    "jest-environment-jsdom": "^29.5.0",
+    "mini-css-extract-plugin": "^2.7.5",
+    "vite": "^4.2.1"
   }
 }

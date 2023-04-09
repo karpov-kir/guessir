@@ -2,8 +2,8 @@ import { NotFoundException } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
 
-import { CreateTextDto } from '../dto';
-import { Text } from '../entities';
+import { CreateTextDto } from '../dto/CreateTextDto';
+import { Text } from '../entities/Text';
 import { mockRepository } from '../testUtils/mockRepository';
 import { TextsController } from './TextsController';
 
@@ -47,7 +47,7 @@ describe(TextsController, () => {
     });
 
     it('should return 404 exception if the text is not found', async () => {
-      jest.spyOn(textsRepository, 'findOne').mockResolvedValue(undefined);
+      jest.spyOn(textsRepository, 'findOne').mockResolvedValue(null);
 
       await expect(textsController.findById('test')).rejects.toEqual(new NotFoundException());
     });

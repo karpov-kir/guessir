@@ -1,4 +1,4 @@
-import { CreateTextDtoInterface } from '@guessir/shared';
+import { CreateTextDtoInterface } from '@guessir/shared/dist/CreateTextDtoInterface';
 import { IsBoolean, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
 
 export class CreateTextDto implements CreateTextDtoInterface {

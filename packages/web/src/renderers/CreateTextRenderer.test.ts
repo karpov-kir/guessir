@@ -1,6 +1,6 @@
-import { TextInterface } from '@guessir/shared';
+import { TextInterface } from '@guessir/shared/dist/TextInterface';
 
-import { Deferred } from '../utils';
+import { Deferred } from '../utils/Deferred';
 import { CreateTextRenderer, getElements } from './CreateTextRenderer';
 
 const mockedText = {
@@ -8,8 +8,8 @@ const mockedText = {
 } as TextInterface;
 const mockedCreateText = jest.fn().mockResolvedValue(mockedText);
 
-jest.mock('../utils', () => ({
-  ...jest.requireActual('../utils'),
+jest.mock('../utils/text', () => ({
+  ...jest.requireActual('../utils/text'),
   createText: (...args: unknown[]) => mockedCreateText(...args),
   generateTextUrl: () => 'http://mocked-url',
 }));

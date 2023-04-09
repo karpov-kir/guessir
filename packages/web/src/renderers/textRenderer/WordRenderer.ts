@@ -1,5 +1,5 @@
-import { Lexeme } from '../../lexemeAnalyzer';
-import { PubSub } from '../../pubSub';
+import { Lexeme } from '../../lexemeAnalyzer/types';
+import { PubSub } from '../../pubSub/PubSub';
 import { ChildrenRenderer } from '../types';
 
 type WordRendererOptions = {

@@ -1,4 +1,4 @@
-import { LexemeAnalyzer } from '../../lexemeAnalyzer';
+import { LexemeAnalyzer } from '../../lexemeAnalyzer/LexemeAnalyzer';
 import { getElements, TextRenderer } from './TextRenderer';
 
 const lexemesAnalysis = new LexemeAnalyzer().analyze(`

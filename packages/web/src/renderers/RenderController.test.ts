@@ -1,16 +1,17 @@
-import { Lexeme, LexemeAnalyzer } from '../lexemeAnalyzer';
-import { PubSub } from '../pubSub';
+import { LexemeAnalyzer } from '../lexemeAnalyzer/LexemeAnalyzer';
+import { Lexeme } from '../lexemeAnalyzer/types';
+import { PubSub } from '../pubSub/PubSub';
 import { ControlsRenderer, GuessEvent } from './ControlsRenderer';
 import { RenderController } from './RenderController';
 import { ScoreRenderer } from './ScoreRenderer';
-import { TextRenderer } from './textRenderer';
+import { TextRenderer } from './textRenderer/TextRenderer';
 
 let interceptedPubSubs: PubSub<unknown>[] = [];
 
-jest.mock('../pubSub', () => {
+jest.mock('../pubSub/PubSub', () => {
   const { PubSub: OriginalPubSub } = jest.requireActual<{
     PubSub: { new (): PubSub<unknown> };
-  }>('../pubSub');
+  }>('../pubSub/PubSub');
 
   return {
     PubSub: class InterceptedPubSub extends OriginalPubSub {

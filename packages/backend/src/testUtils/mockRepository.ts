@@ -1,6 +1,6 @@
-import { Repository } from 'typeorm';
+import { ObjectLiteral, Repository } from 'typeorm';
 
-export const mockRepository = <T>(): Repository<T> => {
+export const mockRepository = <T extends ObjectLiteral>(): Repository<T> => {
   return {
     find: jest.fn() as Repository<T>['find'],
     findOne: jest.fn() as Repository<T>['findOne'],

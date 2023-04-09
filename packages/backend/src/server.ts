@@ -1,10 +1,10 @@
 // Required for TypeORM
 import 'reflect-metadata';
 
+import fastifyHelmet from '@fastify/helmet';
 import { Logger, NotAcceptableException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
-import { fastifyHelmet } from 'fastify-helmet';
 
 import { isDbEnabled } from './dbUtils';
 import { MainModule } from './MainModule';

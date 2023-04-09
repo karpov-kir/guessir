@@ -1,4 +1,4 @@
-import { TextInterface } from '@guessir/shared';
+import { TextInterface } from '@guessir/shared/dist/TextInterface';
 
 import { createText, loadText, parseTextIdFromUrl } from './text';
 
@@ -12,7 +12,7 @@ beforeEach(() => {
     ok: true,
     json: () => Promise.resolve(mockedText),
   }) as jest.Mock;
-  global.fetch = mockedFetch;
+  window.fetch = mockedFetch;
 });
 
 describe(createText, () => {

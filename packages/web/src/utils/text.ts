@@ -1,9 +1,10 @@
-import { CreateTextDtoInterface, TextInterface } from '@guessir/shared';
+import { CreateTextDtoInterface } from '@guessir/shared/dist/CreateTextDtoInterface';
+import { TextInterface } from '@guessir/shared/dist/TextInterface';
 import urlJoin from 'url-join';
 
 export async function createText(payload: CreateTextDtoInterface) {
   try {
-    const response = await fetch(urlJoin(process.env.GUESSIR_API_BASE_URL || '', `texts`), {
+    const response = await fetch(urlJoin(import.meta.env.GUESSIR_API_BASE_URL, `texts`), {
       method: 'POST',
       body: JSON.stringify(payload),
       headers: {
@@ -44,7 +45,7 @@ export function parseTextIdFromUrl(): string {
 }
 
 export async function loadText(id: string) {
-  const response = await fetch(urlJoin(process.env.GUESSIR_API_BASE_URL || '', `texts/${id}`), {
+  const response = await fetch(urlJoin(import.meta.env.GUESSIR_API_BASE_URL, `texts/${id}`), {
     method: 'GET',
   });
 

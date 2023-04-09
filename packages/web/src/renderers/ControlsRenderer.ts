@@ -1,5 +1,5 @@
-import { PubSub } from '../pubSub';
-import { onChangeAndEnter, onEnter } from '../utils';
+import { PubSub } from '../pubSub/PubSub';
+import { onChangeAndEnter, onEnter } from '../utils/dom';
 import { ChildrenRenderer } from './types';
 
 export type GuessEvent = {

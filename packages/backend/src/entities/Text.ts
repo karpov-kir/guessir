@@ -1,4 +1,4 @@
-import { TextInterface } from '@guessir/shared';
+import { TextInterface } from '@guessir/shared/dist/TextInterface';
 import { Exclude } from 'class-transformer';
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 

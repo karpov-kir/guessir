@@ -1,8 +1,8 @@
-import { Lexeme, LexemeAnalysis } from '../lexemeAnalyzer';
+import { Lexeme, LexemeAnalysis } from '../lexemeAnalyzer/types';
 import { ControlsRenderer, GuessEvent } from './ControlsRenderer';
 import { CreateTextRenderer } from './CreateTextRenderer';
 import { ScoreRenderer } from './ScoreRenderer';
-import { TextRenderer } from './textRenderer';
+import { TextRenderer } from './textRenderer/TextRenderer';
 
 type RenderControllerOptions = {
   lexemesAnalysis: LexemeAnalysis;

@@ -1,10 +1,10 @@
 {
   "name": "@guessir/shared",
+  "type": "module",
   "version": "1.0.0",
-  "main": "./build/index.js",
   "scripts": {
     "build": "npm run clean && tsc -b tsconfig.json",
-    "clean": "rimraf ./build"
+    "clean": "del-cli ./dist ./tsconfig.tsbuildinfo"
   },
   "dependencies": {},
   "devDependencies": {}

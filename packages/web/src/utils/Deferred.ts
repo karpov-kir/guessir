@@ -1,6 +1,6 @@
 // https://gist.github.com/GFoley83/5877f6c09fbcfd62569c51dc91444cf0
 export class Deferred<T> implements Promise<T> {
-  [Symbol.toStringTag]: 'Promise';
+  [Symbol.toStringTag] = 'Promise';
 
   private _promise: Promise<T>;
   private _resolve!: (value: T | PromiseLike<T>) => void;

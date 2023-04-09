@@ -1,4 +1,4 @@
-import { PubSub } from '../pubSub';
+import { PubSub } from '../pubSub/PubSub';
 import { ControlsRenderer } from './ControlsRenderer';
 
 describe(ControlsRenderer, () => {

@@ -1,4 +1,4 @@
-import { Lexeme } from '../../lexemeAnalyzer';
+import { Lexeme } from '../../lexemeAnalyzer/types';
 import { WordRenderer } from './WordRenderer';
 
 let wordRenderer: WordRenderer;

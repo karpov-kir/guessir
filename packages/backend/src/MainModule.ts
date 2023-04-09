@@ -2,9 +2,9 @@ import { Module, OnApplicationBootstrap } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 
-import { TextsController } from './conrollers';
+import { TextsController } from './conrollers/TextsController';
 import { applyDbMigrations, isDbEnabled } from './dbUtils';
-import { Text } from './entities';
+import { Text } from './entities/Text';
 
 @Module({
   imports: [getTypeOrmModule(), TypeOrmModule.forFeature([Text])],

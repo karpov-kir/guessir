@@ -1,5 +1,6 @@
-import { copyIcon } from '../icons';
-import { createText, generateTextUrl, onChangeAndEnter } from '../utils';
+import copyIcon from '../icons/copyIcon.svg';
+import { onChangeAndEnter } from '../utils/dom';
+import { createText, generateTextUrl } from '../utils/text';
 import { ChildrenRenderer } from './types';
 
 interface CreateTextRendererOptions {

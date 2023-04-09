@@ -1,5 +1,10 @@
+import { dirname } from 'path';
 import { getConnection } from 'typeorm';
 import { Umzug } from 'umzug';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 interface MigrationContext {
   query: <T = unknown>(sql: string, parameters?: unknown[]) => Promise<T>;
