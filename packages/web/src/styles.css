@@ -544,6 +544,12 @@ summary:focus-visible::marker {
   margin: 0 10px 0 0;
   color: var(--primary);
   display: flex;
+  align-items: center;
+}
+
+#copy-generated-url-button svg{
+  width: 1.5em;
+  height: 1.5em;
 }
 
 #copy-generated-url-button:hover path {
