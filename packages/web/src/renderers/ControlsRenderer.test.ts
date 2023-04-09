@@ -54,7 +54,10 @@ describe(ControlsRenderer, () => {
 
     jest.spyOn(PubSub.prototype, 'publish');
 
+    // Input a value to guess
     guessInputElement.value = ' TeST# ';
+    guessInputElement.dispatchEvent(new Event('input'));
+
     guessButtonElement.click();
     guessInputElement.dispatchEvent(
       new KeyboardEvent('keypress', {
@@ -170,5 +173,52 @@ describe(ControlsRenderer, () => {
     expect(PubSub.prototype.publish).nthCalledWith(1, true);
     // Secondly, the other should be disabled
     expect(PubSub.prototype.publish).nthCalledWith(2, false);
+  });
+
+  it('should render the guess button disabled initially', () => {
+    const controlsRenderer = new ControlsRenderer();
+    const guessButton = controlsRenderer.getElement().querySelector('button') as HTMLButtonElement;
+
+    expect(guessButton.disabled).toBe(true);
+  });
+
+  it('should enable the guess button on input', () => {
+    const controlsRenderer = new ControlsRenderer();
+
+    const guessButton = controlsRenderer.getElement().querySelector('#guess-button') as HTMLButtonElement;
+    const guessInputElement = controlsRenderer.getElement().querySelector('#guess-input') as HTMLInputElement;
+
+    // Input a value to guess
+    guessInputElement.value = ' TeST# ';
+    guessInputElement.dispatchEvent(new Event('input'));
+
+    expect(guessButton.disabled).toBe(false);
+  });
+
+  it('should not enable the guess button on input that consists of spaces only', () => {
+    const controlsRenderer = new ControlsRenderer();
+    const guessButton = controlsRenderer.getElement().querySelector('#guess-button') as HTMLButtonElement;
+    const guessInputElement = controlsRenderer.getElement().querySelector('#guess-input') as HTMLInputElement;
+
+    // Input a value to guess
+    guessInputElement.value = '   ';
+    guessInputElement.dispatchEvent(new Event('input'));
+
+    expect(guessButton.disabled).toBe(true);
+  });
+
+  it('should animate the guess button', () => {
+    const controlsRenderer = new ControlsRenderer();
+    const guessInputElement = controlsRenderer.getElement().querySelector('#guess-input') as HTMLInputElement;
+
+    expect(guessInputElement.classList.contains('shake-and-error')).toBe(false);
+
+    controlsRenderer.shakeAndError();
+
+    expect(guessInputElement.classList.contains('shake-and-error')).toBe(true);
+
+    guessInputElement.addEventListener('animationend', () => {
+      expect(guessInputElement.classList.contains('shake-and-error')).toBe(false);
+    });
   });
 });

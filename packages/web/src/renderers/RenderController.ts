@@ -86,6 +86,8 @@ export class RenderController {
 
     if (shownCount) {
       this.controlsRenderer.cleanAndFocusGuessInput();
+    } else {
+      this.controlsRenderer.shakeAndError();
     }
 
     this.scoreRenderer.addScore(shownCount);

@@ -43,10 +43,23 @@ export class ControlsRenderer implements ChildrenRenderer {
     guessInputElement.focus();
   }
 
+  public shakeAndError() {
+    const { guessInputElement } = this.getElements();
+
+    guessInputElement.classList.add('shake-and-error');
+
+    const removeAnimationClass = () => {
+      guessInputElement.removeEventListener('animationend', removeAnimationClass);
+      guessInputElement.classList.remove('shake-and-error');
+    };
+
+    guessInputElement.addEventListener('animationend', removeAnimationClass);
+  }
+
   private initElement(allowShowingText?: boolean, allowShowingFirstLetters?: boolean) {
     this.containerElement.innerHTML = `
       <input id="guess-input" type="text" />
-      <button id="guess-button" type="button">Guess</button>
+      <button title="Please, input at least one letter to try to guess!" disabled id="guess-button" type="button">Guess</button>
       <label>
         <input type="checkbox" id="show-text-checkbox" /> Show text
       </label>
@@ -68,6 +81,7 @@ export class ControlsRenderer implements ChildrenRenderer {
     this.attachGuessHandler();
     this.attachShowFirstLettersHandler();
     this.attachShowTextHandler();
+    this.attachInputHandler();
   }
 
   private getElements() {
@@ -81,10 +95,28 @@ export class ControlsRenderer implements ChildrenRenderer {
     return { showTextCheckboxElement, showFirstLettersCheckboxElement, guessButtonElement, guessInputElement };
   }
 
+  private getInputtedWord() {
+    const { guessInputElement } = this.getElements();
+
+    return guessInputElement.value.trim().toLowerCase();
+  }
+
+  private attachInputHandler() {
+    const { guessInputElement, guessButtonElement } = this.getElements();
+
+    guessInputElement.addEventListener('input', () => {
+      if (this.getInputtedWord()) {
+        guessButtonElement.disabled = false;
+      } else {
+        guessButtonElement.disabled = true;
+      }
+    });
+  }
+
   private attachGuessHandler() {
     const { guessButtonElement, guessInputElement } = this.getElements();
     const guessHandler = () => {
-      const word = guessInputElement.value.trim().toLowerCase();
+      const word = this.getInputtedWord();
 
       if (!word) {
         return;

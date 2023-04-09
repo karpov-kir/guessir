@@ -110,4 +110,12 @@ describe(RenderController, () => {
 
     expect(scoreRenderer.addScore).not.toBeCalled();
   });
+
+  it('should shake and error the guess input when the user guesses a word that is not in the text', () => {
+    jest.spyOn(controlsRenderer, 'shakeAndError');
+
+    guessPubSub.publish({ word: 'unknown' });
+
+    expect(controlsRenderer.shakeAndError).toBeCalled();
+  });
 });

@@ -549,3 +549,28 @@ summary:focus-visible::marker {
 #copy-generated-url-button:hover path {
   fill: var(--primary);
 }
+
+@keyframes shakeAndError {
+  0% {
+    box-shadow: 0 0 0px var(--error);
+    transform: skewY(-3deg); 
+  }
+  25% {
+    transform: skewY(3deg); 
+  }
+  50% {
+    box-shadow: 0 0 3px var(--error);
+    transform: skewY(-3deg); 
+  }
+  75% {
+    transform: skewY(3deg); 
+  }
+  100% {
+    box-shadow: 0 0 0 var(--error);
+    transform: skewY(0deg); 
+  }
+}
+
+.shake-and-error {
+  animation: shakeAndError 0.2s;
+}
