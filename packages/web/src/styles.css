@@ -552,21 +552,23 @@ summary:focus-visible::marker {
 
 @keyframes shakeAndError {
   0% {
-    box-shadow: 0 0 0px var(--error);
+    outline: 0px solid var(--error);
     transform: skewY(-3deg); 
   }
   25% {
+    outline: 1px solid var(--error);
     transform: skewY(3deg); 
   }
   50% {
-    box-shadow: 0 0 3px var(--error);
+    outline: 1px solid var(--error);
     transform: skewY(-3deg); 
   }
   75% {
+    outline: 1px solid var(--error);
     transform: skewY(3deg); 
   }
   100% {
-    box-shadow: 0 0 0 var(--error);
+    outline: 0px solid var(--error);
     transform: skewY(0deg); 
   }
 }
