@@ -1,6 +1,6 @@
-import { Migration } from '../dbUtils';
+import { MigrationFn } from '../dbUtils';
 
-const up: Migration = async ({ context: { query } }) => {
+export const up: MigrationFn = async ({ context: { query } }) => {
   await query(`
     CREATE TABLE IF NOT EXISTS texts (
       pk SERIAL PRIMARY KEY,
@@ -17,8 +17,6 @@ const up: Migration = async ({ context: { query } }) => {
   await query(`CREATE UNIQUE INDEX id_idx ON texts (id)`);
 };
 
-const down = async () => {
+export const down = async () => {
   // No down migration
 };
-
-module.exports = { up, down };
