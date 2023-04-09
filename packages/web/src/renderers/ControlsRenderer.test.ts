@@ -1,4 +1,5 @@
 import { PubSub } from '../pubSub/PubSub';
+import { Deferred } from '../utils/Deferred';
 import { ControlsRenderer } from './ControlsRenderer';
 
 describe(ControlsRenderer, () => {
@@ -207,7 +208,7 @@ describe(ControlsRenderer, () => {
     expect(guessButton.disabled).toBe(true);
   });
 
-  it('should animate the guess button', () => {
+  it('should animate the guess button on input that does not exist', async () => {
     const controlsRenderer = new ControlsRenderer();
     const guessInputElement = controlsRenderer.getElement().querySelector('#guess-input') as HTMLInputElement;
 
@@ -217,8 +218,15 @@ describe(ControlsRenderer, () => {
 
     expect(guessInputElement.classList.contains('shake-and-error')).toBe(true);
 
+    const animationEndDeferred = new Deferred();
+
     guessInputElement.addEventListener('animationend', () => {
-      expect(guessInputElement.classList.contains('shake-and-error')).toBe(false);
+      animationEndDeferred.resolve(undefined);
     });
+    guessInputElement.dispatchEvent(new Event('animationend'));
+
+    await animationEndDeferred.promise;
+
+    expect(guessInputElement.classList.contains('shake-and-error')).toBe(false);
   });
 });
