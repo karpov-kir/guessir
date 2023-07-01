@@ -178,46 +178,44 @@ describe(ControlsRenderer, () => {
 
   it('should render the guess button disabled initially', () => {
     const controlsRenderer = new ControlsRenderer();
-    const guessButton = controlsRenderer.getElement().querySelector('button') as HTMLButtonElement;
+    const guessButtonElement = controlsRenderer.getElement().querySelector('button') as HTMLButtonElement;
 
-    expect(guessButton.disabled).toBe(true);
+    expect(guessButtonElement.disabled).toBe(true);
   });
 
   it('should enable the guess button on input', () => {
     const controlsRenderer = new ControlsRenderer();
 
-    const guessButton = controlsRenderer.getElement().querySelector('#guess-button') as HTMLButtonElement;
+    const guessButtonElement = controlsRenderer.getElement().querySelector('#guess-button') as HTMLButtonElement;
     const guessInputElement = controlsRenderer.getElement().querySelector('#guess-input') as HTMLInputElement;
 
     // Input a value to guess
     guessInputElement.value = ' TeST# ';
     guessInputElement.dispatchEvent(new Event('input'));
 
-    expect(guessButton.disabled).toBe(false);
+    expect(guessButtonElement.disabled).toBe(false);
   });
 
   it('should not enable the guess button on input that consists of spaces only', () => {
     const controlsRenderer = new ControlsRenderer();
-    const guessButton = controlsRenderer.getElement().querySelector('#guess-button') as HTMLButtonElement;
+    const guessButtonElement = controlsRenderer.getElement().querySelector('#guess-button') as HTMLButtonElement;
     const guessInputElement = controlsRenderer.getElement().querySelector('#guess-input') as HTMLInputElement;
 
     // Input a value to guess
     guessInputElement.value = '   ';
     guessInputElement.dispatchEvent(new Event('input'));
 
-    expect(guessButton.disabled).toBe(true);
+    expect(guessButtonElement.disabled).toBe(true);
   });
 
   it('should animate the guess button on input that does not exist', async () => {
     const controlsRenderer = new ControlsRenderer();
     const guessInputElement = controlsRenderer.getElement().querySelector('#guess-input') as HTMLInputElement;
-
-    expect(guessInputElement.classList.contains('shake-and-error')).toBe(false);
+    const hasShakeAndErrorBefore = guessInputElement.classList.contains('shake-and-error');
 
     controlsRenderer.shakeAndError();
 
-    expect(guessInputElement.classList.contains('shake-and-error')).toBe(true);
-
+    const hasShakeAndErrorAfterTriggered = guessInputElement.classList.contains('shake-and-error');
     const animationEndDeferred = new Deferred();
 
     guessInputElement.addEventListener('animationend', () => {
@@ -227,6 +225,32 @@ describe(ControlsRenderer, () => {
 
     await animationEndDeferred.promise;
 
+    expect(hasShakeAndErrorBefore).toBe(false);
+    expect(hasShakeAndErrorAfterTriggered).toBe(true);
     expect(guessInputElement.classList.contains('shake-and-error')).toBe(false);
+  });
+
+  it('should clear and focus the input', () => {
+    const controlsRenderer = new ControlsRenderer();
+    const guessInputElement = controlsRenderer.getElement().querySelector('#guess-input') as HTMLInputElement;
+
+    guessInputElement.value = 'test';
+    jest.spyOn(guessInputElement, 'focus');
+
+    controlsRenderer.clearAndFocusGuessInput();
+
+    expect(guessInputElement.value).toBe('');
+    expect(guessInputElement.focus).toBeCalled();
+  });
+
+  it('should disable the guess button on clear and focus the input', () => {
+    const controlsRenderer = new ControlsRenderer();
+    const guessButtonElement = controlsRenderer.getElement().querySelector('#guess-button') as HTMLButtonElement;
+
+    guessButtonElement.disabled = false;
+
+    controlsRenderer.clearAndFocusGuessInput();
+
+    expect(guessButtonElement.disabled).toBe(true);
   });
 });

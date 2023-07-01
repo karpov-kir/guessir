@@ -85,7 +85,7 @@ export class RenderController {
     const shownCount = this.textRenderer.showLexemesByWord(word);
 
     if (shownCount) {
-      this.controlsRenderer.cleanAndFocusGuessInput();
+      this.controlsRenderer.clearAndFocusGuessInput();
     } else {
       this.controlsRenderer.shakeAndError();
     }

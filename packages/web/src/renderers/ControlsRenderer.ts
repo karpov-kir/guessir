@@ -36,11 +36,12 @@ export class ControlsRenderer implements ChildrenRenderer {
   }
 
   // istanbul ignore next: no logic
-  public cleanAndFocusGuessInput() {
-    const { guessInputElement } = this.getElements();
+  public clearAndFocusGuessInput() {
+    const { guessInputElement, guessButtonElement } = this.getElements();
 
     guessInputElement.value = '';
     guessInputElement.focus();
+    guessButtonElement.disabled = true;
   }
 
   public shakeAndError() {

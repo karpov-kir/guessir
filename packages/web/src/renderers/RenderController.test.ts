@@ -64,7 +64,7 @@ describe(RenderController, () => {
     renderController.init(document.createElement('div'));
 
     jest.spyOn(scoreRenderer, 'addScore');
-    jest.spyOn(controlsRenderer, 'cleanAndFocusGuessInput');
+    jest.spyOn(controlsRenderer, 'clearAndFocusGuessInput');
   });
 
   it('should reduce the score when the user clicks on a word', () => {
@@ -77,14 +77,14 @@ describe(RenderController, () => {
     guessPubSub.publish({ word: 'one' });
 
     expect(scoreRenderer.addScore).toBeCalledWith(1);
-    expect(controlsRenderer.cleanAndFocusGuessInput).toBeCalled();
+    expect(controlsRenderer.clearAndFocusGuessInput).toBeCalled();
   });
 
   it('should not change the score if the user does not guess the word', () => {
     guessPubSub.publish({ word: 'unknown' });
 
     expect(scoreRenderer.addScore).toBeCalledWith(0);
-    expect(controlsRenderer.cleanAndFocusGuessInput).not.toBeCalled();
+    expect(controlsRenderer.clearAndFocusGuessInput).not.toBeCalled();
   });
 
   it('should reduce the score when the user shows the text', () => {
