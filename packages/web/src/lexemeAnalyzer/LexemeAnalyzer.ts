@@ -17,18 +17,20 @@ export class LexemeAnalyzer {
 
   private static PUNCTUATION_CHARACTERS = [',', '.', '!', '?', ';'];
 
-  // Applies the following rules:
-  // - No more than 2 new line characters in a row
-  // - No more than 1 space
-  // - Keeps only the first letter upper case if this letter is upper case in the original word
-  // - Splits contractions (constructions like `I'm/We'll/they've`) to individual lexemes
-  //   - Adds an additional group for words that cannot be uncotracted (read more in `getGroupingWords`)
-  // - Replaces trailing spaces followed by a punctuation with just punctuation
-  // - Replaces trailing spaces followed by a new line with just new line
-  // - Allows the very first lexeme only if it's a word or a letter
-  // - Replaces specific special characters with more appropriate ones (e.g. `—` with `-`), check `CHARACTERS_TO_NORMALIZED_CHARACTERS`
-  // - Replaces some words (e.g. `i` -> `I`), check `NORMALIZED_WORDS_TO_NORMALIZED_WORDS`
-  // - Treats word separation characters as a part of a word (e.g. `re-generate`)
+  /**
+   * Applies the following rules:
+   *  - No more than 2 new line characters in a row
+   *  - No more than 1 space
+   *  - Keeps only the first letter upper case if this letter is upper case in the original word
+   *  - Splits contractions (constructions like `I'm/We'll/they've`) to individual lexemes
+   *  - Adds an additional group for words that cannot be uncotracted (read more in `getGroupingWords`)
+   *  - Replaces trailing spaces followed by a punctuation with just punctuation
+   *  - Replaces trailing spaces followed by a new line with just new line
+   *  - Allows the very first lexeme only if it's a word or a letter
+   *  - Replaces specific special characters with more appropriate ones (e.g. `—` with `-`), check `CHARACTERS_TO_NORMALIZED_CHARACTERS`
+   *  - Replaces some words (e.g. `i` -> `I`), check `NORMALIZED_WORDS_TO_NORMALIZED_WORDS`
+   *  - Treats word separation characters as a part of a word (e.g. `re-generate`)
+   */
   public analyze(rawText: string): LexemeAnalysis {
     const text = rawText.trim();
     let primitiveLexeme: PrimitiveLexemeNominal = '' as PrimitiveLexemeNominal;
@@ -128,7 +130,7 @@ export class LexemeAnalyzer {
       return;
     }
 
-    const isLastSpace = this.isLastLexemesMatch(1, (lexeme) => lexeme.normalized === ' ');
+    const isLastSpace = this.isLastNLexemesThatMatch(1, (lexeme) => lexeme.normalized === ' ');
     const isCurrentPunctuation = LexemeAnalyzer.PUNCTUATION_CHARACTERS.includes(newLexeme.normalized);
     const isCurrentNewLine = newLexeme.normalized === '\n';
 
@@ -138,7 +140,7 @@ export class LexemeAnalyzer {
       // Replace trailing spaces followed by a new line with just new line
       (isLastSpace && isCurrentNewLine)
     ) {
-      this.deleteLastLexemes((lexeme) => lexeme.normalized === ' ');
+      this.deleteLastLexemesUntilMatch((lexeme) => lexeme.normalized === ' ');
     }
 
     if (this.canAddLexeme(newLexeme)) {
@@ -163,12 +165,12 @@ export class LexemeAnalyzer {
     }
   }
 
-  // Split constructions like `I am/we will/they have` to separate lexemes
+  // Split constructions like 'I am / we will / they have' to separate lexemes e.g. to 'I' and 'am'.
   private splitUncontractedLexeme(lexemeToSplit: Lexeme, startIndex: number, endIndex: number) {
     const newNormalizedPrimitiveLexemes = lexemeToSplit.uncontracted.split(' ') as NormalizedPrimitiveLexemeNominal[];
     const restoreOriginalUncontructedLexeme = (newLexeme: Lexeme) =>
-      // As lexeme is split to separate ones (e.g. 'I am' to 'I' and 'am') we need to know the whole uncontracted
-      // lexeme in each new (lexeme). Otherwise, each new lexeme would have the same `normalized` and `uncontracted`
+      // Because lexemes are split into separate ones (e.g. 'I am' to 'I' and 'am') we need to know the whole uncontracted (original)
+      // lexeme in each new lexeme. Otherwise, each new lexeme would have the same `Lexeme.normalized` and `Lexeme.uncontracted`
       // fields. This overrides e.g. `am` in a new lexeme to `I am`.
       (newLexeme.uncontracted = lexemeToSplit.uncontracted);
 
@@ -203,12 +205,12 @@ export class LexemeAnalyzer {
       return newLexeme.type === LexemeType.Word || newLexeme.type === LexemeType.Letter;
     } else {
       // No more than two `\n` in a row
-      if (newLexeme.normalized === '\n' && this.isLastLexemesMatch(2, (lexeme) => lexeme.normalized === '\n')) {
+      if (newLexeme.normalized === '\n' && this.isLastNLexemesThatMatch(2, (lexeme) => lexeme.normalized === '\n')) {
         return false;
       }
 
       // No more than one space in a row
-      if (newLexeme.normalized === ' ' && this.isLastLexemesMatch(1, (lexeme) => lexeme.normalized === ' ')) {
+      if (newLexeme.normalized === ' ' && this.isLastNLexemesThatMatch(1, (lexeme) => lexeme.normalized === ' ')) {
         return false;
       }
     }
@@ -216,7 +218,7 @@ export class LexemeAnalyzer {
     return true;
   }
 
-  private isLastLexemesMatch(count: number, filter: (lexeme: Lexeme) => boolean) {
+  private isLastNLexemesThatMatch(count: number, filter: (lexeme: Lexeme) => boolean) {
     let lexemeIndex = this.lastLexemeIndex;
 
     while (count > 0) {
@@ -233,7 +235,7 @@ export class LexemeAnalyzer {
     return true;
   }
 
-  private deleteLastLexemes(filter: (lexeme: Lexeme) => boolean) {
+  private deleteLastLexemesUntilMatch(filter: (lexeme: Lexeme) => boolean) {
     let lexeme = this.lexemes.get(this.lastLexemeIndex);
 
     while (lexeme && filter(lexeme)) {

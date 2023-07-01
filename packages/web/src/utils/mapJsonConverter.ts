@@ -3,10 +3,11 @@ type ConvertedMap = {
   convertedMap: Array<[unknown, unknown]>;
 };
 
-// Usage example:
-// JSON.stringify(originalValue, mapToJsonReplacer);
-// JSON.parse(json, mapFromJsonReviver);
-
+/**
+ * Usage example:
+ *  - JSON.stringify(originalValue, mapToJsonReplacer);
+ *  - JSON.parse(json, mapFromJsonReviver);
+ */
 export function mapToJsonReplacer(key: string, value: unknown) {
   if (value instanceof Map) {
     const convertedMap: ConvertedMap = {
