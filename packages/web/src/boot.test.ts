@@ -29,7 +29,7 @@ Object.defineProperty(window, 'location', {
 describe(boot, () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(LexemeAnalyzer.prototype, 'analyze');
+    jest.spyOn(LexemeAnalyzer, 'analyze');
   });
 
   it('should load and render a remote text', async () => {
@@ -38,7 +38,7 @@ describe(boot, () => {
     await boot(document.createElement('div'));
 
     expect(mockedLoadText).toBeCalledWith(mockedText.id);
-    expect(LexemeAnalyzer.prototype.analyze).toBeCalledWith(mockedText.text);
+    expect(LexemeAnalyzer.analyze).toBeCalledWith(mockedText.text);
 
     expect(RenderController).toBeCalledWith({
       lexemesAnalysis: expect.any(Object),
@@ -54,7 +54,7 @@ describe(boot, () => {
 
     await boot(document.createElement('div'));
 
-    expect(LexemeAnalyzer.prototype.analyze).toBeCalledWith(
+    expect(LexemeAnalyzer.analyze).toBeCalledWith(
       expect.stringContaining(`I could not load the remote text. Please, verify your URL or create a new text.`),
     );
     expect(RenderController).toBeCalledWith({
@@ -71,7 +71,7 @@ describe(boot, () => {
 
     await boot(document.createElement('div'));
 
-    expect(LexemeAnalyzer.prototype.analyze).toBeCalledWith('In order to create your own text find the form below.');
+    expect(LexemeAnalyzer.analyze).toBeCalledWith('In order to create your own text find the form below.');
     expect(RenderController).toBeCalledWith({
       lexemesAnalysis: expect.any(Object),
       title: 'Hello!',

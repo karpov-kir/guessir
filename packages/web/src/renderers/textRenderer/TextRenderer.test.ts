@@ -1,7 +1,7 @@
 import { LexemeAnalyzer } from '../../lexemeAnalyzer/LexemeAnalyzer';
 import { getElements, TextRenderer } from './TextRenderer';
 
-const lexemesAnalysis = new LexemeAnalyzer().analyze(`
+const lexemesAnalysis = LexemeAnalyzer.analyze(`
   One
   
   one, @ she's we'd!

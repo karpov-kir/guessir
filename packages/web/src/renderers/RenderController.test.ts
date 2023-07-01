@@ -34,7 +34,7 @@ let showTextPubSub: PubSub<boolean>;
 let textRenderer: TextRenderer;
 let userWordShowPubSub: PubSub<Lexeme>;
 
-const lexemesAnalysis = new LexemeAnalyzer().analyze(`
+const lexemesAnalysis = LexemeAnalyzer.analyze(`
   One two
 `);
 

@@ -38,7 +38,7 @@ export async function boot(containerElement: HTMLElement) {
     }
   }
 
-  const lexemesAnalysis = new LexemeAnalyzer().analyze(text);
+  const lexemesAnalysis = LexemeAnalyzer.analyze(text);
   const renderController = new RenderController({
     lexemesAnalysis,
     title,

@@ -2,9 +2,8 @@ import { LexemeAnalyzer } from './LexemeAnalyzer';
 
 describe(LexemeAnalyzer, () => {
   it('should build lexemes', () => {
-    // This text covers all cases described in `buildLexeme`
-    // TODO maybe split to individual cases
-    const lexemeAnalysis = new LexemeAnalyzer().analyze(`
+    // Application level test. This text covers all cases described in `buildLexeme`.
+    const lexemeAnalysis = LexemeAnalyzer.analyze(`
     
       ^One;   two#       
       

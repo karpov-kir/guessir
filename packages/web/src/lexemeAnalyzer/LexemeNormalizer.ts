@@ -70,10 +70,10 @@ export class LexemeNormalizer {
     return newNormalizedLexeme;
   }
 
-  public static convertNormalizedPrimitiveLexeme(
+  public static convertNormalizedWord(
     originalPrimitiveLexeme: PrimitiveLexemeNominal,
     normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal,
-  ) {
+  ): NormalizedPrimitiveLexemeNominal {
     const converted =
       LexemeNormalizer.NORMALIZED_WORDS_TO_NORMALIZED_WORDS.get(normalizedPrimitiveLexeme) || normalizedPrimitiveLexeme;
 
