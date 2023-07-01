@@ -15,7 +15,7 @@ export async function boot(host = '0.0.0.0', port = 3020) {
   if (isDbEnabled()) {
     logger.log('Using a persistent DB');
   } else {
-    logger.log('Using an in memory DB');
+    logger.log('Using an in-memory DB');
   }
 
   const allowedOrigins = ['http://localhost:5173', 'http://guessir.k-k.local', 'https://guessir.k-k.io'];
