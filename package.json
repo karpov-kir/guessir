@@ -6,7 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run clean && npm run build --workspaces --if-present",
     "clean": "npm run clean --workspaces --if-present",
     "lint": "eslint \"packages/**/src/**/*.ts\"",
     "lint:fix": "npm run lint -- --fix",
