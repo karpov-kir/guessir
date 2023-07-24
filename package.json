@@ -3,7 +3,9 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "packages/*"
+    "packages/shared",
+    "packages/backend",
+    "packages/web"
   ],
   "scripts": {
     "build": "npm run clean && npm run build --workspaces --if-present",
