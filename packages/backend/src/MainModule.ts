@@ -1,7 +1,7 @@
 import { Module, OnApplicationBootstrap } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { TextsController } from './conrollers/TextsController';
+import { TextsController } from './controllers/TextsController';
 import { applyDbMigrations, getTypeOrmConfig, isDbEnabled } from './dbUtils';
 import { TextEntity } from './entities/TextEntity';
 
