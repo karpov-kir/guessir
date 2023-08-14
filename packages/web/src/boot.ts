@@ -1,7 +1,7 @@
 import './styles.css';
 
 import { LexemeAnalyzer } from './lexemeAnalyzer/LexemeAnalyzer';
-import { RenderController } from './renderers/RenderController';
+import { RenderController } from './RenderController';
 import { hasTextParametersInUrl, loadText, parseTextIdFromUrl } from './utils/text';
 
 const defaultTitle = 'Hello!';

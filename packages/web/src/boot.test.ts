@@ -2,7 +2,7 @@ import { TextInterface } from '@guessir/shared/dist/TextInterface';
 
 import { boot } from './boot';
 import { LexemeAnalyzer } from './lexemeAnalyzer/LexemeAnalyzer';
-import { RenderController } from './renderers/RenderController';
+import { RenderController } from './RenderController';
 
 const mockedText = {
   id: 'text-id',
@@ -18,7 +18,7 @@ jest.mock('./utils/text', () => ({
   ...jest.requireActual<Record<string, unknown>>('./utils/text'),
   loadText: (id: string) => mockedLoadText(id),
 }));
-jest.mock('./renderers/RenderController');
+jest.mock('./RenderController');
 
 Object.defineProperty(window, 'location', {
   value: {
