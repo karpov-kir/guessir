@@ -1,5 +1,6 @@
 {
   "name": "@guessir/monorepo",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -9,6 +10,7 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
+    "build:web": "npm run build -w @guessir/web",
     "clean": "npm run clean --workspaces --if-present",
     "lint": "eslint \"packages/**/src/**/*.ts\"",
     "lint:fix": "npm run lint -- --fix",
@@ -18,7 +20,9 @@
     "test": "jest",
     "test:clearCache": "jest --clearCache",
     "test:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "build:docker": "npm run build:docker --workspaces --if-present",
+    "publish:docker": "npm run publish:docker --workspaces --if-present"
   },
   "devDependencies": {
     "@swc/core": "^1.3.67",

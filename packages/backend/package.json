@@ -1,12 +1,15 @@
 {
   "name": "@guessir/backend",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "build": "npm run clean && tsc -b tsconfig.json",
     "clean": "del-cli ./dist",
     "start": "node --experimental-loader=extensionless ./dist/main.js",
     "start:dev": "ts-node --esm --experimental-specifier-resolution=node ./src/main.ts",
-    "start:dev:debug": "ts-node --esm --experimental-specifier-resolution=node --inspect-brk ./src/main.ts"
+    "start:dev:debug": "ts-node --esm --experimental-specifier-resolution=node --inspect-brk ./src/main.ts",
+    "build:docker": "docker build -t guessir-backend -f ./Dockerfile ../..",
+    "publish:docker": "docker tag guessir-backend dr.k-k.io/guessir-backend && docker push dr.k-k.io/guessir-backend"
   },
   "dependencies": {
     "@fastify/helmet": "^10.1.0",
@@ -17,6 +20,7 @@
     "@nestjs/typeorm": "^9.0.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "extensionless": "^1.4.5",
     "fastify": "^4.15.0",
     "nanoid": "^4.0.2",
     "pg": "^8.10.0",
@@ -26,7 +30,12 @@
   },
   "devDependencies": {
     "@types/validator": "^13.7.14",
-    "extensionless": "^1.4.5",
     "sqlite3": "^5.1.6"
+  },
+  "files": [
+    "/dist"
+  ],
+  "bin": {
+    "guessirBackend": "./guessirBackend.js"
   }
 }

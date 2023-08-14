@@ -1,11 +1,14 @@
 {
   "name": "@guessir/web",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "build": "npm run clean && tsc && vite build",
     "clean": "del-cli ./dist",
     "start:dev": "vite",
-    "start:preview": "vite preview"
+    "start:preview": "vite preview",
+    "build:docker": "docker build -t guessir-web -f ./Dockerfile ../..",
+    "publish:docker": "docker tag guessir-web dr.k-k.io/guessir-web && docker push dr.k-k.io/guessir-web"
   },
   "dependencies": {
     "@guessir/shared": "^1.0.0",
