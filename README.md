@@ -1,6 +1,6 @@
 # GuesSir!
 
-A simple tool to turn any English text into a word guessing game. Try it out https://guessir.k-k.io.
+A simple tool to turn any English text into a word guessing game. Try it out https://guessir.k-k.pro.
 
 ## Credits
 
@@ -10,8 +10,8 @@ A simple tool to turn any English text into a word guessing game. Try it out htt
 
 ### Technical stats
 
-[![Maintainability Rating](https://sq.k-k.io/api/project_badges/measure?project=Guessir&metric=sqale_rating&token=aea6af2cef2a86c02926e0cbfd3c67d55c7a2142)](https://sq.k-k.io/dashboard?id=Guessir)
-[![Quality Gate Status](https://sq.k-k.io/api/project_badges/measure?project=Guessir&metric=alert_status&token=aea6af2cef2a86c02926e0cbfd3c67d55c7a2142)](https://sq.k-k.io/dashboard?id=Guessir)
-[![Coverage](https://sq.k-k.io/api/project_badges/measure?project=Guessir&metric=coverage&token=aea6af2cef2a86c02926e0cbfd3c67d55c7a2142)](https://sq.k-k.io/dashboard?id=Guessir)
-[![Code Smells](https://sq.k-k.io/api/project_badges/measure?project=Guessir&metric=code_smells&token=aea6af2cef2a86c02926e0cbfd3c67d55c7a2142)](https://sq.k-k.io/dashboard?id=Guessir)
-[![Technical Debt](https://sq.k-k.io/api/project_badges/measure?project=Guessir&metric=sqale_index&token=aea6af2cef2a86c02926e0cbfd3c67d55c7a2142)](https://sq.k-k.io/dashboard?id=Guessir)
+[![Maintainability Rating](https://sq.k-k.pro/api/project_badges/measure?project=Guessir&metric=sqale_rating&token=aea6af2cef2a86c02926e0cbfd3c67d55c7a2142)](https://sq.k-k.pro/dashboard?id=Guessir)
+[![Quality Gate Status](https://sq.k-k.pro/api/project_badges/measure?project=Guessir&metric=alert_status&token=aea6af2cef2a86c02926e0cbfd3c67d55c7a2142)](https://sq.k-k.pro/dashboard?id=Guessir)
+[![Coverage](https://sq.k-k.pro/api/project_badges/measure?project=Guessir&metric=coverage&token=aea6af2cef2a86c02926e0cbfd3c67d55c7a2142)](https://sq.k-k.pro/dashboard?id=Guessir)
+[![Code Smells](https://sq.k-k.pro/api/project_badges/measure?project=Guessir&metric=code_smells&token=aea6af2cef2a86c02926e0cbfd3c67d55c7a2142)](https://sq.k-k.pro/dashboard?id=Guessir)
+[![Technical Debt](https://sq.k-k.pro/api/project_badges/measure?project=Guessir&metric=sqale_index&token=aea6af2cef2a86c02926e0cbfd3c67d55c7a2142)](https://sq.k-k.pro/dashboard?id=Guessir)

@@ -9,7 +9,7 @@
     "start:dev": "ts-node --esm --experimental-specifier-resolution=node ./src/main.ts",
     "start:dev:debug": "ts-node --esm --experimental-specifier-resolution=node --inspect-brk ./src/main.ts",
     "build:docker": "docker build -t guessir-backend -f ./Dockerfile ../..",
-    "publish:docker": "docker tag guessir-backend dr.k-k.io/guessir-backend && docker push dr.k-k.io/guessir-backend"
+    "publish:docker": "docker tag guessir-backend dr.k-k.pro/guessir-backend && docker push dr.k-k.pro/guessir-backend"
   },
   "dependencies": {
     "@fastify/helmet": "^10.1.0",

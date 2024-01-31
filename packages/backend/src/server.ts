@@ -22,7 +22,7 @@ export async function boot(host = '0.0.0.0', port = 3020) {
     'http://localhost:5173',
     'http://127.0.0.1:5173',
     'http://guessir.k-k.local',
-    'https://guessir.k-k.io',
+    'https://guessir.k-k.pro',
   ];
   const app = await NestFactory.create<NestFastifyApplication>(
     MainModule,
