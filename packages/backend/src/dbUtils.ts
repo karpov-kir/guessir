@@ -53,7 +53,7 @@ const logger = new Logger('dbUtils');
 export async function applyDbMigrations() {
   const migrator = new Umzug({
     migrations: {
-      glob: ['migrations/*.ts', { cwd: __dirname }],
+      glob: ['migrations/*.{js,ts}', { cwd: __dirname }],
     },
     context: await getContext(),
     storage: {
