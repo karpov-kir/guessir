@@ -1,4 +1,4 @@
-import { Module, OnApplicationBootstrap } from '@nestjs/common';
+import { Logger, Module, OnApplicationBootstrap } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { TextsController } from './controllers/TextsController';
@@ -11,8 +11,11 @@ import { TextEntity } from './entities/TextEntity';
   providers: [],
 })
 export class MainModule implements OnApplicationBootstrap {
+  private static logger = new Logger(MainModule.name);
+
   async onApplicationBootstrap() {
     if (isDbEnabled()) {
+      MainModule.logger.log('Applying DB migrations');
       await applyDbMigrations();
     }
   }

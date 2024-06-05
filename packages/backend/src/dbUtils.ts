@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { dirname } from 'path';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { MigrationFn as UmzugMigrationFn, Umzug } from 'umzug';
@@ -47,6 +48,8 @@ const getContext = async (): Promise<MigrationContext> => {
   };
 };
 
+const logger = new Logger('dbUtils');
+
 export async function applyDbMigrations() {
   const migrator = new Umzug({
     migrations: {
@@ -69,7 +72,12 @@ export async function applyDbMigrations() {
         await client.query(`delete from ${migrationTable} where name = $1`, [name]);
       },
     },
-    logger: console,
+    logger: {
+      info: (message) => logger.log(message),
+      warn: (message) => logger.warn(message),
+      error: (message) => logger.error(message),
+      debug: (message) => logger.debug(message),
+    },
   });
 
   await migrator.up();
