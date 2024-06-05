@@ -7,7 +7,7 @@
     "clean": "del-cli ./dist",
     "start:dev": "vite",
     "start:preview": "vite preview",
-    "build:docker": "docker build -t guessir-web -f ./Dockerfile ../..",
+    "build:docker": "docker build --platform=linux/amd64 -t guessir-web -f ./Dockerfile ../..",
     "publish:docker": "docker tag guessir-web dr.k-k.pro/guessir-web && docker push dr.k-k.pro/guessir-web"
   },
   "dependencies": {
