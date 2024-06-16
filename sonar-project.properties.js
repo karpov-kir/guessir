@@ -1,5 +1,5 @@
 export default {
-  'sonar.projectKey': 'Guessir',
+  'sonar.projectKey': 'GuesSir',
 
   'sonar.javascript.lcov.reportPaths': 'coverage/lcov.info',
   'sonar.testExecutionReportPaths': 'coverage/test-report.xml',
