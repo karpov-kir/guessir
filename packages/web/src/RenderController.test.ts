@@ -67,6 +67,12 @@ describe(RenderController, () => {
     jest.spyOn(controlsRenderer, 'clearAndFocusGuessInput');
   });
 
+  it('should increase the score when the user clicks on a word', () => {
+    userWordShowPubSub.publish(lexemesAnalysis.lexemes.get(0) as Lexeme);
+
+    expect(scoreRenderer.addScore).toBeCalledWith(1);
+  });
+
   it('should increase the score if the user guesses a word', () => {
     guessPubSub.publish({ word: 'one' });
 

@@ -78,7 +78,7 @@ export class RenderController {
   }
 
   private handleUserWordShow(_lexeme: Lexeme) {
-    // TODO is there an interesting way to handle it to entertain the user?
+    this.scoreRenderer.addScore(1);
   }
 
   private handleGuess({ word }: GuessEvent) {
