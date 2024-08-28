@@ -1,14 +1,7 @@
 import { LexemeAnalyzerStore } from './LexemeAnalyzerStore';
 import { LexemeAnalyzerUtils } from './lexemeAnalyzerUtils';
 import { LexemeNormalizer } from './LexemeNormalizer';
-import {
-  BaseLexeme,
-  Lexeme,
-  LexemeAnalysis,
-  LexemeType,
-  NormalizedPrimitiveLexemeNominal,
-  PrimitiveLexemeNominal,
-} from './types';
+import { Lexeme, LexemeAnalysis, LexemeType, NormalizedPrimitiveLexemeNominal, PrimitiveLexemeNominal } from './types';
 
 export class LexemeAnalyzer {
   private static PUNCTUATION_CHARACTERS = [',', '.', '!', '?', ';'];
@@ -31,40 +24,41 @@ export class LexemeAnalyzer {
     const text = rawText.trim();
     const lexemeAnalyzerStore = new LexemeAnalyzerStore();
     let buffer = LexemeAnalyzerUtils.createEmptyBuffer();
+    let startIndex = 0;
+
+    function processPrimitiveLexeme(endIndex: number) {
+      LexemeAnalyzer.processPrimitiveLexeme(
+        lexemeAnalyzerStore,
+        buffer.primitiveLexeme,
+        buffer.normalizedPrimitiveLexeme,
+        startIndex,
+        endIndex,
+      );
+      buffer = LexemeAnalyzerUtils.createEmptyBuffer();
+      startIndex = endIndex + 1;
+    }
 
     for (let i = 0, l = text.length; i < l; i++) {
-      let shouldProcessPrimitiveLexeme = false;
       const character = text[i];
       const nextCharacter = text[i + 1];
       const normalizedCharacter = LexemeNormalizer.normalizeCharacter(character);
-      const nextNormalizedCharacter =
-        // Can be undefined if this is beyond the text
-        nextCharacter === undefined ? undefined : LexemeNormalizer.normalizeCharacter(nextCharacter);
-      // If the next character is not a part of the word, then the word is finished
-      const isWordBoundary =
-        nextNormalizedCharacter === undefined || !LexemeNormalizer.isWordCharacter(nextNormalizedCharacter);
-
-      if (buffer.startIndex === undefined) {
-        buffer.startIndex = i;
-      }
 
       if (LexemeNormalizer.isWordCharacter(normalizedCharacter)) {
-        LexemeAnalyzerUtils.accumulateCharacterToWordInBuffer(buffer, character, normalizedCharacter, isWordBoundary);
-        shouldProcessPrimitiveLexeme = isWordBoundary;
+        const nextNormalizedCharacter =
+          // Can be undefined if this is beyond the text
+          nextCharacter === undefined ? undefined : LexemeNormalizer.normalizeCharacter(nextCharacter);
+        const isWordBoundary =
+          nextNormalizedCharacter === undefined || !LexemeNormalizer.isWordCharacter(nextNormalizedCharacter);
+
+        LexemeAnalyzerUtils.addCharacterToBuffer(buffer, character, normalizedCharacter, isWordBoundary);
+
+        // If the next character is not a part of the word, then the word is finished
+        if (isWordBoundary) {
+          processPrimitiveLexeme(i);
+        }
       } else {
         LexemeAnalyzerUtils.setCharacterAsBuffer(buffer, character, normalizedCharacter);
-        shouldProcessPrimitiveLexeme = true;
-      }
-
-      if (shouldProcessPrimitiveLexeme) {
-        LexemeAnalyzer.processPrimitiveLexeme(
-          lexemeAnalyzerStore,
-          buffer.primitiveLexeme,
-          buffer.normalizedPrimitiveLexeme,
-          buffer.startIndex,
-          i,
-        );
-        buffer = LexemeAnalyzerUtils.createEmptyBuffer();
+        processPrimitiveLexeme(i);
       }
     }
 
@@ -82,68 +76,41 @@ export class LexemeAnalyzer {
     normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal,
     startIndex: number,
     endIndex: number,
-    options: { onCreated?: (lexeme: Lexeme) => void } = {},
   ) {
-    const { onCreated } = options;
-    const newBaseLexeme: BaseLexeme = {
+    // It may be split into smaller lexemes. E.g. `I'm` to `I` and `am`.
+    const possiblyNewLexeme = LexemeAnalyzerUtils.createLexeme(
+      primitiveLexeme,
+      normalizedPrimitiveLexeme,
+      startIndex,
       endIndex,
-      startIndex: startIndex,
-      original: primitiveLexeme,
-      normalized: normalizedPrimitiveLexeme,
-      uncontracted: LexemeNormalizer.uncontractPrimitiveLexeme(normalizedPrimitiveLexeme),
-    };
-    const newLexeme: Lexeme = {
-      ...newBaseLexeme,
-      type: LexemeNormalizer.getLexemeType(newBaseLexeme),
-    };
+    );
+
+    let newLexemes = [possiblyNewLexeme];
 
     // Uncontraction is applied after normalization. Therefor if `uncontracted` is not equal `normalized` then
     // we need to split the new primitive uncontracted lexeme (e.g. `do not`) to separate lexemes (e.g. to `do` and `not).
-    if (newLexeme.uncontracted !== newLexeme.normalized) {
-      LexemeAnalyzer.processPrimitiveUncontractedLexeme(lexemeAnalyzerStore, newLexeme, startIndex, endIndex);
-      return;
+    if (possiblyNewLexeme.uncontracted !== possiblyNewLexeme.normalized) {
+      newLexemes = LexemeAnalyzerUtils.splitUncontractedLexeme(possiblyNewLexeme, startIndex, endIndex);
     }
 
-    const isLastSpace = lexemeAnalyzerStore.isLastNLexemesMatch(1, (lexeme) => lexeme.normalized === ' ');
-    const isCurrentPunctuation = LexemeAnalyzer.PUNCTUATION_CHARACTERS.includes(newLexeme.normalized);
-    const isCurrentNewLine = newLexeme.normalized === '\n';
+    newLexemes.forEach((newLexeme) => {
+      const isLastSpace = lexemeAnalyzerStore.isLastNLexemesMatch(1, (lexeme) => lexeme.normalized === ' ');
+      const isCurrentPunctuation = LexemeAnalyzer.PUNCTUATION_CHARACTERS.includes(newLexeme.normalized);
+      const isCurrentNewLine = newLexeme.normalized === '\n';
 
-    if (
-      // Replace trailing spaces followed by a punctuation with just punctuation
-      (isLastSpace && isCurrentPunctuation) ||
-      // Replace trailing spaces followed by a new line with just new line
-      (isLastSpace && isCurrentNewLine)
-    ) {
-      lexemeAnalyzerStore.deleteLastLexemesUntilMatch((lexeme) => lexeme.normalized === ' ');
-    }
-
-    if (LexemeAnalyzer.canAddLexeme(lexemeAnalyzerStore, newLexeme)) {
-      lexemeAnalyzerStore.addLexeme(newLexeme);
-
-      if (onCreated) {
-        onCreated(newLexeme);
+      if (
+        // Replace trailing spaces followed by a punctuation with just punctuation
+        (isLastSpace && isCurrentPunctuation) ||
+        // Replace trailing spaces followed by a new line with just new line
+        (isLastSpace && isCurrentNewLine)
+      ) {
+        lexemeAnalyzerStore.deleteLastLexemesUntilMatch((lexeme) => lexeme.normalized === ' ');
       }
-    }
-  }
 
-  private static processPrimitiveUncontractedLexeme(
-    lexemeAnalyzerStore: LexemeAnalyzerStore,
-    uncontractedLexeme: Lexeme,
-    startIndex: number,
-    endIndex: number,
-  ) {
-    const restoreOriginalUncontructedLexeme = (newSplitLexeme: Lexeme) =>
-      // Because lexemes are split into separate ones (e.g. 'I am' to 'I' and 'am') we need to know the whole uncontracted (original)
-      // lexeme in each new lexeme. Otherwise, each new lexeme would have the same `Lexeme.normalized` and `Lexeme.uncontracted`
-      // fields. This overrides e.g. `am` in a new lexeme to `I am`.
-      (newSplitLexeme.uncontracted = uncontractedLexeme.uncontracted);
-
-    LexemeAnalyzerUtils.splitUncontractedLexeme(uncontractedLexeme, startIndex, endIndex).forEach(
-      ({ original, normalized, startIndex, endIndex }) =>
-        this.processPrimitiveLexeme(lexemeAnalyzerStore, original, normalized, startIndex, endIndex, {
-          onCreated: restoreOriginalUncontructedLexeme,
-        }),
-    );
+      if (LexemeAnalyzer.canAddLexeme(lexemeAnalyzerStore, newLexeme)) {
+        lexemeAnalyzerStore.addLexeme(newLexeme);
+      }
+    });
   }
 
   private static canAddLexeme(lexemeAnalyzerStore: LexemeAnalyzerStore, lexemeToAdd: Lexeme) {
