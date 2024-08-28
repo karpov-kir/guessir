@@ -67,12 +67,6 @@ describe(RenderController, () => {
     jest.spyOn(controlsRenderer, 'clearAndFocusGuessInput');
   });
 
-  it('should reduce the score when the user clicks on a word', () => {
-    userWordShowPubSub.publish(lexemesAnalysis.lexemes.get(0) as Lexeme);
-
-    expect(scoreRenderer.addScore).toBeCalledWith(-1);
-  });
-
   it('should increase the score if the user guesses a word', () => {
     guessPubSub.publish({ word: 'one' });
 
@@ -87,22 +81,10 @@ describe(RenderController, () => {
     expect(controlsRenderer.clearAndFocusGuessInput).not.toBeCalled();
   });
 
-  it('should reduce the score when the user shows the text', () => {
-    showTextPubSub.publish(true);
-
-    expect(scoreRenderer.addScore).toBeCalledWith(-7);
-  });
-
   it('should not change the score when the user hides the text', () => {
     showTextPubSub.publish(false);
 
     expect(scoreRenderer.addScore).not.toBeCalled();
-  });
-
-  it('should reduce the score when the user shows the first letters', () => {
-    showFirstLettersPubSub.publish(true);
-
-    expect(scoreRenderer.addScore).toBeCalledWith(-2);
   });
 
   it('should not change the score when the user hides the first letters', () => {

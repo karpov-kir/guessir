@@ -78,7 +78,7 @@ export class RenderController {
   }
 
   private handleUserWordShow(_lexeme: Lexeme) {
-    this.scoreRenderer.addScore(-1);
+    // TODO is there an interesting way to handle it to entertain the user?
   }
 
   private handleGuess({ word }: GuessEvent) {
@@ -97,7 +97,7 @@ export class RenderController {
     this.textRenderer.toggleText(isTextShown);
 
     if (isTextShown) {
-      this.scoreRenderer.addScore(-7);
+      // TODO is there an interesting way to handle it to entertain the user?
     }
   }
 
@@ -105,7 +105,7 @@ export class RenderController {
     this.textRenderer.toggleFirstLetters(isFirstLettersShown);
 
     if (isFirstLettersShown) {
-      this.scoreRenderer.addScore(-2);
+      // TODO is there an interesting way to handle it to entertain the user?
     }
   }
 }
