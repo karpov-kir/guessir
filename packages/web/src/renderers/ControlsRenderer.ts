@@ -1,6 +1,6 @@
 import { PubSub } from '../pubSub/PubSub';
 import { onChangeAndEnter, onEnter } from '../utils/dom';
-import { ChildrenRenderer } from './types';
+import { ChildRenderer } from './types';
 
 export type GuessEvent = {
   word: string;
@@ -11,7 +11,7 @@ type ControlsRendererOptions = {
   allowShowingFirstLetters?: boolean;
 };
 
-export class ControlsRenderer implements ChildrenRenderer {
+export class ControlsRenderer implements ChildRenderer {
   private containerElement: HTMLElement;
   private guessPubSub = new PubSub<GuessEvent>();
   private showFirstLettersPubSub = new PubSub<boolean>();

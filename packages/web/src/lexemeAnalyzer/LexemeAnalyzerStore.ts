@@ -26,19 +26,20 @@ export class LexemeAnalyzerStore implements LexemeAnalysis {
   }
 
   public deleteLastLexemesUntilMatch(filter: (lexeme: Lexeme) => boolean) {
-    let lexeme = this.lexemes.get(this.lastLexemeIndex);
+    let lastLexeme = this.lexemes.get(this.lastLexemeIndex);
 
-    while (lexeme && filter(lexeme)) {
-      if (LexemeNormalizer.isLexemeOtherCharacter(lexeme)) {
+    while (lastLexeme && filter(lastLexeme)) {
+      if (LexemeNormalizer.isLexemeOtherCharacter(lastLexeme)) {
         this.otherCharacterCount--;
       } else {
         this.wordLikeCount--;
 
-        LexemeNormalizer.getGroupingWords(lexeme.normalized).forEach((groupWordLikeNominal) => {
-          const lexemes = this.lexemesByWordLike.get(groupWordLikeNominal) || new Map<number, Lexeme>();
-          lexemes.delete(this.lastLexemeIndex);
+        LexemeNormalizer.getGroupingWords(lastLexeme.normalized).forEach((groupWordLikeNominal) => {
+          const lexemesByWordLike = this.lexemesByWordLike.get(groupWordLikeNominal) || new Map<number, Lexeme>();
 
-          if (!lexemes.size) {
+          lexemesByWordLike.delete(this.lastLexemeIndex);
+
+          if (!lexemesByWordLike.size) {
             this.lexemesByWordLike.delete(groupWordLikeNominal);
           }
         });
@@ -46,7 +47,7 @@ export class LexemeAnalyzerStore implements LexemeAnalysis {
 
       this.lexemes.delete(this.lastLexemeIndex);
       this.lastLexemeIndex--;
-      lexeme = this.lexemes.get(this.lastLexemeIndex);
+      lastLexeme = this.lexemes.get(this.lastLexemeIndex);
     }
 
     return true;

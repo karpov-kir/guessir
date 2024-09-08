@@ -1,7 +1,7 @@
 import { LexemeNormalizer } from '../../lexemeAnalyzer/LexemeNormalizer';
 import { Lexeme, LexemeAnalysis } from '../../lexemeAnalyzer/types';
 import { PubSub } from '../../pubSub/PubSub';
-import { ChildrenRenderer } from '../types';
+import { ChildRenderer } from '../types';
 import { WordRenderer } from './WordRenderer';
 
 type TextRendererOptions = {
@@ -10,7 +10,7 @@ type TextRendererOptions = {
   description?: string;
 };
 
-export class TextRenderer implements ChildrenRenderer {
+export class TextRenderer implements ChildRenderer {
   private containerElement: HTMLElement;
   private lexemesAnalysis: LexemeAnalysis;
   private title?: string;

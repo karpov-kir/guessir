@@ -1,12 +1,12 @@
 import { Lexeme } from '../../lexemeAnalyzer/types';
 import { PubSub } from '../../pubSub/PubSub';
-import { ChildrenRenderer } from '../types';
+import { ChildRenderer } from '../types';
 
 type WordRendererOptions = {
   lexeme: Lexeme;
 };
 
-export class WordRenderer implements ChildrenRenderer {
+export class WordRenderer implements ChildRenderer {
   private lexeme: Lexeme;
   private containerElement: HTMLElement;
   private userWordShowPubSub = new PubSub<Lexeme>();

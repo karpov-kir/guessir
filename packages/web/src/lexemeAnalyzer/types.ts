@@ -2,7 +2,7 @@ export enum LexemeType {
   Word = 'w',
   SpecialCharacter = 'sc',
   Letter = 'l',
-  // E.g. dash in `re-configured` or apostrophe in`don't`
+  // E.g. dash in `re-configured` or apostrophe in `don't`
   WordHelping = 'wh',
 }
 
@@ -37,8 +37,6 @@ export interface Lexeme extends BaseLexeme {
   type: LexemeType;
 }
 
-// Nominals
-
 export type NormalizedPrimitiveLexemeNominal = string & {
   __type: 'normalized';
 };
@@ -47,6 +45,9 @@ export type PrimitiveLexemeNominal = string & {
   __type: 'primitive';
 };
 
+// To workaround words like `Item's/I'd/She'd/He'd/He's/She's`. We cannot uncontract them, as they can be
+// uncontracted in multiple ways (e.g. she's - she is / she has or it can be a possessive ’s), so we can simply
+// let the user just use e.g. `she` and count it as `she's` and as `she`.
 export type GroupWordLikeNominal = string & {
   __type: 'groupWordLike';
 };

@@ -139,9 +139,6 @@ export class LexemeNormalizer {
     return LexemeType.Word;
   }
 
-  // To workaround words like `Item's/I'd/She'd/He'd/He's/She's`. We cannot uncontract them, as they can be
-  // uncontracted in multiple ways (e.g. she's - she is / she has or it can be a possessive ’s), so we can simply
-  // let the user use just e.g. `she` and count it as `she's` and as `she`.
   public static getGroupingWords(normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal): GroupWordLikeNominal[] {
     const length = normalizedPrimitiveLexeme.length;
     // Keep as lower-cased for easy access

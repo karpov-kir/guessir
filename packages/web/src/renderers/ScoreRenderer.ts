@@ -1,10 +1,10 @@
-import { ChildrenRenderer } from './types';
+import { ChildRenderer } from './types';
 
 type ScoreRendererOptions = {
   wordLikeCount: number;
 };
 
-export class ScoreRenderer implements ChildrenRenderer {
+export class ScoreRenderer implements ChildRenderer {
   private wordLikeCount = 0;
   private score = 0;
   private containerElement: HTMLElement;

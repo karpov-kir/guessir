@@ -1,3 +1,3 @@
-export interface ChildrenRenderer {
+export interface ChildRenderer {
   getElement(): HTMLElement;
 }

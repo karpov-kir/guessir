@@ -1,7 +1,7 @@
 import copyIcon from '../icons/copyIcon.svg';
 import { onChangeAndEnter } from '../utils/dom';
 import { createText, generateTextUrl } from '../utils/text';
-import { ChildrenRenderer } from './types';
+import { ChildRenderer } from './types';
 
 interface CreateTextRendererOptions {
   maxTitleLength?: number;
@@ -9,7 +9,7 @@ interface CreateTextRendererOptions {
   maxTextLength?: number;
 }
 
-export class CreateTextRenderer implements ChildrenRenderer {
+export class CreateTextRenderer implements ChildRenderer {
   private containerElement: HTMLElement;
   private generatedUrl = '';
   private copiedAlertElement = document.createElement('div');
