@@ -17,7 +17,7 @@ export async function createText(payload: CreateTextDto) {
     }
 
     return (await response.json()) as Text;
-  } catch (error) {
+  } catch (_error) {
     throw new Error('Could not create text');
   }
 }

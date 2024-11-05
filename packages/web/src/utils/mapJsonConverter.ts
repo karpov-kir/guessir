@@ -28,6 +28,7 @@ export function mapFromJsonReviver(key: string, value: unknown) {
   return value;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isConvertedMap(value: any): value is ConvertedMap {
   return value?.dataType === 'Map';
 }
