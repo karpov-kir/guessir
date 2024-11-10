@@ -1,4 +1,6 @@
-import { getElementText } from '../testUtils/dom';
+import { beforeEach, describe, expect, it } from 'vitest';
+
+import { getElementText } from '../../tests/utils/dom';
 import { ScoreRenderer } from './ScoreRenderer';
 
 let scoreRenderer: ScoreRenderer;

@@ -1,15 +1,12 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "rootDir": "./src",
-    "outDir": "./dist",
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "types": ["jest"]
+    "experimentalDecorators": true
   },
   "references": [
     {
-      "path": "../shared"
+      "path": "../shared/tsconfig.json"
     }
   ]
 }

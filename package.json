@@ -9,40 +9,38 @@
     "packages/web"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build": "lerna run build",
     "build:web": "npm run build -w @guessir/web",
-    "clean": "npm run clean --workspaces --if-present",
+    "clean": "lerna run clean",
     "lint": "eslint \"packages/**/src/**/*.ts\"",
     "lint:fix": "npm run lint -- --fix",
     "start:dev:backend": "npm run start:dev -w @guessir/backend",
     "start:dev:web": "npm run start:dev -w @guessir/web",
     "start:backend": "npm run start -w @guessir/backend",
-    "test": "jest",
-    "test:clearCache": "jest --clearCache",
-    "test:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand",
-    "test:watch": "jest --watch",
-    "build:docker": "npm run build:docker --workspaces --if-present",
-    "publish:docker": "npm run publish:docker --workspaces --if-present"
+    "test": "vitest run",
+    "test:ci": "vitest run --coverage --reporter default --reporter vitest-sonar-reporter --outputFile=./coverage/test-report.xml",
+    "test:debug": "vitest --inspect-brk --pool forks --poolOptions.forks.singleFork",
+    "test:watch": "vitest watch",
+    "build:docker": "lerna run build:docker",
+    "publish:docker": "lerna run publish:docker"
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
-    "@swc/core": "^1.8.0",
-    "@swc/jest": "^0.2.37",
     "@types/eslint__js": "^8.42.3",
-    "@types/jest": "^29.5.14",
+    "@vitest/coverage-v8": "^2.1.4",
     "del-cli": "^6.0.0",
     "eslint": "^9.14.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
-    "jest": "^29.7.0",
-    "jest-sonar-reporter": "^2.0.0",
+    "lerna": "^8.1.9",
     "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3",
-    "typescript-eslint": "^8.13.0"
-  },
-  "jestSonar": {
-    "reportPath": "./coverage"
+    "typescript-eslint": "^8.13.0",
+    "unplugin-swc": "^1.5.1",
+    "vitest": "^2.1.4",
+    "vitest-mock-extended": "^2.0.2",
+    "vitest-sonar-reporter": "^2.0.0"
   }
 }

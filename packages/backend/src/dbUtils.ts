@@ -1,3 +1,5 @@
+/* v8 ignore start */
+
 import { Logger } from '@nestjs/common';
 import { dirname } from 'path';
 import { DataSource, DataSourceOptions } from 'typeorm';
@@ -96,3 +98,5 @@ export const isDbEnabled = () => {
 
   return false;
 };
+
+/* v8 ignore stop */

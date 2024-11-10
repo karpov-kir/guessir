@@ -1,8 +1,14 @@
-import { TextInterface } from '@guessir/shared/dist/TextInterface';
+import { Text } from '@guessir/shared/dist/Text';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { mock, MockProxy } from 'vitest-mock-extended';
 
 import { boot } from './boot';
 import { LexemeAnalyzer } from './lexemeAnalyzer/LexemeAnalyzer';
 import { RenderController } from './RenderController';
+import { ApiClient } from './utils/ApiClient';
+
+let mockedApiClient: MockProxy<ApiClient>;
+vi.mock('./RenderController');
 
 const mockedText = {
   id: 'text-id',
@@ -11,14 +17,7 @@ const mockedText = {
   description: 'Test description',
   allowShowingFirstLetters: true,
   allowShowingText: true,
-} as TextInterface;
-const mockedLoadText = jest.fn();
-
-jest.mock('./utils/text', () => ({
-  ...jest.requireActual<Record<string, unknown>>('./utils/text'),
-  loadText: (id: string) => mockedLoadText(id),
-}));
-jest.mock('./RenderController');
+} as Text;
 
 Object.defineProperty(window, 'location', {
   value: {
@@ -28,16 +27,16 @@ Object.defineProperty(window, 'location', {
 
 describe(boot, () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(LexemeAnalyzer, 'analyze');
+    mockedApiClient = mock<ApiClient>();
+    vi.spyOn(LexemeAnalyzer, 'analyze');
   });
 
   it('should load and render a remote text', async () => {
-    mockedLoadText.mockResolvedValue(mockedText);
+    mockedApiClient.loadText.mockResolvedValue(mockedText);
 
-    await boot(document.createElement('div'));
+    await boot(document.createElement('div'), mockedApiClient);
 
-    expect(mockedLoadText).toBeCalledWith(mockedText.id);
+    expect(mockedApiClient.loadText).toBeCalledWith(mockedText.id);
     expect(LexemeAnalyzer.analyze).toBeCalledWith(mockedText.text);
 
     expect(RenderController).toBeCalledWith({
@@ -50,9 +49,9 @@ describe(boot, () => {
   });
 
   it('should render an error text if loading a remote text fails', async () => {
-    mockedLoadText.mockRejectedValue(new Error('Test'));
+    mockedApiClient.loadText.mockRejectedValue(new Error('Test'));
 
-    await boot(document.createElement('div'));
+    await boot(document.createElement('div'), mockedApiClient);
 
     expect(LexemeAnalyzer.analyze).toBeCalledWith(
       expect.stringContaining(`I could not load the remote text. Please, verify your URL or create a new text.`),
@@ -69,7 +68,7 @@ describe(boot, () => {
   it('should render a default text if a text ID is not set in the URL', async () => {
     window.location.search = '';
 
-    await boot(document.createElement('div'));
+    await boot(document.createElement('div'), mockedApiClient);
 
     expect(LexemeAnalyzer.analyze).toBeCalledWith('In order to create your own text find the form below.');
     expect(RenderController).toBeCalledWith({

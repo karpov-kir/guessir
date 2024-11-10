@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { LexemeAnalyzer } from './lexemeAnalyzer/LexemeAnalyzer';
 import { Lexeme } from './lexemeAnalyzer/types';
 import { PubSub } from './pubSub/PubSub';
@@ -5,23 +7,6 @@ import { RenderController } from './RenderController';
 import { ControlsRenderer, GuessEvent } from './renderers/ControlsRenderer';
 import { ScoreRenderer } from './renderers/ScoreRenderer';
 import { TextRenderer } from './renderers/textRenderer/TextRenderer';
-
-let interceptedPubSubs: PubSub<unknown>[] = [];
-
-jest.mock('./pubSub/PubSub', () => {
-  const { PubSub: OriginalPubSub } = jest.requireActual<{
-    PubSub: { new (): PubSub<unknown> };
-  }>('./pubSub/PubSub');
-
-  return {
-    PubSub: class InterceptedPubSub extends OriginalPubSub {
-      constructor() {
-        super();
-        interceptedPubSubs.push(this);
-      }
-    },
-  };
-});
 
 let renderController: RenderController;
 let scoreRenderer: ScoreRenderer;
@@ -40,19 +25,19 @@ const lexemesAnalysis = LexemeAnalyzer.analyze(`
 
 describe(RenderController, () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    interceptedPubSubs = [];
-
-    controlsRenderer = new ControlsRenderer();
-    guessPubSub = interceptedPubSubs[0] as typeof guessPubSub;
-    showFirstLettersPubSub = interceptedPubSubs[1] as typeof showFirstLettersPubSub;
-    showTextPubSub = interceptedPubSubs[2] as typeof showTextPubSub;
+    guessPubSub = new PubSub<GuessEvent>();
+    showFirstLettersPubSub = new PubSub<boolean>();
+    showTextPubSub = new PubSub<boolean>();
+    controlsRenderer = new ControlsRenderer({
+      guessPubSub,
+      showFirstLettersPubSub,
+      showTextPubSub,
+    });
 
     scoreRenderer = new ScoreRenderer({ wordLikeCount: lexemesAnalysis.wordLikeCount });
 
-    interceptedPubSubs = [];
-    textRenderer = new TextRenderer({ lexemesAnalysis });
-    userWordShowPubSub = interceptedPubSubs[0] as typeof userWordShowPubSub;
+    userWordShowPubSub = new PubSub<Lexeme>();
+    textRenderer = new TextRenderer({ lexemesAnalysis, userWordShowPubSub });
 
     renderController = new RenderController({
       lexemesAnalysis,
@@ -63,8 +48,8 @@ describe(RenderController, () => {
 
     renderController.init(document.createElement('div'));
 
-    jest.spyOn(scoreRenderer, 'addScore');
-    jest.spyOn(controlsRenderer, 'clearAndFocusGuessInput');
+    vi.spyOn(scoreRenderer, 'addScore');
+    vi.spyOn(controlsRenderer, 'clearAndFocusGuessInput');
   });
 
   it('should increase the score when the user clicks on a word', () => {
@@ -100,7 +85,7 @@ describe(RenderController, () => {
   });
 
   it('should shake and error the guess input when the user guesses a word that is not in the text', () => {
-    jest.spyOn(controlsRenderer, 'shakeAndError');
+    vi.spyOn(controlsRenderer, 'shakeAndError');
 
     guessPubSub.publish({ word: 'unknown' });
 

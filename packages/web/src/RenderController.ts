@@ -4,7 +4,7 @@ import { CreateTextRenderer } from './renderers/CreateTextRenderer';
 import { ScoreRenderer } from './renderers/ScoreRenderer';
 import { TextRenderer } from './renderers/textRenderer/TextRenderer';
 
-type RenderControllerOptions = {
+export type RenderControllerOptions = {
   lexemesAnalysis: LexemeAnalysis;
   title?: string;
   description?: string;
@@ -17,47 +17,35 @@ type RenderControllerOptions = {
 };
 
 export class RenderController {
-  private guessirContainer: HTMLElement;
+  private readonly guessirContainer: HTMLElement;
 
-  private textRenderer: TextRenderer;
-  private controlsRenderer: ControlsRenderer;
-  private scoreRenderer: ScoreRenderer;
-  private utilsRenderer: CreateTextRenderer;
+  private readonly textRenderer: TextRenderer;
+  private readonly controlsRenderer: ControlsRenderer;
+  private readonly scoreRenderer: ScoreRenderer;
+  private readonly utilsRenderer: CreateTextRenderer;
 
   constructor(options: RenderControllerOptions) {
-    const {
-      lexemesAnalysis,
-      title,
-      description,
-      allowShowingText,
-      allowShowingFirstLetters,
-      textRenderer,
-      controlsRenderer,
-      scoreRenderer,
-      createTextRenderer,
-    } = options;
-
     this.guessirContainer = document.createElement('div');
     this.guessirContainer.id = 'guessir';
     this.textRenderer =
-      textRenderer ||
+      options.textRenderer ||
       new TextRenderer({
-        lexemesAnalysis,
-        title,
-        description,
+        lexemesAnalysis: options.lexemesAnalysis,
+        title: options.title,
+        description: options.description,
       });
     this.controlsRenderer =
-      controlsRenderer ||
+      options.controlsRenderer ||
       new ControlsRenderer({
-        allowShowingText,
-        allowShowingFirstLetters,
+        allowShowingText: options.allowShowingText,
+        allowShowingFirstLetters: options.allowShowingFirstLetters,
       });
     this.scoreRenderer =
-      scoreRenderer ||
+      options.scoreRenderer ||
       new ScoreRenderer({
-        wordLikeCount: lexemesAnalysis.wordLikeCount,
+        wordLikeCount: options.lexemesAnalysis.wordLikeCount,
       });
-    this.utilsRenderer = createTextRenderer || new CreateTextRenderer();
+    this.utilsRenderer = options.createTextRenderer || new CreateTextRenderer();
   }
 
   public init(containerElement: HTMLElement) {

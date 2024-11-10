@@ -1,16 +1,17 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { onChangeAndEnter } from './dom';
 
 let inputElement: HTMLInputElement;
-const callback = jest.fn();
+let callback: () => void;
 const enterPressEvent = new KeyboardEvent('keypress', {
   key: 'Enter',
 });
 
 describe(onChangeAndEnter, () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-
     inputElement = document.createElement('input');
+    callback = vi.fn();
 
     onChangeAndEnter(inputElement, callback, { toggleChecked: true });
   });

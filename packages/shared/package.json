@@ -3,8 +3,8 @@
   "type": "module",
   "version": "1.0.0",
   "scripts": {
-    "build": "npm run clean && tsc -b tsconfig.json",
-    "clean": "del-cli ./dist ./tsconfig.tsbuildinfo"
+    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "clean": "del-cli ./dist ./tsconfig.build.tsbuildinfo"
   },
   "dependencies": {},
   "devDependencies": {}

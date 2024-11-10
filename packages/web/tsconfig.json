@@ -1,14 +1,12 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "./dist",
     "lib": ["DOM", "ES2022"],
-    "types": ["./src/@types/svg", "./src/@types/env", "jest"],
-    "noEmit": true
+    "types": ["./src/@types/env", "vite/client"]
   },
   "references": [
     {
-      "path": "../shared"
+      "path": "../shared/tsconfig.json"
     }
   ]
 }

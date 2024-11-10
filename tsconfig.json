@@ -11,12 +11,7 @@
     "baseUrl": "./",
     "paths": {
       "@guessir/shared/dist/*": ["./packages/shared/src/*"]
-    }
-  },
-  "exclude": [
-    "**/*.spec.ts",
-    "**/*.test.ts",
-    "**/*.e2e-spec.ts",
-    "**/jest.config.ts"
-  ]
+    },
+    "types": []
+  }
 }

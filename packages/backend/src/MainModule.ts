@@ -1,7 +1,9 @@
+/* v8 ignore start */
+
 import { Logger, Module, OnApplicationBootstrap } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { TextsController } from './controllers/TextsController';
+import { TextsController } from './controllers/TextController';
 import { applyDbMigrations, getTypeOrmConfig, isDbEnabled } from './dbUtils';
 import { TextEntity } from './entities/TextEntity';
 
@@ -11,7 +13,7 @@ import { TextEntity } from './entities/TextEntity';
   providers: [],
 })
 export class MainModule implements OnApplicationBootstrap {
-  private static logger = new Logger(MainModule.name);
+  private static readonly logger = new Logger(MainModule.name);
 
   async onApplicationBootstrap() {
     if (isDbEnabled()) {
@@ -39,3 +41,5 @@ function getTypeOrmModule() {
     migrations: [],
   });
 }
+
+/* v8 ignore stop */

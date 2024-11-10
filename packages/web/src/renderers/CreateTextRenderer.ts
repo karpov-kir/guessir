@@ -1,31 +1,34 @@
-import copyIcon from '../icons/copyIcon.svg';
+import copyIcon from '../icons/copyIcon.svg?raw';
+import { ApiClient } from '../utils/ApiClient';
 import { onChangeAndEnter } from '../utils/dom';
-import { createText, generateTextUrl } from '../utils/text';
+import { generateTextUrl } from '../utils/text';
 import { ChildRenderer } from './types';
 
 interface CreateTextRendererOptions {
   maxTitleLength?: number;
   maxDescriptionLength?: number;
   maxTextLength?: number;
+  apiClient?: ApiClient;
 }
 
 export class CreateTextRenderer implements ChildRenderer {
-  private containerElement: HTMLElement;
+  private readonly containerElement: HTMLElement;
   private generatedUrl = '';
-  private copiedAlertElement = document.createElement('div');
-  private maxTitleLength = 0;
-  private maxDescriptionLength = 0;
-  private maxTextLength = 0;
+  private readonly copiedAlertElement = document.createElement('div');
+  private readonly maxTitleLength: number = 0;
+  private readonly maxDescriptionLength: number = 0;
+  private readonly maxTextLength: number = 0;
+  private readonly apiClient: ApiClient;
 
   constructor(options: CreateTextRendererOptions = {}) {
-    const { maxTitleLength = 500, maxDescriptionLength = 4000, maxTextLength = 4000 } = options;
-
     this.containerElement = document.createElement('div');
     this.containerElement.id = 'utils-container';
 
-    this.maxTitleLength = maxTitleLength;
-    this.maxDescriptionLength = maxDescriptionLength;
-    this.maxTextLength = maxTextLength;
+    this.apiClient = options.apiClient || new ApiClient();
+
+    this.maxTitleLength = options.maxTitleLength ?? 500;
+    this.maxDescriptionLength = options.maxDescriptionLength ?? 4000;
+    this.maxTextLength = options.maxTextLength || 4000;
 
     this.copiedAlertElement.textContent = '(copied)';
 
@@ -248,7 +251,8 @@ export class CreateTextRenderer implements ChildRenderer {
       this.blockForm(true);
       generatedUrlContainerElement.classList.add('hide');
 
-      createText(this.getValues())
+      this.apiClient
+        .createText(this.getValues())
         .then((apiText) => {
           this.cleanForm();
 

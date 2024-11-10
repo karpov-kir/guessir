@@ -1,3 +1,5 @@
+import { describe, expect, it, vi } from 'vitest';
+
 import { Deferred } from './Deferred';
 
 describe(Deferred, () => {
@@ -37,7 +39,7 @@ describe(Deferred, () => {
 
   it('should call a finally callback on fulfilled', async () => {
     const deferred = new Deferred<string>();
-    const finallyCallback = jest.fn();
+    const finallyCallback = vi.fn();
     const finallyPromise = deferred.finally(finallyCallback);
 
     setTimeout(() => {
@@ -50,7 +52,7 @@ describe(Deferred, () => {
 
   it('should call a finally callback on rejection', async () => {
     const deferred = new Deferred<string>();
-    const finallyCallback = jest.fn();
+    const finallyCallback = vi.fn();
     const finallyPromise = deferred.finally(finallyCallback);
 
     setTimeout(() => {

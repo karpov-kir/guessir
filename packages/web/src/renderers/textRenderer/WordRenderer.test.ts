@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { Lexeme } from '../../lexemeAnalyzer/types';
 import { WordRenderer } from './WordRenderer';
 
@@ -30,7 +32,7 @@ describe(WordRenderer, () => {
   });
 
   it('should not notify about about second click', () => {
-    const userWordShowCallback = jest.fn();
+    const userWordShowCallback = vi.fn();
 
     wordRenderer.userWordShowEvent.subscribe(userWordShowCallback);
     wordRenderer.getElement().click();

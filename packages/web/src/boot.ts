@@ -1,8 +1,11 @@
+/* v8 ignore start */
+
 import './styles.css';
 
 import { LexemeAnalyzer } from './lexemeAnalyzer/LexemeAnalyzer';
 import { RenderController } from './RenderController';
-import { hasTextParametersInUrl, loadText, parseTextIdFromUrl } from './utils/text';
+import { ApiClient } from './utils/ApiClient';
+import { hasTextParametersInUrl, parseTextIdFromUrl } from './utils/text';
 
 const defaultTitle = 'Hello!';
 
@@ -14,7 +17,7 @@ const couldNotLoadRemoteTextText = `
   I could not load the remote text. Please, verify your URL or create a new text.
 `;
 
-export async function boot(containerElement: HTMLElement) {
+export async function boot(containerElement: HTMLElement, apiClient = new ApiClient()) {
   let text = defaultText;
   let title = defaultTitle;
   let description: string | undefined = defaultDescription;
@@ -26,7 +29,7 @@ export async function boot(containerElement: HTMLElement) {
       console.log('Trying to load text...');
 
       const id = parseTextIdFromUrl();
-      const apiText = await loadText(id);
+      const apiText = await apiClient.loadText(id);
 
       console.log('Text has been loaded', apiText);
 
@@ -49,3 +52,5 @@ export async function boot(containerElement: HTMLElement) {
 
   renderController.init(containerElement);
 }
+
+/* v8 ignore stop */

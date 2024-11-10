@@ -1,19 +1,15 @@
 import { Text } from '@guessir/shared/dist/Text';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { mock, MockProxy } from 'vitest-mock-extended';
 
+import { ApiClient } from '../utils/ApiClient';
 import { Deferred } from '../utils/Deferred';
 import { CreateTextRenderer, getElements } from './CreateTextRenderer';
 
 const mockedText = {
   id: 'mocked-id',
 } as Text;
-const mockedCreateText = jest.fn().mockResolvedValue(mockedText);
-
-jest.mock('../utils/text', () => ({
-  ...jest.requireActual('../utils/text'),
-  createText: (...args: unknown[]) => mockedCreateText(...args),
-  generateTextUrl: () => 'http://mocked-url',
-}));
-
+let mockedApiClient: MockProxy<ApiClient>;
 let createTextRenderer: CreateTextRenderer;
 
 const createText = async () => {
@@ -26,7 +22,7 @@ const createText = async () => {
   } = getElements(createTextRenderer.getElement());
   const deferred = new Deferred<Text>();
 
-  mockedCreateText.mockReturnValue(deferred.promise);
+  mockedApiClient.createText.mockReturnValue(deferred.promise);
 
   textInputElement.value = 'Text text';
   titleInputElement.value = 'Test title';
@@ -40,10 +36,15 @@ const createText = async () => {
 
 describe(CreateTextRenderer, () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useRealTimers();
+    vi.useRealTimers();
 
-    createTextRenderer = new CreateTextRenderer({ maxTitleLength: 2, maxDescriptionLength: 2, maxTextLength: 2 });
+    mockedApiClient = mock<ApiClient>();
+    createTextRenderer = new CreateTextRenderer({
+      maxTitleLength: 2,
+      maxDescriptionLength: 2,
+      maxTextLength: 2,
+      apiClient: mockedApiClient,
+    });
   });
 
   it('should create a text when the form is submitted', async () => {
@@ -53,15 +54,15 @@ describe(CreateTextRenderer, () => {
 
     await createText();
 
-    expect(mockedCreateText).toBeCalledWith({
+    expect(mockedApiClient.createText).toBeCalledWith({
       allowShowingFirstLetters: false,
       allowShowingText: true,
       description: 'Test description',
       text: 'Text text',
       title: 'Test title',
     });
-    expect(generatedUrlElement.textContent).toBe('http://mocked-url');
-    expect(generatedUrlElement.href).toBe('http://mocked-url/');
+    expect(generatedUrlElement.textContent).toBe('http://localhost:3000?textId=mocked-id');
+    expect(generatedUrlElement.href).toBe('http://localhost:3000/?textId=mocked-id');
     expect(generatedUrlContainerElement.classList).not.toContain('hide');
   });
 
@@ -71,7 +72,7 @@ describe(CreateTextRenderer, () => {
       createTextRenderer.getElement(),
     );
 
-    mockedCreateText.mockReturnValue(deferred.promise);
+    mockedApiClient.createText.mockReturnValue(deferred.promise);
 
     // Set required fields
     textInputElement.value = 'Text text';
@@ -95,7 +96,7 @@ describe(CreateTextRenderer, () => {
     const containerElement = createTextRenderer.getElement();
     const getDisabledElements = () => containerElement.querySelectorAll('input:disabled, textarea:disabled');
 
-    mockedCreateText.mockReturnValue(deferred.promise);
+    mockedApiClient.createText.mockReturnValue(deferred.promise);
 
     // Set required fields
     textInputElement.value = 'Text text';
@@ -119,7 +120,7 @@ describe(CreateTextRenderer, () => {
 
     generateUrlButtonElement.click();
 
-    expect(mockedCreateText).not.toBeCalled();
+    expect(mockedApiClient.createText).not.toBeCalled();
   });
 
   it('should initialize inputs without validation classes', () => {
@@ -165,7 +166,7 @@ describe(CreateTextRenderer, () => {
   });
 
   it('should copy a generated URL on click', async () => {
-    const mockedWriteText = jest.fn();
+    const mockedWriteText = vi.fn();
     const { copyGeneratedUrlButtonElement } = getElements(createTextRenderer.getElement());
 
     Object.assign(navigator, {
@@ -177,20 +178,20 @@ describe(CreateTextRenderer, () => {
     await createText();
     copyGeneratedUrlButtonElement.click();
 
-    expect(mockedWriteText).toBeCalledWith('http://mocked-url');
+    expect(mockedWriteText).toBeCalledWith('http://localhost:3000?textId=mocked-id');
   });
 
   it('should hide the alert that a generated URL was copied on a timeout', async () => {
     const { copyGeneratedUrlButtonElement } = getElements(createTextRenderer.getElement());
 
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     await createText();
     copyGeneratedUrlButtonElement.click();
 
     expect(copyGeneratedUrlButtonElement.querySelector('div')?.textContent).toBe('(copied)');
 
-    jest.runAllTimers();
+    vi.runAllTimers();
 
     expect(copyGeneratedUrlButtonElement.querySelector('div')).toBe(null);
   });

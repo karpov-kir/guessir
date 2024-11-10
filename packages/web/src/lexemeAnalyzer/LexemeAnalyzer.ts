@@ -4,7 +4,7 @@ import { LexemeNormalizer } from './LexemeNormalizer';
 import { Lexeme, LexemeAnalysis, LexemeType, NormalizedPrimitiveLexemeNominal, PrimitiveLexemeNominal } from './types';
 
 export class LexemeAnalyzer {
-  private static PUNCTUATION_CHARACTERS = [',', '.', '!', '?', ';'];
+  private static readonly PUNCTUATION_CHARACTERS = [',', '.', '!', '?', ';'];
 
   /**
    * Applies the following rules:

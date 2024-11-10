@@ -1,10 +1,12 @@
+import { describe, expect, it, vi } from 'vitest';
+
 import { PubSub } from './PubSub';
 
 describe(PubSub, () => {
   it('should notify subscribers', () => {
     const pubSub = new PubSub();
-    const mockedSubscriber1 = jest.fn();
-    const mockedSubscriber2 = jest.fn();
+    const mockedSubscriber1 = vi.fn();
+    const mockedSubscriber2 = vi.fn();
 
     pubSub.event.subscribe(mockedSubscriber1);
     pubSub.event.subscribe(mockedSubscriber2);
@@ -19,7 +21,7 @@ describe(PubSub, () => {
 
   it('should throw an error if a subscriber is subscribed for the second time', () => {
     const pubSub = new PubSub();
-    const mockedSubscriber = jest.fn();
+    const mockedSubscriber = vi.fn();
 
     pubSub.event.subscribe(mockedSubscriber);
 
@@ -30,8 +32,8 @@ describe(PubSub, () => {
 
   it('should unsubscribe subscribers', () => {
     const pubSub = new PubSub();
-    const mockedSubscriber1 = jest.fn();
-    const mockedSubscriber2 = jest.fn();
+    const mockedSubscriber1 = vi.fn();
+    const mockedSubscriber2 = vi.fn();
 
     pubSub.event.subscribe(mockedSubscriber1);
     pubSub.event.subscribe(mockedSubscriber2);
@@ -49,10 +51,10 @@ describe(PubSub, () => {
 
   it('should notify all subscribers even if a subscriber is unsubscribed during the notification process', () => {
     const pubSub = new PubSub();
-    const mockedSubscriber1 = jest.fn(() => {
+    const mockedSubscriber1 = vi.fn(() => {
       pubSub.event.unsubscribe(mockedSubscriber1);
     });
-    const mockedSubscriber2 = jest.fn();
+    const mockedSubscriber2 = vi.fn();
 
     pubSub.event.subscribe(mockedSubscriber1);
     pubSub.event.subscribe(mockedSubscriber2);

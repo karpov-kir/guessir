@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { mapFromJsonReviver, mapToJsonReplacer } from './mapJsonConverter';
 
 describe(mapToJsonReplacer, () => {

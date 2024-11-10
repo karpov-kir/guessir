@@ -5,14 +5,12 @@ type ScoreRendererOptions = {
 };
 
 export class ScoreRenderer implements ChildRenderer {
-  private wordLikeCount = 0;
-  private score = 0;
-  private containerElement: HTMLElement;
+  private readonly wordLikeCount: number = 0;
+  private score: number = 0;
+  private readonly containerElement: HTMLElement;
 
   constructor(options: ScoreRendererOptions) {
-    const { wordLikeCount } = options;
-
-    this.wordLikeCount = wordLikeCount;
+    this.wordLikeCount = options.wordLikeCount;
     this.containerElement = document.createElement('div');
     this.containerElement.id = 'score-container';
 

@@ -8,20 +8,20 @@ import {
 } from './types';
 
 export class LexemeNormalizer {
-  private static CHARACTERS_TO_NORMALIZED_CHARACTERS = new Map<string, NormalizedPrimitiveLexemeNominal>([
+  private static readonly CHARACTERS_TO_NORMALIZED_CHARACTERS = new Map<string, NormalizedPrimitiveLexemeNominal>([
     ['—', '-'],
     ['’', "'"],
     ['`', "'"],
   ] as Array<[string, NormalizedPrimitiveLexemeNominal]>);
-  private static NORMALIZED_WORDS_TO_NORMALIZED_WORDS = new Map<
+  private static readonly NORMALIZED_WORDS_TO_NORMALIZED_WORDS = new Map<
     NormalizedPrimitiveLexemeNominal,
     NormalizedPrimitiveLexemeNominal
   >([['i', 'I']] as Array<[NormalizedPrimitiveLexemeNominal, NormalizedPrimitiveLexemeNominal]>);
-  private static NORMALIZED_CONTRACTION_CHARACTERS = ["'"] as NormalizedPrimitiveLexemeNominal[];
-  private static NORMALIZED_WORD_SEPARATION_CHARACTERS = ['-'] as NormalizedPrimitiveLexemeNominal[];
-  private static LETTER_RE = /^[A-Za-z]$/;
+  private static readonly NORMALIZED_CONTRACTION_CHARACTERS = ["'"] as NormalizedPrimitiveLexemeNominal[];
+  private static readonly NORMALIZED_WORD_SEPARATION_CHARACTERS = ['-'] as NormalizedPrimitiveLexemeNominal[];
+  private static readonly LETTER_RE = /^[A-Za-z]$/;
 
-  private static NORMALIZED_CONTRACTION_TO_NORMALIZED_NORMAL = new Map<string, string>([
+  private static readonly NORMALIZED_CONTRACTION_TO_NORMALIZED_NORMAL = new Map<string, string>([
     ["don't", 'do not'],
     ["doesn't", 'does not'],
     ["didn't", 'did not'],

@@ -1,9 +1,10 @@
 import { ObjectLiteral, Repository } from 'typeorm';
+import { vi } from 'vitest';
 
 export const mockRepository = <T extends ObjectLiteral>(): Repository<T> => {
   return {
-    find: jest.fn() as Repository<T>['find'],
-    findOne: jest.fn() as Repository<T>['findOne'],
-    save: jest.fn() as Repository<T>['save'],
+    find: vi.fn() as Repository<T>['find'],
+    findOne: vi.fn() as Repository<T>['findOne'],
+    save: vi.fn() as Repository<T>['save'],
   } as Repository<T>;
 };

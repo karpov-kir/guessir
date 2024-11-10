@@ -1,7 +1,7 @@
 .idea
 .vscode
 build
-tsconfig.tsbuildinfo
+tsconfig.build.tsbuildinfo
 dist
 node_modules
 coverage

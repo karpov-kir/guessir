@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "npm run clean && tsc && vite build",
+    "build": "npm run clean && tsc -p ./tsconfig.build.json && vite build",
     "clean": "del-cli ./dist",
     "start:dev": "vite",
     "start:preview": "vite preview",
@@ -15,9 +15,7 @@
     "url-join": "^5.0.0"
   },
   "devDependencies": {
-    "jest-environment-jsdom": "^29.7.0",
-    "mini-css-extract-plugin": "^2.9.2",
-    "svg-inline-loader": "^0.8.2",
-    "vite": "^5.4.10"
+    "vite": "^5.4.10",
+    "vite-plugin-svgr": "^4.3.0"
   }
 }

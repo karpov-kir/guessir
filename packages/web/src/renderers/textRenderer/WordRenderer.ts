@@ -7,17 +7,15 @@ type WordRendererOptions = {
 };
 
 export class WordRenderer implements ChildRenderer {
-  private lexeme: Lexeme;
-  private containerElement: HTMLElement;
-  private userWordShowPubSub = new PubSub<Lexeme>();
+  private readonly lexeme: Lexeme;
+  private readonly containerElement: HTMLElement;
+  private readonly userWordShowPubSub = new PubSub<Lexeme>();
 
   public isShown = false;
   public readonly userWordShowEvent = this.userWordShowPubSub.event;
 
   constructor(options: WordRendererOptions) {
-    const { lexeme } = options;
-
-    this.lexeme = lexeme;
+    this.lexeme = options.lexeme;
     this.containerElement = document.createElement('button');
     this.containerElement.classList.add('lexeme-container');
 

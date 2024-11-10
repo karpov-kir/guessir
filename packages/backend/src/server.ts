@@ -1,4 +1,5 @@
-// Required for TypeORM
+/* v8 ignore start */
+
 import 'reflect-metadata';
 
 import fastifyHelmet from '@fastify/helmet';
@@ -58,3 +59,5 @@ export async function boot(host = '0.0.0.0', port = 3020) {
 
   await app.listen(port, host);
 }
+
+/* v8 ignore stop */

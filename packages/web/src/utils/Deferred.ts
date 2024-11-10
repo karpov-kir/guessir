@@ -2,7 +2,7 @@
 export class Deferred<T> implements Promise<T> {
   [Symbol.toStringTag] = 'Promise';
 
-  private _promise: Promise<T>;
+  private readonly _promise: Promise<T>;
   private _resolve!: (value: T | PromiseLike<T>) => void;
   private _reject!: (reason: unknown) => void;
   private _state: 'pending' | 'fulfilled' | 'rejected' = 'pending';

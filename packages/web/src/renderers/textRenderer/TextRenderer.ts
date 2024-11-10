@@ -8,28 +8,29 @@ type TextRendererOptions = {
   lexemesAnalysis: LexemeAnalysis;
   title?: string;
   description?: string;
+  userWordShowPubSub?: PubSub<Lexeme>;
 };
 
 export class TextRenderer implements ChildRenderer {
-  private containerElement: HTMLElement;
-  private lexemesAnalysis: LexemeAnalysis;
-  private title?: string;
-  private description?: string;
-  private userWordShowPubSub = new PubSub<Lexeme>();
-  private wordRenderers = new Map<
+  private readonly containerElement: HTMLElement;
+  private readonly lexemesAnalysis: LexemeAnalysis;
+  private readonly title?: string;
+  private readonly description?: string;
+  private readonly userWordShowPubSub: PubSub<Lexeme>;
+  private readonly wordRenderers = new Map<
     // Lexeme index
     number,
     WordRenderer
   >();
 
-  public userWordShowEvent = this.userWordShowPubSub.event;
+  public userWordShowEvent: PubSub<Lexeme>['event'];
 
   constructor(options: TextRendererOptions) {
-    const { lexemesAnalysis, title, description } = options;
-
-    this.lexemesAnalysis = lexemesAnalysis;
-    this.title = title;
-    this.description = description;
+    this.userWordShowPubSub = options.userWordShowPubSub || new PubSub<Lexeme>();
+    this.userWordShowEvent = this.userWordShowPubSub.event;
+    this.lexemesAnalysis = options.lexemesAnalysis;
+    this.title = options.title;
+    this.description = options.description;
     this.containerElement = document.createElement('div');
     this.containerElement.id = 'text-container';
 

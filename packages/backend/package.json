@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "npm run clean && tsc -b tsconfig.json",
-    "clean": "del-cli ./dist",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "clean": "del-cli ./dist ./tsconfig.build.tsbuildinfo",
     "start": "node --experimental-loader=extensionless ./dist/main.js",
     "start:dev": "node --experimental-loader=ts-node/esm --experimental-loader=extensionless ./src/main.ts",
     "start:dev:debug": "node --experimental-loader=ts-node/esm --experimental-loader=extensionless --inspect-brk ./src/main.ts",
@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@types/validator": "^13.12.2",
+    "lerna": "^8.1.9",
     "sqlite3": "^5.1.7"
   },
   "files": [

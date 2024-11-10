@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it } from 'vitest';
+
 import { LexemeAnalyzer } from '../../lexemeAnalyzer/LexemeAnalyzer';
 import { getElements, TextRenderer } from './TextRenderer';
 
@@ -59,7 +61,7 @@ describe(TextRenderer, () => {
   it('should not count already shown lexemes as shown', () => {
     const lexemeElements = getLexemeElements();
 
-    // The first word is `One`. Show only it directly and left the second word `one` hidden.
+    // The first word is `One`. Show only it directly and leave the second word `one` hidden.
     lexemeElements[0].click();
 
     const shownCount = textRenderer.showLexemesByWord('one');

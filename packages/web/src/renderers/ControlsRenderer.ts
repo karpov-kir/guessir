@@ -9,33 +9,42 @@ export type GuessEvent = {
 type ControlsRendererOptions = {
   allowShowingText?: boolean;
   allowShowingFirstLetters?: boolean;
+  guessPubSub?: PubSub<GuessEvent>;
+  showFirstLettersPubSub?: PubSub<boolean>;
+  showTextPubSub?: PubSub<boolean>;
 };
 
 export class ControlsRenderer implements ChildRenderer {
-  private containerElement: HTMLElement;
-  private guessPubSub = new PubSub<GuessEvent>();
-  private showFirstLettersPubSub = new PubSub<boolean>();
-  private showTextPubSub = new PubSub<boolean>();
+  private readonly containerElement: HTMLElement;
+  private readonly guessPubSub: PubSub<GuessEvent>;
+  private readonly showFirstLettersPubSub: PubSub<boolean>;
+  private readonly showTextPubSub: PubSub<boolean>;
   private isTextShown = false;
   private isFirstLettersShown = false;
 
-  public readonly guessEvent = this.guessPubSub.event;
-  public readonly showFirstLettersEvent = this.showFirstLettersPubSub.event;
-  public readonly showTextEvent = this.showTextPubSub.event;
+  public readonly guessEvent: PubSub<GuessEvent>['event'];
+  public readonly showFirstLettersEvent: PubSub<boolean>['event'];
+  public readonly showTextEvent: PubSub<boolean>['event'];
 
   constructor(options: ControlsRendererOptions = {}) {
-    const { allowShowingFirstLetters, allowShowingText } = options;
+    this.guessPubSub = options.guessPubSub || new PubSub<GuessEvent>();
+    this.showFirstLettersPubSub = options.showFirstLettersPubSub || new PubSub<boolean>();
+    this.showTextPubSub = options.showTextPubSub || new PubSub<boolean>();
+
+    this.guessEvent = this.guessPubSub.event;
+    this.showFirstLettersEvent = this.showFirstLettersPubSub.event;
+    this.showTextEvent = this.showTextPubSub.event;
 
     this.containerElement = document.createElement('div');
     this.containerElement.id = 'controls-container';
-    this.initElement(allowShowingText, allowShowingFirstLetters);
+    this.initElement(options.allowShowingText, options.allowShowingFirstLetters);
   }
 
   public getElement(): HTMLElement {
     return this.containerElement;
   }
 
-  // istanbul ignore next: no logic
+  // v8 ignore next: no logic
   public clearAndFocusGuessInput() {
     const { guessInputElement, guessButtonElement } = this.getElements();
 
