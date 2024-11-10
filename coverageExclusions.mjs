@@ -4,6 +4,8 @@ export default [
   '**/vitest.*',
   '**/eslint.*',
   '**/sonar-*',
-  'coverageExclusions.mjs',
-  'packages/backend/guessirBackend.js',
+  'coverageExclusions.*',
+  'packages/backend/guessirBackend.*',
+  '**/registerLoaders.*',
+  '**/registerDevLoaders.*',
 ];
