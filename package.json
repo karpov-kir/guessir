@@ -12,7 +12,7 @@
     "build": "lerna run build",
     "build:web": "npm run build -w @guessir/web",
     "clean": "lerna run clean",
-    "lint": "eslint \"packages/**/src/**/*.ts\"",
+    "lint": "eslint \"packages/**/src/**/*.ts\" \"packages/**/tests/**/*.ts\"",
     "lint:fix": "npm run lint -- --fix",
     "start:dev:backend": "npm run start:dev -w @guessir/backend",
     "start:dev:web": "npm run start:dev -w @guessir/web",
