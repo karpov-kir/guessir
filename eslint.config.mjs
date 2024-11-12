@@ -1,16 +1,16 @@
 // @ts-check
 import eslint from '@eslint/js';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
-import simpleImportSort from 'eslint-plugin-simple-import-sort';
-import tseslint from 'typescript-eslint';
+import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
+import typescriptEslint from 'typescript-eslint';
 
-export default tseslint.config(
+export default typescriptEslint.config(
   eslint.configs.recommended,
-  ...tseslint.configs.recommended,
+  ...typescriptEslint.configs.recommended,
   eslintPluginPrettierRecommended,
   {
     plugins: {
-      'simple-import-sort': simpleImportSort,
+      'simple-import-sort': simpleImportSortPlugin,
     },
     rules: {
       '@typescript-eslint/no-unused-vars': [

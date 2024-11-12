@@ -26,7 +26,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
-    "@types/eslint__js": "^8.42.3",
     "@vitest/coverage-v8": "^2.1.4",
     "del-cli": "^6.0.0",
     "eslint": "^9.14.0",
@@ -37,7 +36,7 @@
     "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3",
-    "typescript-eslint": "^8.13.0",
+    "typescript-eslint": "^8.14.0",
     "unplugin-swc": "^1.5.1",
     "vitest": "^2.1.4",
     "vitest-mock-extended": "^2.0.2",
