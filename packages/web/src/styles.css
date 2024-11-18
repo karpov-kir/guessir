@@ -1,44 +1,41 @@
 /* Variables */
 
 :root {
-  --textContrast: #ffffff;
-  --textPrimary: #333333;
-  --textSecondary: #C7C7C7;
-
-  --primary: #09A598;
-  --primaryHover: #0db2a4;
-  --primaryActive: #0a9b8f;
-  --primaryOutline: #087a72;
-
-  --unchecked: #D1D1D6;
-  --uncheckedHover: rgb(194, 193, 193, 0.3);
-  --uncheckedActive: rgb(194, 193, 193, 0.5);
-
-  --disabled: #cccccc;
-
-  --error: #FF4949;
+  --text-contrast: #fff;
+  --text-primary: #333;
+  --text-secondary: #c7c7c7;
+  --primary: #09a598;
+  --primary-hover: #0db2a4;
+  --primary-active: #0a9b8f;
+  --primary-outline: #087a72;
+  --unchecked: #d1d1d6;
+  --unchecked-hover: rgb(194 193 193 / 30%);
+  --unchecked-active: rgb(194 193 193 / 50%);
+  --disabled: #ccc;
+  --error: #ff4949;
 }
 
 /* Reset */
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
 }
 
 * {
   box-sizing: border-box;
-  font-family: 'Circe', sans-serif;
+  font-family: Circe, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 *:focus-visible {
-  outline: 1px solid var(--primaryOutline);
+  outline: 1px solid var(--primary-outline);
 }
 
 body {
-  color: var(--textPrimary)
+  color: var(--text-primary);
 }
 
 /* Typography */
@@ -58,7 +55,7 @@ p {
 /* Helpers */
 
 .hide {
-  display: none!important;
+  display: none !important;
 }
 
 .invalid {
@@ -90,7 +87,7 @@ p {
 }
 
 .limit-text {
-  color: var(--textSecondary);
+  color: var(--text-secondary);
   font-size: 12px;
   line-height: 12px;
   position: absolute;
@@ -100,10 +97,11 @@ p {
 
 /* Scrollbar */
 
+/* stylelint-disable-next-line no-descending-specificity, no-duplicate-selectors */
 * {
   /* FF */
   scrollbar-width: thin;
-  scrollbar-color: rgb(179, 177, 177) rgb(68, 68, 68);
+  scrollbar-color: rgb(179 177 177) rgb(68 68 68);
 }
 
 *::-webkit-scrollbar {
@@ -112,22 +110,22 @@ p {
 }
 
 *::-webkit-scrollbar-track {
-  background: rgb(179, 177, 177);
+  background: rgb(179 177 177);
   border-radius: 10px;
 }
 
 *::-webkit-scrollbar-thumb {
-  background: rgb(136, 136, 136);
+  background: rgb(136 136 136);
   border-radius: 10px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: rgb(100, 100, 100);
+  background: rgb(100 100 100);
   border-radius: 10px;
 }
 
 *::-webkit-scrollbar-thumb:active {
-  background: rgb(68, 68, 68);
+  background: rgb(68 68 68);
   border-radius: 10px;
 }
 
@@ -136,7 +134,7 @@ p {
 button {
   font-size: 16px;
   line-height: 24px;
-  color: var(--textContrast);
+  color: var(--text-contrast);
   background: var(--primary);
   border-radius: 6px;
   border: none;
@@ -146,11 +144,11 @@ button {
 button:hover,
 button:focus-visible {
   cursor: pointer;
-  background: var(--primaryHover);
+  background: var(--primary-hover);
 }
 
 button:active {
-  background: var(--primaryActive);
+  background: var(--primary-active);
 }
 
 button:disabled {
@@ -161,7 +159,7 @@ button:disabled {
 /* Inputs */
 
 input {
-  border: 1px solid var(--textSecondary);
+  border: 1px solid var(--text-secondary);
   border-radius: 6px;
   font-size: 16px;
   line-height: 24px;
@@ -169,7 +167,7 @@ input {
 }
 
 input::placeholder {
-  color: var(--textSecondary)
+  color: var(--text-secondary);
 }
 
 input.invalid {
@@ -177,8 +175,8 @@ input.invalid {
 }
 
 input.invalid:focus {
-  color: var(--textPrimary);
-  border: 1px solid var(--textSecondary);
+  color: var(--text-primary);
+  border: 1px solid var(--text-secondary);
 }
 
 input.invalid::placeholder {
@@ -186,23 +184,23 @@ input.invalid::placeholder {
 }
 
 input.invalid:focus::placeholder {
-  color: var(--textSecondary);
+  color: var(--text-secondary);
 }
 
 /* Textareas */
 
 textarea {
-  border: 1px solid var(--textSecondary);
+  border: 1px solid var(--text-secondary);
   border-radius: 6px;
   font-size: 16px;
   line-height: 24px;
   padding: 3px 20px;
   resize: vertical;
-  margin: 0 0 18px 0;
+  margin: 0 0 18px;
 }
 
 textarea::placeholder {
-  color: var(--textSecondary)
+  color: var(--text-secondary);
 }
 
 textarea.invalid {
@@ -210,8 +208,8 @@ textarea.invalid {
 }
 
 textarea.invalid:focus {
-  color: var(--textPrimary);
-  border: 1px solid var(--textSecondary);
+  color: var(--text-primary);
+  border: 1px solid var(--text-secondary);
 }
 
 textarea.invalid::placeholder {
@@ -219,16 +217,16 @@ textarea.invalid::placeholder {
 }
 
 textarea.invalid:focus::placeholder {
-  color: var(--textSecondary);
+  color: var(--text-secondary);
 }
 
 /* Checkboxes */
 
-input[type="checkbox"] {
+input[type='checkbox'] {
   position: relative;
   width: 24px;
   height: 24px;
-  -webkit-appearance:none;
+  appearance: none;
   border-radius: 6px;
   color: transparent;
   cursor: pointer;
@@ -237,7 +235,7 @@ input[type="checkbox"] {
   padding: 0;
 }
 
-input[type="checkbox"]:before {
+input[type='checkbox']::before {
   content: '';
   display: block;
   position: absolute;
@@ -249,24 +247,24 @@ input[type="checkbox"]:before {
   height: calc(100% - 4px);
 }
 
-input[type="checkbox"]:focus-visible {
+input[type='checkbox']:focus-visible {
   outline: none;
 }
 
-input[type="checkbox"]:hover:before,
-input[type="checkbox"]:focus-visible:before {
-  background: var(--uncheckedHover);
+input[type='checkbox']:hover::before,
+input[type='checkbox']:focus-visible::before {
+  background: var(--unchecked-hover);
 }
 
-input[type="checkbox"]:focus-visible:before {
-  outline: 1px solid var(--primaryOutline);
+input[type='checkbox']:focus-visible::before {
+  outline: 1px solid var(--primary-outline);
 }
 
-input[type="checkbox"]:active:before {
-  background: var(--uncheckedActive);
+input[type='checkbox']:active::before {
+  background: var(--unchecked-active);
 }
 
-input[type="checkbox"]:disabled:before {
+input[type='checkbox']:disabled::before {
   cursor: not-allowed;
   background: var(--disabled);
 }
@@ -279,20 +277,21 @@ label {
   cursor: pointer;
 }
 
-label input[type="checkbox"] {
+/* stylelint-disable-next-line no-descending-specificity */
+label input[type='checkbox'] {
   margin-right: 10px;
 }
 
 /* Checkboxes checked */
 
-input[type="checkbox"]:checked:before {
+input[type='checkbox']:checked::before {
   border: none;
   background: var(--primary);
   width: 100%;
   height: 100%;
 }
 
-input[type="checkbox"]:checked:after {
+input[type='checkbox']:checked::after {
   width: 100%;
   height: 100%;
   content: '';
@@ -300,29 +299,25 @@ input[type="checkbox"]:checked:after {
   position: absolute;
   left: 0;
   top: 0;
-
-  -webkit-mask: url('./icons/checkIcon.svg') no-repeat 50% 50%;
   mask: url('./icons/checkIcon.svg') no-repeat 50% 50%;
-  -webkit-mask-size: cover;
   mask-size: cover;
-
-  background: var(--textContrast);
+  background: var(--text-contrast);
 }
 
-input[type="checkbox"]:checked:hover:before,
-input[type="checkbox"]:checked:focus-visible:before {
-  background: var(--primaryHover);
+input[type='checkbox']:checked:hover::before,
+input[type='checkbox']:checked:focus-visible::before {
+  background: var(--primary-hover);
 }
 
-input[type="checkbox"]:checked:focus-visible:before {
-  outline: 1px solid var(--primaryOutline);
+input[type='checkbox']:checked:focus-visible::before {
+  outline: 1px solid var(--primary-outline);
 }
 
-input[type="checkbox"]:checked:active:before {
-  background: var(--primaryActive);
+input[type='checkbox']:checked:active::before {
+  background: var(--primary-active);
 }
 
-input[type="checkbox"]:checked:disabled:before {
+input[type='checkbox']:checked:disabled::before {
   cursor: not-allowed;
   background: var(--disabled);
 }
@@ -337,17 +332,17 @@ input[type="checkbox"]:checked:disabled:before {
 
 #logo a {
   text-decoration: none;
-  color: var(--textSecondary);
+  color: var(--text-secondary);
 }
 
 #logo a:hover {
-  color: var(--textPrimary);
+  color: var(--text-primary);
 }
 
 #guessir {
   margin: auto;
   max-width: 1100px;
-  padding: 20px 50px 60px 50px;
+  padding: 20px 50px 60px;
 }
 
 /* Words */
@@ -368,7 +363,7 @@ input[type="checkbox"]:checked:disabled:before {
 
 .lexeme-container {
   position: relative;
-  border-bottom: 1px solid var(--textSecondary);
+  border-bottom: 1px solid var(--text-secondary);
   display: inline-flex;
   margin-bottom: 5px;
   background: transparent;
@@ -384,13 +379,13 @@ input[type="checkbox"]:checked:disabled:before {
 }
 
 .lexeme-container:hover {
-  border-color: var(--textPrimary);
+  border-color: var(--text-primary);
   cursor: pointer;
 }
 
 .lexeme {
   visibility: hidden;
-  color: var(--textPrimary);
+  color: var(--text-primary);
 }
 
 .lexeme-first-letter {
@@ -398,7 +393,15 @@ input[type="checkbox"]:checked:disabled:before {
   position: absolute;
   left: 0;
   top: 0;
-  color: var(--textPrimary);
+  color: var(--text-primary);
+}
+
+.lexeme-container.show .lexeme {
+  visibility: visible;
+}
+
+.lexeme-container.show .lexeme-first-letter {
+  visibility: hidden !important;
 }
 
 #text-container.show-text .lexeme {
@@ -409,14 +412,6 @@ input[type="checkbox"]:checked:disabled:before {
   visibility: visible;
 }
 
-.lexeme-container.show .lexeme {
-  visibility: visible;
-}
-
-.lexeme-container.show .lexeme-first-letter {
-  visibility: hidden!important;
-}
-
 /* Controls */
 
 #controls-container {
@@ -425,7 +420,7 @@ input[type="checkbox"]:checked:disabled:before {
   align-items: flex-end;
 }
 
-#controls-container input[type="text"] {
+#controls-container input[type='text'] {
   width: 285px;
   margin-right: 10px;
 }
@@ -459,13 +454,10 @@ summary {
   margin-bottom: 30px;
 }
 
-summary:before {
+summary::before {
   content: '';
-  -webkit-mask: url('./icons/arrowRightIcon.svg') no-repeat 50% 50%;
   mask: url('./icons/arrowRightIcon.svg') no-repeat 50% 50%;
-  -webkit-mask-size: cover;
   mask-size: cover;
-
   width: 1em;
   height: 1em;
   display: block;
@@ -475,12 +467,12 @@ summary:before {
   top: -1px;
 }
 
-summary:hover:before,
-summary:focus-visible:before {
-  background: var(--primaryHover);
+summary:hover::before,
+summary:focus-visible::before {
+  background: var(--primary-hover);
 }
 
-details[open] summary:before {
+details[open] summary::before {
   transform: rotate(90deg);
 }
 
@@ -492,14 +484,14 @@ summary::-webkit-details-marker {
 
 summary:hover::marker,
 summary:focus-visible::marker {
-  /*color: var(--primaryHover);*/
+  /* color: var(--primaryHover); */
   display: none;
   color: transparent;
 }
 
 /* Utils */
 
-#utils-container input[type="text"],
+#utils-container input[type='text'],
 #utils-container textarea {
   margin-bottom: 32px;
   position: relative;
@@ -547,7 +539,7 @@ summary:focus-visible::marker {
   align-items: center;
 }
 
-#copy-generated-url-button svg{
+#copy-generated-url-button svg {
   width: 1.5em;
   height: 1.5em;
 }
@@ -556,29 +548,33 @@ summary:focus-visible::marker {
   fill: var(--primary);
 }
 
-@keyframes shakeAndError {
+@keyframes shake-and-error {
   0% {
-    outline: 0px solid var(--error);
-    transform: skewY(-3deg); 
+    outline: 0 solid var(--error);
+    transform: skewY(-3deg);
   }
+
   25% {
     outline: 1px solid var(--error);
-    transform: skewY(3deg); 
+    transform: skewY(3deg);
   }
+
   50% {
     outline: 1px solid var(--error);
-    transform: skewY(-3deg); 
+    transform: skewY(-3deg);
   }
+
   75% {
     outline: 1px solid var(--error);
-    transform: skewY(3deg); 
+    transform: skewY(3deg);
   }
+
   100% {
-    outline: 0px solid var(--error);
-    transform: skewY(0deg); 
+    outline: 0 solid var(--error);
+    transform: skewY(0deg);
   }
 }
 
 .shake-and-error {
-  animation: shakeAndError 0.2s;
+  animation: shake-and-error 0.2s;
 }
