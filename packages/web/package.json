@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "npm run clean && tsc -p ./tsconfig.build.json && vite build",
+    "build": "npm run clean && tsc -b ./tsconfig.build.json && vite build",
     "clean": "del-cli ./dist",
     "start:dev": "vite",
     "start:preview": "vite preview",

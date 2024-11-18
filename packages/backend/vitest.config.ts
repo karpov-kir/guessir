@@ -1,4 +1,4 @@
-import swc from 'unplugin-swc';
+import swcPlugin from 'unplugin-swc';
 import { defineProject } from 'vitest/config';
 
 export default defineProject({
@@ -6,5 +6,5 @@ export default defineProject({
     name: 'Backend',
     environment: 'jsdom',
   },
-  plugins: [swc.vite()],
+  plugins: [swcPlugin.vite()],
 });

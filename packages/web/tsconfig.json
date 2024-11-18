@@ -2,11 +2,12 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "lib": ["DOM", "ES2022"],
-    "types": ["./src/@types/env", "vite/client"]
+    "types": ["./src/@types/env", "vite/client"],
+    "noEmit": true
   },
   "references": [
     {
-      "path": "../shared/tsconfig.json"
+      "path": "../shared/tsconfig.build.json"
     }
   ]
 }

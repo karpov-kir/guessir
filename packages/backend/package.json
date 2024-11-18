@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "build": "npm run clean && tsc -b tsconfig.build.json",
     "clean": "del-cli ./dist ./tsconfig.build.tsbuildinfo",
     "start": "node --import ./loaders/prod.mjs ./dist/main.js",
     "start:dev": "node --import ./loaders/dev.mjs ./src/main.ts",
