@@ -3,6 +3,7 @@
   "exclude": [
     "**/*.test.ts",
     "**/vitest.config.ts",
-    "**/tests/**"
+    "**/tests/**",
+    "**/vite.config.ts"
   ]
 }
