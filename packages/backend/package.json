@@ -34,7 +34,8 @@
     "sqlite3": "^5.1.7"
   },
   "files": [
-    "/dist"
+    "./dist",
+    "./loaders"
   ],
   "bin": {
     "guessirBackend": "./guessirBackend.js"
