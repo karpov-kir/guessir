@@ -9,7 +9,7 @@
     "start:dev": "node --import ./loaders/dev.mjs ./src/main.ts",
     "start:dev:debug": "node --import ./loaders/dev.mjs --inspect-brk ./src/main.ts",
     "build:docker": "docker build --platform=linux/amd64 -t guessir-backend -f ./Dockerfile ../..",
-    "publish:docker": "docker tag guessir-backend dr.k-k.pro/guessir-backend && docker push dr.k-k.pro/guessir-backend"
+    "publish:docker": "docker tag guessir-backend dr.kk-forge.com/guessir-backend && docker push dr.kk-forge.com/guessir-backend"
   },
   "dependencies": {
     "@fastify/helmet": "^11.1.1",
