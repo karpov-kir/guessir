@@ -1,7 +1,7 @@
 import coverageExclusions from './coverageExclusions.mjs';
 
 export default {
-  'sonar.projectKey': 'GuesSir',
+  'sonar.projectKey': 'guessir',
 
   'sonar.javascript.lcov.reportPaths': 'coverage/lcov.info',
   'sonar.testExecutionReportPaths': 'coverage/test-report.xml',
