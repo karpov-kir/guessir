@@ -5,20 +5,20 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: NPM prepare
-        uses: karpov-kir/github-actions/npm-prepare@main
+        uses: kk-forge-engineering/github-actions/npm-prepare@v1
 
   build:
     runs-on: ubuntu-22.04
     needs: install
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: NPM prepare
-        uses: karpov-kir/github-actions/npm-prepare@main
+        uses: kk-forge-engineering/github-actions/npm-prepare@v1
 
       - name: Build
         run: npm run build
@@ -28,10 +28,10 @@ jobs:
     needs: install
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: NPM prepare
-        uses: karpov-kir/github-actions/npm-prepare@main
+        uses: kk-forge-engineering/github-actions/npm-prepare@v1
 
       - name: Lint
         run: npm run lint
@@ -41,13 +41,13 @@ jobs:
     needs: install
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: NPM prepare
-        uses: karpov-kir/github-actions/npm-prepare@main
+        uses: kk-forge-engineering/github-actions/npm-prepare@v1
 
       - name: Initialize coverage cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ./coverage
           key: ${{ runner.os }}-coverage-${{ github.sha }}
@@ -60,16 +60,16 @@ jobs:
     needs: test
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Restore coverage cache 
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ./coverage
           key: ${{ runner.os }}-coverage-${{ github.sha }}
 
       - name: SonarQube scan
-        uses: karpov-kir/github-actions/sonarqube-scan@main
+        uses: kk-forge-engineering/github-actions/sonarqube-scan@v1
         with:
           sonar-token: ${{ secrets.SONAR_TOKEN }}
           sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
