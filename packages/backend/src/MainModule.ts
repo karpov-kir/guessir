@@ -4,7 +4,8 @@ import { Logger, Module, OnApplicationBootstrap } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { TextsController } from './controllers/TextController';
-import { applyDbMigrations, getTypeOrmConfig, isDbEnabled } from './dbUtils';
+import { isDbEnabled } from './dbEnv';
+import { applyDbMigrations, entities, getTypeOrmConfig } from './dbUtils';
 import { TextEntity } from './entities/TextEntity';
 
 @Module({
@@ -24,11 +25,8 @@ export class MainModule implements OnApplicationBootstrap {
 }
 
 function getTypeOrmModule() {
-  const config = getTypeOrmConfig();
-  const { entities } = config;
-
   if (isDbEnabled()) {
-    return TypeOrmModule.forRoot(config);
+    return TypeOrmModule.forRoot(getTypeOrmConfig());
   }
 
   return TypeOrmModule.forRoot({

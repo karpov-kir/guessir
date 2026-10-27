@@ -6,7 +6,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { MigrationFn as UmzugMigrationFn, Umzug } from 'umzug';
 import { fileURLToPath } from 'url';
 
-import { getDbPassword } from './dbPassword';
+import { getDbPassword } from './dbEnv';
 import { TextEntity } from './entities/TextEntity';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -24,15 +24,15 @@ interface MigrationLog {
 
 const migrationTable = 'migrations';
 
-const entities = [TextEntity];
+export const entities = [TextEntity];
 
 export const getTypeOrmConfig = (): DataSourceOptions => ({
   type: 'postgres',
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432,
-  username: process.env.DB_USER,
+  host: process.env.DATABASE_HOST,
+  port: process.env.DATABASE_PORT ? parseInt(process.env.DATABASE_PORT) : 5432,
+  username: process.env.DATABASE_USER,
   password: getDbPassword(),
-  database: process.env.DB_NAME,
+  database: process.env.DATABASE_NAME,
   // Handled manually using Umzug
   synchronize: false,
   logging: true,
@@ -85,23 +85,5 @@ export async function applyDbMigrations() {
 
   await migrator.up();
 }
-
-export const isDbEnabled = () => {
-  if (process.env.DB === 'true') {
-    ['DB_USER', 'DB_NAME', 'DB_HOST'].forEach((envName) => {
-      if (!process.env[envName]) {
-        throw new Error(`${envName} must be provided when DB is enabled`);
-      }
-    });
-
-    if (!process.env.DB_PW && !process.env.DB_PW_FILE) {
-      throw new Error('DB_PW or DB_PW_FILE must be provided when DB is enabled');
-    }
-
-    return true;
-  }
-
-  return false;
-};
 
 /* v8 ignore stop */

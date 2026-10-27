@@ -7,7 +7,7 @@ import { Logger, NotAcceptableException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 
-import { isDbEnabled } from './dbUtils';
+import { isDbEnabled } from './dbEnv';
 import { MainModule } from './MainModule';
 
 export async function boot(host = '0.0.0.0', port = 3020) {
