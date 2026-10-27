@@ -3,22 +3,13 @@
 import 'reflect-metadata';
 
 import fastifyHelmet from '@fastify/helmet';
-import { Logger, NotAcceptableException, ValidationPipe } from '@nestjs/common';
+import { NotAcceptableException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 
-import { isDbEnabled } from './dbUtils';
 import { MainModule } from './MainModule';
 
 export async function boot(host = '0.0.0.0', port = 3020) {
-  const logger = new Logger(boot.name);
-
-  if (isDbEnabled()) {
-    logger.log('Using a persistent DB');
-  } else {
-    logger.log('Using an in-memory DB');
-  }
-
   const allowedOrigins = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',

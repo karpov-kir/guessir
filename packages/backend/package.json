@@ -6,8 +6,8 @@
     "build": "npm run clean && tsc -b tsconfig.build.json",
     "clean": "del-cli ./dist ./tsconfig.build.tsbuildinfo",
     "start": "node --import ./loaders/prod.mjs ./dist/main.js",
-    "start:dev": "node --import ./loaders/dev.mjs ./src/main.ts",
-    "start:dev:debug": "node --import ./loaders/dev.mjs --inspect-brk ./src/main.ts",
+    "start:dev": "docker compose up -d --wait && node --env-file=env/.env.development --import ./loaders/dev.mjs ./src/main.ts",
+    "start:dev:debug": "docker compose up -d --wait && node --env-file=env/.env.development --import ./loaders/dev.mjs --inspect-brk ./src/main.ts",
     "build:docker": "docker build --platform=linux/amd64 -t guessir-backend -f ./Dockerfile ../..",
     "publish:docker": "docker tag guessir-backend dr.kk-forge.com/guessir-backend && docker push dr.kk-forge.com/guessir-backend"
   },
@@ -30,8 +30,7 @@
   },
   "devDependencies": {
     "@types/validator": "^13.12.2",
-    "lerna": "^8.1.9",
-    "sqlite3": "^6.0.1"
+    "lerna": "^8.1.9"
   },
   "files": [
     "./dist",
