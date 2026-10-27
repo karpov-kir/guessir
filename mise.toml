@@ -1,0 +1,26 @@
+[tools]
+node = "22"
+
+[tasks.setup]
+description = "Install every dependency"
+run = "npm ci"
+
+[tasks.check]
+description = "The gate before a commit: every linter, the build and every test"
+depends = ["lint", "build", "test"]
+
+[tasks."check:ci"]
+description = "check with coverage and the SonarQube reports, as CI runs it"
+depends = ["lint", "build", "test:ci"]
+
+[tasks.lint]
+run = "npm run lint"
+
+[tasks.build]
+run = "npm run build"
+
+[tasks.test]
+run = "npm test"
+
+[tasks."test:ci"]
+run = "npm run test:ci"
