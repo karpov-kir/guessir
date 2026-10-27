@@ -4,9 +4,6 @@ FROM base AS packed
 
 WORKDIR /app
 
-# Install necessary build tools and dependencies
-RUN apk add --no-cache python3 python3-dev py3-setuptools py3-pip make g++ curl-dev
-
 COPY . .
 
 # The `npm pack` command creates the same packages as `npm publish`, but locally.
