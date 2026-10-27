@@ -8,7 +8,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: NPM prepare
-        uses: kk-forge-engineering/github-actions/npm-prepare@v1
+        uses: kk-forge-engineering/gh-actions/npm-prepare@v1
 
   build:
     runs-on: ubuntu-22.04
@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: NPM prepare
-        uses: kk-forge-engineering/github-actions/npm-prepare@v1
+        uses: kk-forge-engineering/gh-actions/npm-prepare@v1
 
       - name: Build
         run: npm run build
@@ -31,7 +31,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: NPM prepare
-        uses: kk-forge-engineering/github-actions/npm-prepare@v1
+        uses: kk-forge-engineering/gh-actions/npm-prepare@v1
 
       - name: Lint
         run: npm run lint
@@ -44,7 +44,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: NPM prepare
-        uses: kk-forge-engineering/github-actions/npm-prepare@v1
+        uses: kk-forge-engineering/gh-actions/npm-prepare@v1
 
       - name: Initialize coverage cache
         uses: actions/cache@v6
@@ -69,7 +69,7 @@ jobs:
           key: ${{ runner.os }}-coverage-${{ github.sha }}
 
       - name: SonarQube scan
-        uses: kk-forge-engineering/github-actions/sonarqube-scan@v1
+        uses: kk-forge-engineering/gh-actions/sonarqube-scan@v1
         with:
           sonar-token: ${{ secrets.SONAR_TOKEN }}
           sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
