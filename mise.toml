@@ -1,5 +1,5 @@
 [tools]
-node = "22"
+node = "26"
 
 [tasks.setup]
 description = "Install every dependency"
