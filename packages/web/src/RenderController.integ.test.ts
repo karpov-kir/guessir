@@ -9,6 +9,7 @@ import { ScoreRenderer } from './renderers/ScoreRenderer';
 import { TextRenderer } from './renderers/textRenderer/TextRenderer';
 
 let renderController: RenderController;
+let containerElement: HTMLElement;
 let scoreRenderer: ScoreRenderer;
 
 let controlsRenderer: ControlsRenderer;
@@ -46,10 +47,19 @@ describe(RenderController, () => {
       controlsRenderer,
     });
 
-    renderController.init(document.createElement('div'));
+    containerElement = document.createElement('div');
+    renderController.init(containerElement);
 
     vi.spyOn(scoreRenderer, 'addScore');
     vi.spyOn(controlsRenderer, 'clearAndFocusGuessInput');
+  });
+
+  it('should put the score and the controls together above the text', () => {
+    const hudElement = containerElement.querySelector('#hud') as HTMLElement;
+
+    expect(hudElement.contains(scoreRenderer.getElement())).toBe(true);
+    expect(hudElement.contains(controlsRenderer.getElement())).toBe(true);
+    expect(hudElement.nextElementSibling).toBe(textRenderer.getElement());
   });
 
   it('should increase the score when the user clicks on a word', () => {

@@ -66,6 +66,19 @@ describe(CreateTextRenderer, () => {
     expect(generatedUrlContainerElement.classList).not.toContain('hide');
   });
 
+  it('should reset the length counters after a text is created', async () => {
+    const { titleInputElement } = getElements(createTextRenderer.getElement());
+    const getTitleLimitText = () => titleInputElement.parentElement?.querySelector('.limit-text')?.textContent;
+
+    titleInputElement.value = 'ab';
+    titleInputElement.dispatchEvent(new Event('input'));
+    expect(getTitleLimitText()).toBe('2/2');
+
+    await createText();
+
+    expect(getTitleLimitText()).toBe('0/2');
+  });
+
   it('should render an error if text creation fails', async () => {
     const deferred = new Deferred<Text>();
     const { errorElement, generateUrlButtonElement, textInputElement, titleInputElement } = getElements(
@@ -139,6 +152,23 @@ describe(CreateTextRenderer, () => {
 
     expect(titleInputElement.classList.contains('invalid'));
     expect(textInputElement.classList.contains('invalid'));
+  });
+
+  it('should mark empty required fields invalid for screen readers too', () => {
+    const { textInputElement, titleInputElement, generateUrlButtonElement } = getElements(
+      createTextRenderer.getElement(),
+    );
+
+    generateUrlButtonElement.click();
+
+    expect(titleInputElement.getAttribute('aria-invalid')).toBe('true');
+    expect(textInputElement.getAttribute('aria-invalid')).toBe('true');
+
+    titleInputElement.value = 'ab';
+    titleInputElement.dispatchEvent(new Event('input'));
+
+    expect(titleInputElement.getAttribute('aria-invalid')).toBe('false');
+    expect(textInputElement.getAttribute('aria-invalid')).toBe('true');
   });
 
   it('should validate inputs on change', () => {
