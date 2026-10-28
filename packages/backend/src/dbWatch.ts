@@ -58,7 +58,9 @@ export async function waitForDb(ping: () => Promise<unknown>, { limitMs, interva
     try {
       await Promise.race([
         ping(),
-        sleep(Math.max(deadline - Date.now(), 0), undefined, { ref: false }).then(() => Promise.reject(timeout)),
+        sleep(Math.max(deadline - Date.now(), 0), undefined, { ref: false }).then(() => {
+          throw timeout;
+        }),
       ]);
       return;
     } catch (error) {
