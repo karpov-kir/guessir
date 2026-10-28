@@ -5,7 +5,8 @@
   "scripts": {
     "build": "npm run clean && tsc -b ./tsconfig.build.json && vite build",
     "clean": "del-cli ./dist",
-    "start:dev": "vite",
+    "start:dev": "run-p start:vite typecheck:watch",
+    "start:vite": "vite",
     "typecheck:watch": "tsc -b ./tsconfig.build.json --watch",
     "start:preview": "vite preview",
     "build:docker": "docker build --platform=linux/amd64 -t guessir-web -f ./Dockerfile ../..",
