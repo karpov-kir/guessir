@@ -2,55 +2,56 @@
 
 import './styles.css';
 
-import { LexemeAnalyzer } from './lexemeAnalyzer/LexemeAnalyzer';
+import { CreateTextDto } from '@guessir/shared/dist/CreateTextDto';
+
+import { Game } from './game/Game';
+import { LocalGame } from './game/LocalGame';
 import { RenderController } from './RenderController';
 import { ApiClient } from './utils/ApiClient';
 import { hasTextParametersInUrl, parseTextIdFromUrl } from './utils/text';
 
-const defaultTitle = 'Hello!';
-
-const defaultDescription = `I am a simple tool to turn any English text into a word guessing game.`;
-
-const defaultText = `In order to create your own text find the form below.`;
+const defaultText: CreateTextDto = {
+  title: 'Hello!',
+  description: `I am a simple tool to turn any English text into a word guessing game.`,
+  text: `In order to create your own text find the form below.`,
+  allowShowingFirstLetters: true,
+  allowShowingText: true,
+};
 
 const couldNotLoadRemoteTextText = `
   I could not load the remote text. Please, verify your URL or create a new text.
 `;
 
+/** Loads the game for the text in the current URL and renders it into the container element. */
 export async function boot(containerElement: HTMLElement, apiClient = new ApiClient()) {
-  let text = defaultText;
-  let title = defaultTitle;
-  let description: string | undefined = defaultDescription;
-  let allowShowingText = true;
-  let allowShowingFirstLetters = true;
-
-  if (hasTextParametersInUrl()) {
-    try {
-      console.log('Trying to load text...');
-
-      const id = parseTextIdFromUrl();
-      const apiText = await apiClient.loadText(id);
-
-      console.log('Text has been loaded', apiText);
-
-      ({ text, title, allowShowingText, allowShowingFirstLetters, description } = apiText);
-    } catch (error) {
-      console.log('Text has been failed to load', error);
-      console.error(error);
-      text = couldNotLoadRemoteTextText;
-    }
-  }
-
-  const lexemesAnalysis = LexemeAnalyzer.analyze(text);
-  const renderController = new RenderController({
-    lexemesAnalysis,
-    title,
-    description,
-    allowShowingText,
-    allowShowingFirstLetters,
-  });
+  const game = await loadGame(apiClient);
+  const renderController = new RenderController({ game });
 
   renderController.init(containerElement);
+}
+
+/**
+ * Returns the remote game of the text in the URL, or a local game with the default text when the URL has no text,
+ * or a local game with an error text when the load fails.
+ */
+async function loadGame(apiClient: ApiClient): Promise<Game> {
+  if (!hasTextParametersInUrl()) {
+    return new LocalGame(defaultText);
+  }
+
+  try {
+    console.log('Trying to load text...');
+
+    const remoteGame = await apiClient.loadGame(parseTextIdFromUrl());
+
+    console.log('Text has been loaded', remoteGame.skeleton);
+
+    return remoteGame;
+  } catch (error) {
+    console.error('Failed to load the text', error);
+
+    return new LocalGame({ ...defaultText, text: couldNotLoadRemoteTextText });
+  }
 }
 
 /* v8 ignore stop */

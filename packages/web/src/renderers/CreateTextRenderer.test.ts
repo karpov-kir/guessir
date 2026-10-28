@@ -1,4 +1,4 @@
-import { Text } from '@guessir/shared/dist/Text';
+import { CreateTextDtoResponse } from '@guessir/shared/dist/CreateTextDtoResponse';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mock, MockProxy } from 'vitest-mock-extended';
 
@@ -8,7 +8,7 @@ import { CreateTextRenderer, getElements } from './CreateTextRenderer';
 
 const mockedText = {
   id: 'mocked-id',
-} as Text;
+};
 let mockedApiClient: MockProxy<ApiClient>;
 let createTextRenderer: CreateTextRenderer;
 
@@ -20,7 +20,7 @@ const createText = async () => {
     allowShowingFirstLettersCheckboxElement,
     generateUrlButtonElement,
   } = getElements(createTextRenderer.getElement());
-  const deferred = new Deferred<Text>();
+  const deferred = new Deferred<CreateTextDtoResponse>();
 
   mockedApiClient.createText.mockReturnValue(deferred.promise);
 
@@ -80,7 +80,7 @@ describe(CreateTextRenderer, () => {
   });
 
   it('should render an error if text creation fails', async () => {
-    const deferred = new Deferred<Text>();
+    const deferred = new Deferred<CreateTextDtoResponse>();
     const { errorElement, generateUrlButtonElement, textInputElement, titleInputElement } = getElements(
       createTextRenderer.getElement(),
     );
@@ -102,7 +102,7 @@ describe(CreateTextRenderer, () => {
   });
 
   it('should disable form while a request is executing', async () => {
-    const deferred = new Deferred<Text>();
+    const deferred = new Deferred<CreateTextDtoResponse>();
     const { textInputElement, titleInputElement, generateUrlButtonElement } = getElements(
       createTextRenderer.getElement(),
     );

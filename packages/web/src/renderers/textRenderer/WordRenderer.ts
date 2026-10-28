@@ -1,4 +1,3 @@
-import { Lexeme } from '../../lexemeAnalyzer/types';
 import { PubSub } from '../../pubSub/PubSub';
 import { ChildRenderer } from '../types';
 
@@ -9,23 +8,34 @@ export enum WordHint {
 }
 
 type WordRendererOptions = {
-  lexeme: Lexeme;
+  index: number;
+  length: number;
 };
 
 export class WordRenderer implements ChildRenderer {
-  private readonly lexeme: Lexeme;
+  private readonly index: number;
+  private readonly length: number;
   private readonly containerElement: HTMLElement;
-  private readonly userWordShowPubSub = new PubSub<Lexeme>();
+  private readonly lexemeElement: HTMLElement;
+  private readonly firstLetterElement: HTMLElement;
+  private readonly revealRequestPubSub = new PubSub<number>();
 
   private hint = WordHint.None;
+  private firstLetter?: string;
 
   public isShown = false;
-  public readonly userWordShowEvent = this.userWordShowPubSub.event;
+  /** Publishes the lexeme index when the user clicks the word while it is hidden. */
+  public readonly revealRequestEvent = this.revealRequestPubSub.event;
 
   constructor(options: WordRendererOptions) {
-    this.lexeme = options.lexeme;
+    this.index = options.index;
+    this.length = options.length;
     this.containerElement = document.createElement('button');
     this.containerElement.classList.add('lexeme-container');
+    this.lexemeElement = document.createElement('span');
+    this.lexemeElement.classList.add('lexeme');
+    this.firstLetterElement = document.createElement('span');
+    this.firstLetterElement.classList.add('lexeme-first-letter');
 
     this.initElement();
   }
@@ -34,10 +44,21 @@ export class WordRenderer implements ChildRenderer {
     return this.containerElement;
   }
 
-  /** Reveals the word without publishing `userWordShowEvent`, which only a user click publishes. */
-  public show() {
+  public show(word: string) {
+    this.setWord(word);
     this.isShown = true;
     this.containerElement.classList.add('show');
+    this.renderLabel();
+  }
+
+  /** Puts the word into the tile without showing it, so the text hint can show it. */
+  public setWord(word: string) {
+    this.lexemeElement.textContent = word;
+  }
+
+  public setFirstLetter(firstLetter: string) {
+    this.firstLetter = firstLetter;
+    this.firstLetterElement.textContent = firstLetter;
     this.renderLabel();
   }
 
@@ -53,42 +74,32 @@ export class WordRenderer implements ChildRenderer {
 
   /**
    * Names the word for screen readers by what the current hint shows, and drops the name once the word is visible.
-   * The hidden letters are invisible, so a screen reader would otherwise announce an empty button.
+   * The hidden placeholder is invisible, so a screen reader would otherwise announce an empty button.
    */
   private renderLabel() {
-    const { normalized } = this.lexeme;
-
     if (this.isShown || this.hint === WordHint.Text) {
       this.containerElement.removeAttribute('aria-label');
-    } else if (this.hint === WordHint.FirstLetters) {
+    } else if (this.hint === WordHint.FirstLetters && this.firstLetter) {
       this.containerElement.setAttribute(
         'aria-label',
-        `Hidden word starting with ${normalized[0]}, ${normalized.length} letters`,
+        `Hidden word starting with ${this.firstLetter}, ${this.length} letters`,
       );
     } else {
-      this.containerElement.setAttribute('aria-label', `Hidden word, ${normalized.length} letters`);
+      this.containerElement.setAttribute('aria-label', `Hidden word, ${this.length} letters`);
     }
   }
 
   private initElement() {
     this.renderLabel();
 
-    this.containerElement.innerHTML = `
-      <span class="lexeme">${this.lexeme.normalized}</span>
-      <span class="lexeme-first-letter">${this.lexeme.normalized[0]}</span>
-    `;
+    // The page font is monospace, so a placeholder of as many characters keeps the tile as wide as the hidden word
+    this.lexemeElement.textContent = '_'.repeat(this.length);
+    this.containerElement.append(this.lexemeElement, this.firstLetterElement);
 
-    this.attachClickHandler();
-  }
-
-  private attachClickHandler() {
     this.containerElement.addEventListener('click', () => {
-      if (this.isShown) {
-        return;
+      if (!this.isShown) {
+        this.revealRequestPubSub.publish(this.index);
       }
-
-      this.show();
-      this.userWordShowPubSub.publish(this.lexeme);
     });
   }
 }

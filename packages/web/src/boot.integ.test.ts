@@ -1,68 +1,78 @@
-import { Text } from '@guessir/shared/dist/Text';
+import { TextSkeleton } from '@guessir/shared/dist/game/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mock, MockProxy } from 'vitest-mock-extended';
 
 import { boot } from './boot';
-import { LexemeAnalyzer } from './lexemeAnalyzer/LexemeAnalyzer';
+import { Game } from './game/Game';
+import { LocalGame } from './game/LocalGame';
+import { RemoteGame } from './game/RemoteGame';
 import { RenderController } from './RenderController';
 import { ApiClient } from './utils/ApiClient';
+import { HttpClient } from './utils/HttpClient';
 
 let mockedApiClient: MockProxy<ApiClient>;
 vi.mock('./RenderController');
 
-const mockedText = {
-  id: 'text-id',
+const textId = 'text-id';
+const skeleton: TextSkeleton = {
   title: 'Test title',
-  text: 'Test text',
   description: 'Test description',
   allowShowingFirstLetters: true,
   allowShowingText: true,
-} as Text;
+  wordCount: 1,
+  lexemes: [{ index: 0, length: 4 }],
+};
 
 Object.defineProperty(window, 'location', {
   value: {
-    search: `?textId=${mockedText.id}`,
+    search: `?textId=${textId}`,
   },
 });
+
+/** Returns the game that `boot` handed to the last `RenderController`. */
+const getRenderedGame = (): Game => {
+  const options = vi.mocked(RenderController).mock.lastCall?.[0];
+
+  if (!options) {
+    throw new Error('RenderController was not created');
+  }
+
+  return options.game;
+};
 
 describe(boot, () => {
   beforeEach(() => {
     mockedApiClient = mock<ApiClient>();
-    vi.spyOn(LexemeAnalyzer, 'analyze');
   });
 
   it('should load and render a remote text', async () => {
-    mockedApiClient.loadText.mockResolvedValue(mockedText);
+    const remoteGame = new RemoteGame({ httpClient: mock<HttpClient>(), textUrl: 'texts/text-id', skeleton });
+
+    mockedApiClient.loadGame.mockResolvedValue(remoteGame);
 
     await boot(document.createElement('div'), mockedApiClient);
 
-    expect(mockedApiClient.loadText).toBeCalledWith(mockedText.id);
-    expect(LexemeAnalyzer.analyze).toBeCalledWith(mockedText.text);
-
-    expect(RenderController).toBeCalledWith({
-      lexemesAnalysis: expect.any(Object),
-      title: mockedText.title,
-      description: mockedText.description,
-      allowShowingFirstLetters: true,
-      allowShowingText: true,
-    });
+    expect(mockedApiClient.loadGame).toBeCalledWith(textId);
+    expect(getRenderedGame()).toBe(remoteGame);
   });
 
   it('should render an error text if loading a remote text fails', async () => {
-    mockedApiClient.loadText.mockRejectedValue(new Error('Test'));
+    mockedApiClient.loadGame.mockRejectedValue(new Error('Test'));
 
     await boot(document.createElement('div'), mockedApiClient);
 
-    expect(LexemeAnalyzer.analyze).toBeCalledWith(
-      expect.stringContaining(`I could not load the remote text. Please, verify your URL or create a new text.`),
+    expect(getRenderedGame()).toBeInstanceOf(LocalGame);
+    expect(getRenderedGame().skeleton).toEqual(
+      expect.objectContaining({
+        title: 'Hello!',
+        description: 'I am a simple tool to turn any English text into a word guessing game.',
+        allowShowingFirstLetters: true,
+        allowShowingText: true,
+      }),
     );
-    expect(RenderController).toBeCalledWith({
-      lexemesAnalysis: expect.any(Object),
-      title: 'Hello!',
-      description: 'I am a simple tool to turn any English text into a word guessing game.',
-      allowShowingFirstLetters: true,
-      allowShowingText: true,
-    });
+    await expect(getRenderedGame().words()).resolves.toEqual(
+      expect.arrayContaining([{ index: 0, word: 'I' }, expect.objectContaining({ word: 'remote' })]),
+    );
   });
 
   it('should render a default text if a text ID is not set in the URL', async () => {
@@ -70,13 +80,9 @@ describe(boot, () => {
 
     await boot(document.createElement('div'), mockedApiClient);
 
-    expect(LexemeAnalyzer.analyze).toBeCalledWith('In order to create your own text find the form below.');
-    expect(RenderController).toBeCalledWith({
-      lexemesAnalysis: expect.any(Object),
-      title: 'Hello!',
-      description: 'I am a simple tool to turn any English text into a word guessing game.',
-      allowShowingFirstLetters: true,
-      allowShowingText: true,
-    });
+    expect(mockedApiClient.loadGame).not.toBeCalled();
+    expect(getRenderedGame()).toBeInstanceOf(LocalGame);
+    expect(getRenderedGame().skeleton.title).toBe('Hello!');
+    await expect(getRenderedGame().guess('order')).resolves.toEqual([{ index: 2, word: 'order' }]);
   });
 });
