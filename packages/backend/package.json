@@ -5,36 +5,38 @@
   "scripts": {
     "build": "npm run clean && tsc -b tsconfig.build.json",
     "clean": "del-cli ./dist ./tsconfig.build.tsbuildinfo",
-    "start": "node --import ./loaders/prod.mjs ./dist/main.js",
-    "start:dev": "docker compose up -d --wait && node --env-file=env/.env.development --import ./loaders/dev.mjs ./src/main.ts",
-    "start:dev:debug": "docker compose up -d --wait && node --env-file=env/.env.development --import ./loaders/dev.mjs --inspect-brk ./src/main.ts",
+    "start": "node ./guessirBackend.js",
+    "start:dev": "docker compose up -d --wait && npm run build && run-p dev:compile dev:run",
+    "start:dev:debug": "docker compose up -d --wait && npm run build && node --env-file=env/.env.development --inspect-brk ./guessirBackend.js",
     "build:docker": "docker build --platform=linux/amd64 -t guessir-backend -f ./Dockerfile ../..",
-    "publish:docker": "docker tag guessir-backend dr.kk-forge.com/guessir-backend && docker push dr.kk-forge.com/guessir-backend"
+    "publish:docker": "docker tag guessir-backend dr.kk-forge.com/guessir-backend && docker push dr.kk-forge.com/guessir-backend",
+    "dev:compile": "tsc -b tsconfig.build.json --watch --preserveWatchOutput",
+    "dev:run": "node --watch --env-file=env/.env.development ./guessirBackend.js"
   },
   "dependencies": {
-    "@fastify/helmet": "^11.1.1",
+    "@fastify/helmet": "^13.2.0",
     "@guessir/shared": "^1.0.0",
-    "@nestjs/common": "^10.4.7",
-    "@nestjs/core": "^10.4.7",
-    "@nestjs/platform-fastify": "^10.4.7",
-    "@nestjs/typeorm": "^10.0.2",
+    "@nestjs/common": "^12.3.2",
+    "@nestjs/core": "^12.3.2",
+    "@nestjs/platform-fastify": "^12.3.2",
+    "@nestjs/typeorm": "^12.0.2",
     "class-transformer": "^0.5.1",
-    "class-validator": "^0.14.1",
-    "extensionless": "^1.9.9",
-    "fastify": "4.28.1",
-    "nanoid": "^5.0.8",
-    "pg": "^8.13.1",
+    "class-validator": "^0.15.1",
+    "fastify": "5.12.7",
+    "nanoid": "^6.0.2",
+    "pg": "^8.23.1",
     "reflect-metadata": "^0.2.2",
-    "typeorm": "^0.3.31",
-    "umzug": "^3.8.2"
+    "typeorm": "^1.1.2",
+    "umzug": "^3.8.3"
   },
   "devDependencies": {
+    "@types/node": "^26.6.6",
     "@types/validator": "^13.15.10",
     "lerna": "^10.1.1"
   },
   "files": [
     "./dist",
-    "./loaders"
+    "./loaders/*.mjs"
   ],
   "bin": {
     "guessirBackend": "./guessirBackend.js"
