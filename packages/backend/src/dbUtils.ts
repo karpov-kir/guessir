@@ -37,6 +37,25 @@ export const getTypeOrmConfig = (): DataSourceOptions => ({
   migrations: [],
 });
 
+// Pings over a pool of its own: in the request pool a ping waits behind requests, and a flood of them would make a
+// healthy server exit. The timeouts end a dial to a database host that is gone and a query on a dropped connection.
+export const createDbPing = () => {
+  const dataSource = new DataSource({
+    type: 'postgres',
+    ...getDbSettings(),
+    connectTimeoutMS: 2_000,
+    extra: { max: 1, query_timeout: 2_000 },
+  });
+
+  return async () => {
+    if (!dataSource.isInitialized) {
+      await dataSource.initialize();
+    }
+
+    await dataSource.query('SELECT 1');
+  };
+};
+
 const getContext = async (): Promise<MigrationContext> => {
   const dataSource = new DataSource(getTypeOrmConfig());
 
