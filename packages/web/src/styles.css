@@ -526,7 +526,8 @@ input[type='checkbox']:disabled {
   visibility: visible;
 }
 
-.lexeme-container.show.fresh {
+/* Scoped to the text so the mark also beats the peek rule above, which would turn it dark on dark */
+#text-container .lexeme-container.show.fresh {
   padding: 0 6px;
   background: var(--yellow);
   color: var(--on-yellow);
