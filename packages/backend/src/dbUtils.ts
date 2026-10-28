@@ -29,6 +29,9 @@ const entities = [TextEntity];
 export const getTypeOrmConfig = (): DataSourceOptions => ({
   type: 'postgres',
   ...getDbSettings(),
+  // Ends a connection attempt to a database host that is gone. Without the timeout the attempt hangs and the startup
+  // retries stall. pg-pool also fails a query that waits this long for a free connection.
+  connectTimeoutMS: 5_000,
   // Handled manually using Umzug
   synchronize: false,
   logging: true,
