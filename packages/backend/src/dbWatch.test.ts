@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { watchDb } from './dbWatch';
+import { waitForDb, watchDb } from './dbWatch';
 
 const down = new Error('getaddrinfo ENOTFOUND guessir_database');
 
@@ -35,6 +35,38 @@ describe(watchDb, () => {
     const error = await watchDb(db.ping, { limitMs: 30, intervalMs: 5 });
 
     expect(error).toEqual(new Error('Database ping has not returned for 30ms'));
+    expect(db.pings).toBe(1);
+  });
+});
+
+describe(waitForDb, () => {
+  it('should return once the database answers', async () => {
+    const db = fakeDb((ping) => (ping <= 3 ? Promise.reject(down) : Promise.resolve()));
+
+    await waitForDb(db.ping, { limitMs: 1_000, intervalMs: 5 });
+
+    expect(db.pings).toBe(4);
+  });
+
+  it('should throw the last ping error once the limit has passed', async () => {
+    const errors: Error[] = [];
+    const db = fakeDb((ping) => {
+      errors.push(new Error(`ping ${ping} failed`));
+      return Promise.reject(errors[ping - 1]);
+    });
+
+    const thrown = await waitForDb(db.ping, { limitMs: 50, intervalMs: 5 }).catch((error: unknown) => error);
+
+    expect(db.pings).toBeGreaterThan(3);
+    expect(thrown).toBe(errors[db.pings - 1]);
+  });
+
+  it('should throw by the limit on a ping that never settles', async () => {
+    const db = fakeDb(() => new Promise(() => {}));
+
+    await expect(waitForDb(db.ping, { limitMs: 30, intervalMs: 5 })).rejects.toEqual(
+      new Error('Database ping has not returned for 30ms'),
+    );
     expect(db.pings).toBe(1);
   });
 });
