@@ -1,5 +1,6 @@
+import { setTimeout as sleep } from 'node:timers/promises';
+
 import { Logger } from '@nestjs/common';
-import { setTimeout as sleep } from 'timers/promises';
 
 const logger = new Logger('dbWatch');
 
