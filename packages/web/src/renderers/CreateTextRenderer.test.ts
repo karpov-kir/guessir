@@ -139,8 +139,8 @@ describe(CreateTextRenderer, () => {
   it('should initialize inputs without validation classes', () => {
     const { textInputElement, titleInputElement } = getElements(createTextRenderer.getElement());
 
-    expect(!titleInputElement.classList.contains('invalid'));
-    expect(!textInputElement.classList.contains('invalid'));
+    expect(titleInputElement.classList).not.toContain('invalid');
+    expect(textInputElement.classList).not.toContain('invalid');
   });
 
   it('should validate inputs on submit', () => {
@@ -150,8 +150,8 @@ describe(CreateTextRenderer, () => {
 
     generateUrlButtonElement.click();
 
-    expect(titleInputElement.classList.contains('invalid'));
-    expect(textInputElement.classList.contains('invalid'));
+    expect(titleInputElement.classList).toContain('invalid');
+    expect(textInputElement.classList).toContain('invalid');
   });
 
   it('should mark empty required fields invalid for screen readers too', () => {
@@ -171,14 +171,14 @@ describe(CreateTextRenderer, () => {
     expect(textInputElement.getAttribute('aria-invalid')).toBe('true');
   });
 
-  it('should validate inputs on change', () => {
+  it('should validate inputs on input', () => {
     const { textInputElement, titleInputElement } = getElements(createTextRenderer.getElement());
 
-    titleInputElement.dispatchEvent(new KeyboardEvent('keypress'));
-    textInputElement.dispatchEvent(new KeyboardEvent('keypress'));
+    titleInputElement.dispatchEvent(new Event('input'));
+    textInputElement.dispatchEvent(new Event('input'));
 
-    expect(titleInputElement.classList.contains('invalid'));
-    expect(textInputElement.classList.contains('invalid'));
+    expect(titleInputElement.classList).toContain('invalid');
+    expect(textInputElement.classList).toContain('invalid');
   });
 
   it('should limit inputs length', () => {
