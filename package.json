@@ -9,9 +9,9 @@
     "packages/web"
   ],
   "scripts": {
-    "build": "lerna run build",
+    "build": "npm run build --workspaces --if-present",
     "build:web": "npm run build -w @guessir/web",
-    "clean": "lerna run clean",
+    "clean": "npm run clean --workspaces --if-present",
     "lint:eslint": "eslint \"packages/**/src/**/*.ts\" \"packages/**/tests/**/*.ts\" \"packages/**/loaders/**/*.{ts,mjs}\"",
     "lint:eslint:fix": "npm run lint:eslint -- --fix",
     "lint:tsc": "tsc --noEmit -p packages/backend/tsconfig.json && tsc --noEmit -p packages/shared/tsconfig.json && tsc --noEmit -p packages/web/tsconfig.json",
@@ -26,8 +26,8 @@
     "test:ci": "vitest run --coverage",
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
     "test:watch": "vitest watch",
-    "build:docker": "lerna run build:docker",
-    "publish:docker": "lerna run publish:docker"
+    "build:docker": "npm run build:docker --workspaces --if-present",
+    "publish:docker": "npm run publish:docker --workspaces --if-present"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -38,7 +38,6 @@
     "eslint-plugin-prettier": "^5.5.7",
     "eslint-plugin-simple-import-sort": "^14.0.0",
     "jsdom": "^30.1.3",
-    "lerna": "^10.1.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.9.10",
     "stylelint": "^17.16.0",

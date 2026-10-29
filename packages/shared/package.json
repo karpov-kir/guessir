@@ -8,10 +8,5 @@
   "scripts": {
     "build": "npm run clean && tsc -b tsconfig.build.json",
     "clean": "del-cli ./dist ./tsconfig.build.tsbuildinfo"
-  },
-  "dependencies": {},
-  "devDependencies": {},
-  "files": [
-    "./dist"
-  ]
+  }
 }
