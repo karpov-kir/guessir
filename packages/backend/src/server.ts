@@ -49,7 +49,7 @@ export async function boot(host = '0.0.0.0', port = 3020) {
       if (isAllowed) {
         callback(null, true);
       } else {
-        callback(new NotAcceptableException('Not allowed by CORS'));
+        callback(new NotAcceptableException('Not allowed by CORS'), false);
       }
     },
   });

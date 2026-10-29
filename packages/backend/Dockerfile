@@ -29,6 +29,4 @@ EXPOSE 3020
 
 # HEALTHCHECK CMD curl --fail --head http://localhost:3020
 
-ENV NODE_OPTIONS='--import /app/node_modules/@guessir/backend/loaders/prod.mjs'
-
 ENTRYPOINT ["npx", "guessirBackend"]
