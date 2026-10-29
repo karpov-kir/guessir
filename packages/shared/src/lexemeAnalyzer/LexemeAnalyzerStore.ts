@@ -7,6 +7,11 @@ export class LexemeAnalyzerStore implements LexemeAnalysis {
     return new Map(this.#lexemes);
   }
 
+  /** Returns the lexeme at `index` without copying the lexemes, or undefined where there is none. */
+  public getLexeme(index: number) {
+    return this.#lexemes.get(index);
+  }
+
   #lexemesByWordLike: Map<GroupWordLikeNominal, Map<number, Lexeme>> = new Map<
     GroupWordLikeNominal,
     Map<number, Lexeme>

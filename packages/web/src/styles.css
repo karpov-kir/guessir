@@ -403,6 +403,18 @@ input[type='checkbox']:disabled {
   box-shadow: none;
 }
 
+#guess-status {
+  color: var(--on-accent);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* An empty status leaves the flow, so it adds no gap under the guess row. It stays rendered rather than hidden,
+   because a screen reader announces a live region only while it is in the page */
+#guess-status:empty {
+  position: absolute;
+}
+
 #hints {
   display: flex;
   flex-wrap: wrap;
