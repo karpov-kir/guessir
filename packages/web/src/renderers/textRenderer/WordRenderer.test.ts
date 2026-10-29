@@ -31,6 +31,22 @@ describe(WordRenderer, () => {
     expect(wordRenderer.getElement().classList).toContain('show');
   });
 
+  it('should name a hidden word for screen readers until it is shown', () => {
+    expect(wordRenderer.getElement().getAttribute('aria-label')).toBe('Hidden word, 4 letters');
+
+    wordRenderer.show();
+
+    expect(wordRenderer.getElement().hasAttribute('aria-label')).toBe(false);
+  });
+
+  it('should mark a word as just guessed', () => {
+    wordRenderer.markFresh(true);
+    expect(wordRenderer.getElement().classList).toContain('fresh');
+
+    wordRenderer.markFresh(false);
+    expect(wordRenderer.getElement().classList).not.toContain('fresh');
+  });
+
   it('should not notify about about second click', () => {
     const userWordShowCallback = vi.fn();
 

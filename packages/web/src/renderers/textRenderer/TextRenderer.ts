@@ -2,7 +2,7 @@ import { LexemeNormalizer } from '../../lexemeAnalyzer/LexemeNormalizer';
 import { Lexeme, LexemeAnalysis } from '../../lexemeAnalyzer/types';
 import { PubSub } from '../../pubSub/PubSub';
 import { ChildRenderer } from '../types';
-import { WordRenderer } from './WordRenderer';
+import { WordHint, WordRenderer } from './WordRenderer';
 
 type TextRendererOptions = {
   lexemesAnalysis: LexemeAnalysis;
@@ -22,6 +22,8 @@ export class TextRenderer implements ChildRenderer {
     number,
     WordRenderer
   >();
+  /** Words of the last successful guess, highlighted so the user sees where they landed */
+  private freshWordRenderers: WordRenderer[] = [];
 
   public userWordShowEvent: PubSub<Lexeme>['event'];
 
@@ -31,7 +33,7 @@ export class TextRenderer implements ChildRenderer {
     this.lexemesAnalysis = options.lexemesAnalysis;
     this.title = options.title;
     this.description = options.description;
-    this.containerElement = document.createElement('div');
+    this.containerElement = document.createElement('article');
     this.containerElement.id = 'text-container';
 
     this.initElement();
@@ -41,6 +43,10 @@ export class TextRenderer implements ChildRenderer {
     return this.containerElement;
   }
 
+  /**
+   * Shows every lexeme that matches `word` and returns how many of them were hidden before.
+   * Moves the fresh highlight to these words only when at least one word was newly shown.
+   */
   public showLexemesByWord(word: string): number {
     const lexemes = this.lexemesAnalysis.lexemesByWordLike.get(word);
     let shownCount = 0;
@@ -48,6 +54,8 @@ export class TextRenderer implements ChildRenderer {
     if (!lexemes) {
       return shownCount;
     }
+
+    const guessedWordRenderers: WordRenderer[] = [];
 
     for (const [index] of lexemes) {
       const wordRenderer = this.wordRenderers.get(index);
@@ -59,33 +67,41 @@ export class TextRenderer implements ChildRenderer {
       const isShownBefore = wordRenderer.isShown;
 
       wordRenderer.show();
+      guessedWordRenderers.push(wordRenderer);
 
       if (!isShownBefore) {
         shownCount++;
       }
     }
 
+    // A guess that opens nothing new is a miss, so the highlight stays on the last guess that opened words
+    if (shownCount) {
+      this.freshWordRenderers.forEach((wordRenderer) => wordRenderer.markFresh(false));
+      guessedWordRenderers.forEach((wordRenderer) => wordRenderer.markFresh(true));
+      this.freshWordRenderers = guessedWordRenderers;
+    }
+
     return shownCount;
   }
 
   public toggleText(isShown: boolean) {
-    this.containerElement.classList.remove('show-text', 'show-first-letters');
-
-    if (isShown) {
-      this.containerElement.classList.add('show-text');
-    } else {
-      this.containerElement.classList.remove('show-text');
-    }
+    this.setHint(isShown ? WordHint.Text : WordHint.None);
   }
 
   public toggleFirstLetters(isShown: boolean) {
+    this.setHint(isShown ? WordHint.FirstLetters : WordHint.None);
+  }
+
+  private setHint(hint: WordHint) {
     this.containerElement.classList.remove('show-text', 'show-first-letters');
 
-    if (isShown) {
+    if (hint === WordHint.Text) {
+      this.containerElement.classList.add('show-text');
+    } else if (hint === WordHint.FirstLetters) {
       this.containerElement.classList.add('show-first-letters');
-    } else {
-      this.containerElement.classList.remove('show-first-letters');
     }
+
+    this.wordRenderers.forEach((wordRenderer) => wordRenderer.setHint(hint));
   }
 
   private initElement() {

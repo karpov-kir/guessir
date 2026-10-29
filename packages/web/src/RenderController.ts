@@ -25,7 +25,7 @@ export class RenderController {
   private readonly utilsRenderer: CreateTextRenderer;
 
   constructor(options: RenderControllerOptions) {
-    this.guessirContainer = document.createElement('div');
+    this.guessirContainer = document.createElement('main');
     this.guessirContainer.id = 'guessir';
     this.textRenderer =
       options.textRenderer ||
@@ -59,9 +59,21 @@ export class RenderController {
       this.handleShowFirstLetters(isFirstLettersShown),
     );
 
-    this.guessirContainer.appendChild(this.textRenderer.getElement());
-    this.guessirContainer.appendChild(this.controlsRenderer.getElement());
-    this.guessirContainer.appendChild(this.scoreRenderer.getElement());
+    // The score and the controls stay together and stick to the screen edge, so a long text never scrolls them away.
+    // They share a wrapper with the text alone, so they stop sticking at the text end and leave the create-text form
+    // below them uncovered.
+    const gameElement = document.createElement('div');
+    const hudElement = document.createElement('section');
+
+    gameElement.id = 'game';
+    hudElement.id = 'hud';
+    hudElement.setAttribute('aria-label', 'Game controls');
+    hudElement.appendChild(this.scoreRenderer.getElement());
+    hudElement.appendChild(this.controlsRenderer.getElement());
+
+    gameElement.appendChild(hudElement);
+    gameElement.appendChild(this.textRenderer.getElement());
+    this.guessirContainer.appendChild(gameElement);
     this.guessirContainer.appendChild(this.utilsRenderer.getElement());
   }
 
