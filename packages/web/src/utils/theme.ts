@@ -20,7 +20,7 @@ const storageKey = 'guessir.theme';
 
 /**
  * Returns the stored theme, or undefined when none is stored or the storage is unavailable.
- * Storage can throw in a private window or with blocked site data, even on reaching `window.localStorage`,
+ * Storage can throw in a private window or with blocked site data, even on reaching `globalThis.localStorage`,
  * so the toggle keeps working without it.
  */
 function readStoredTheme(getStorage: () => Storage): Theme | undefined {
@@ -48,8 +48,8 @@ function storeTheme(getStorage: () => Storage, theme: Theme) {
 export function initThemeToggle({
   button,
   root = document.documentElement,
-  getStorage = () => window.localStorage,
-  systemTheme = window.matchMedia('(prefers-color-scheme: dark)'),
+  getStorage = () => globalThis.localStorage,
+  systemTheme = globalThis.matchMedia('(prefers-color-scheme: dark)'),
 }: ThemeToggleOptions) {
   const storedTheme = readStoredTheme(getStorage);
 
