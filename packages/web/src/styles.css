@@ -517,9 +517,11 @@ input[type='checkbox']:disabled {
   visibility: visible;
 }
 
-/* While peeking, the words not found yet are muted, so the found ones still stand out */
+/* While peeking, the words not found yet are muted and dotted, so the found ones stand out without relying on colour */
 #text-container.show-text .lexeme-container:not(.show) {
   color: var(--muted);
+  text-decoration: underline dotted 2px;
+  text-underline-offset: 4px;
 }
 
 /* A shown word needs no hint, whatever the hint mode says */
