@@ -529,6 +529,11 @@ input[type='checkbox']:disabled {
   visibility: visible;
 }
 
+/* While peeking, the words not found yet are muted, so the found ones still stand out */
+#text-container.show-text .lexeme-container:not(.show) {
+  color: var(--muted);
+}
+
 /* A shown word needs no hint, whatever the hint mode says */
 .lexeme-container.show .lexeme-first-letter {
   visibility: hidden !important;
