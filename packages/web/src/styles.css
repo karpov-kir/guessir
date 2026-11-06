@@ -2,8 +2,22 @@
 
 :root {
   --font: 'JetBrains Mono', ui-monospace, monospace;
+  --text-2xs: 13px;
+  --text-xs: 14px;
+  --text-sm: 15px;
+  --text-md: 16px;
+  --text-lg: 17px;
+  --text-xl: 19px;
+  --text-2xl: 20px;
+  --text-3xl: 24px;
+  --text-4xl: 30px;
+  --radius-pill: 999px;
   --radius-lg: 28px;
   --radius-md: 16px;
+  --control-md: 44px;
+  --control-lg: 52px;
+  --control-xl: 56px;
+  --gutter: 32px;
   --bg: light-dark(#f1eeff, #120d2b);
   --surface: light-dark(#fff, #1d1645);
   --ink: light-dark(#1b1340, #f1eeff);
@@ -13,6 +27,8 @@
   --accent-deep: #3a21b8;
   --on-accent: #fff;
   --yellow: #ffd23f;
+  --yellow-hover: #ffdc66;
+  --yellow-disabled: #ffe9a3;
   --yellow-deep: #c99a00;
   --on-yellow: #1b1340;
   --tile: light-dark(#e6e0ff, #2e2468);
@@ -23,6 +39,11 @@
   --error: light-dark(#c0262d, #ff8a8f);
   --focus: light-dark(#5b3df5, #c9bfff);
   --track: light-dark(rgb(255 255 255 / 28%), rgb(18 13 43 / 35%));
+
+  /* The HUD is violet in both themes, so its guess field stays light in both */
+  --hud-field: #fff;
+  --on-hud-field: #1b1340;
+  --hud-field-placeholder: #544d7a;
   --hud-chip-border: rgb(255 255 255 / 60%);
 
   /* Without the user's own pick the page follows the system theme */
@@ -45,21 +66,10 @@
   box-sizing: border-box;
 }
 
-html,
-body {
+body,
+h1,
+p {
   margin: 0;
-  padding: 0;
-}
-
-body {
-  min-height: 100vh;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--font);
-  font-size: 16px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 button,
@@ -69,45 +79,36 @@ textarea {
   color: inherit;
 }
 
-:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 2px;
+/* Base elements */
+
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--text-md);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
   color: var(--link);
 }
 
-h1,
-p {
-  margin: 0;
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
 }
-
-/* Helpers */
-
-.hide {
-  display: none !important;
-}
-
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-/* Buttons */
 
 button {
-  min-height: 44px;
+  min-height: var(--control-md);
   padding: 0 24px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 17px;
+  font-size: var(--text-lg);
   font-weight: 800;
   cursor: pointer;
 }
@@ -121,23 +122,18 @@ button:active {
 }
 
 button:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
   transform: none;
 }
-
-/* Fields */
 
 input[type='text'],
 textarea {
   width: 100%;
-  min-height: 52px;
+  min-height: var(--control-lg);
   padding: 12px 18px;
   border: 2px solid var(--tile-border);
   border-radius: var(--radius-md);
   background: var(--field);
-  font-size: 17px;
-  line-height: 1.5;
+  font-size: var(--text-lg);
 }
 
 input[type='text']::placeholder,
@@ -154,12 +150,11 @@ textarea:focus {
   border-color: var(--focus);
 }
 
-input.invalid,
+/* After the focus rule and as specific, so a field keeps showing its error while focused */
+input[type='text'].invalid,
 textarea.invalid {
   border-color: var(--error);
 }
-
-/* Checkboxes */
 
 input[type='checkbox'] {
   position: relative;
@@ -187,33 +182,40 @@ input[type='checkbox']:checked::after {
   mask: url('./icons/checkIcon.svg') no-repeat 50% 50% / 80%;
 }
 
+button:disabled,
 input[type='checkbox']:disabled {
   cursor: not-allowed;
   opacity: 0.55;
 }
 
+/* Shared components */
+
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  min-height: 44px;
+  min-height: var(--control-md);
   padding: 0 18px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--chip);
-  font-size: 15px;
+  font-size: var(--text-sm);
   font-weight: 600;
   cursor: pointer;
 }
 
 /* Header */
 
+#site-header,
+#guessir {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
 #site-header {
   display: flex;
   align-items: center;
   gap: 16px;
-  max-width: 1040px;
-  margin: 0 auto;
-  padding: 20px 32px;
+  padding: 20px var(--gutter);
 }
 
 #logo {
@@ -237,7 +239,7 @@ input[type='checkbox']:disabled {
   border-radius: 12px;
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 24px;
+  font-size: var(--text-3xl);
   transform: rotate(-8deg);
 }
 
@@ -245,7 +247,7 @@ input[type='checkbox']:disabled {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
+  width: var(--control-md);
   padding: 0;
   background: var(--surface);
   color: var(--ink);
@@ -263,19 +265,15 @@ input[type='checkbox']:disabled {
 
 /* Main */
 
-#guessir {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 1040px;
-  margin: 0 auto;
-  padding: 8px 32px 64px;
-}
-
+#guessir,
 #game {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+#guessir {
+  padding: 8px var(--gutter) 64px;
 }
 
 /* HUD: the score and the controls */
@@ -322,7 +320,7 @@ input[type='checkbox']:disabled {
 }
 
 #score-total {
-  font-size: 13px;
+  font-size: var(--text-2xs);
   font-weight: 600;
 }
 
@@ -333,7 +331,7 @@ input[type='checkbox']:disabled {
 }
 
 #score-label {
-  font-size: 20px;
+  font-size: var(--text-2xl);
   font-weight: 800;
 }
 
@@ -341,7 +339,7 @@ input[type='checkbox']:disabled {
   width: 160px;
   height: 10px;
   overflow: hidden;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--track);
 }
 
@@ -367,24 +365,24 @@ input[type='checkbox']:disabled {
 #guess-input {
   flex-grow: 1;
   min-width: 0;
-  height: 56px;
+  height: var(--control-xl);
   padding: 0 22px;
   border: 0;
-  border-radius: 999px;
-  background: #fff;
-  color: #1b1340;
-  font-size: 20px;
+  border-radius: var(--radius-pill);
+  background: var(--hud-field);
+  color: var(--on-hud-field);
+  font-size: var(--text-2xl);
 }
 
 #guess-input::placeholder {
-  color: #544d7a;
+  color: var(--hud-field-placeholder);
 }
 
 #guess-button {
   display: flex;
   align-items: center;
   gap: 8px;
-  height: 56px;
+  height: var(--control-xl);
   padding: 0 26px;
   background: var(--yellow);
   color: var(--on-yellow);
@@ -393,12 +391,12 @@ input[type='checkbox']:disabled {
 }
 
 #guess-button:hover {
-  background: #ffdc66;
+  background: var(--yellow-hover);
 }
 
 /* Half-transparent yellow over the violet panel turns muddy, so the disabled button gets its own solid shade */
 #guess-button:disabled {
-  background: #ffe9a3;
+  background: var(--yellow-disabled);
   opacity: 1;
   box-shadow: none;
 }
@@ -428,7 +426,7 @@ input[type='checkbox']:disabled {
 
 #hints-label {
   margin-right: 4px;
-  font-size: 15px;
+  font-size: var(--text-sm);
   font-weight: 600;
 }
 
@@ -454,11 +452,15 @@ input[type='checkbox']:disabled {
 
 /* Text */
 
-#text-container {
-  padding: 40px 44px 44px;
+#text-container,
+#utils-container details {
   border-radius: var(--radius-lg);
   background: var(--surface);
   box-shadow: inset 0 0 0 2px var(--tile-border);
+}
+
+#text-container {
+  padding: 40px 44px 44px;
 }
 
 #title {
@@ -472,7 +474,7 @@ input[type='checkbox']:disabled {
 #description {
   margin-bottom: 28px;
   color: var(--muted);
-  font-size: 19px;
+  font-size: var(--text-xl);
 }
 
 #lexemes {
@@ -483,11 +485,13 @@ input[type='checkbox']:disabled {
 
 /* A hidden word is a tile as wide as the word itself */
 .lexeme-container {
+  --tile-inset: 6px;
+
   position: relative;
   display: inline-flex;
   min-height: 0;
   margin: 0 2px;
-  padding: 0 6px;
+  padding: 0 var(--tile-inset);
   border-radius: 9px;
   background: var(--tile);
   color: var(--ink);
@@ -509,14 +513,14 @@ input[type='checkbox']:disabled {
 .lexeme-first-letter {
   position: absolute;
   top: 0;
-  left: 6px;
+  left: var(--tile-inset);
   visibility: hidden;
   color: var(--link);
   font-weight: 800;
 }
 
 .lexeme-container.show,
-#text-container.show-text .lexeme-container {
+.show-text .lexeme-container {
   margin: 0;
   padding: 0;
   background: transparent;
@@ -524,30 +528,26 @@ input[type='checkbox']:disabled {
   cursor: default;
 }
 
-.lexeme-container.show .lexeme,
-#text-container.show-text .lexeme {
+.show-text .lexeme,
+.lexeme-container.show .lexeme {
   visibility: visible;
 }
 
 /* While peeking, the words not found yet are muted and dotted, so the found ones stand out without relying on colour */
-#text-container.show-text .lexeme-container:not(.show) {
+.show-text .lexeme-container:not(.show) {
   color: var(--muted);
   text-decoration: underline dotted 2px;
   text-underline-offset: 4px;
 }
 
-/* A shown word needs no hint, whatever the hint mode says */
-.lexeme-container.show .lexeme-first-letter {
-  visibility: hidden !important;
-}
-
-#text-container.show-first-letters .lexeme-first-letter {
+/* Only the words still hidden: a shown word needs no hint */
+.show-first-letters .lexeme-container:not(.show) .lexeme-first-letter {
   visibility: visible;
 }
 
-/* Scoped to the text so the mark also beats the peek rule above, which would turn it dark on dark */
-#text-container .lexeme-container.show.fresh {
-  padding: 0 6px;
+/* Last among the word rules, so the mark of the last guess beats the shown and peek rules of equal specificity */
+.lexeme-container.fresh {
+  padding: 0 var(--tile-inset);
   background: var(--yellow);
   color: var(--on-yellow);
   font-weight: 800;
@@ -557,19 +557,16 @@ input[type='checkbox']:disabled {
 
 #utils-container details {
   padding: 32px 44px;
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  box-shadow: inset 0 0 0 2px var(--tile-border);
 }
 
 summary {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 4px;
   padding-left: 40px;
-  position: relative;
-  cursor: pointer;
   list-style: none;
+  cursor: pointer;
 }
 
 summary::-webkit-details-marker {
@@ -595,14 +592,14 @@ details[open] summary::before {
 }
 
 .summary-title {
-  font-size: 30px;
+  font-size: var(--text-4xl);
   font-weight: 800;
   letter-spacing: -0.03em;
 }
 
 .summary-text {
   color: var(--muted);
-  font-size: 17px;
+  font-size: var(--text-lg);
 }
 
 #create-form {
@@ -622,13 +619,13 @@ details[open] summary::before {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  font-size: 15px;
+  font-size: var(--text-sm);
   font-weight: 600;
 }
 
 .field-hint {
   color: var(--muted);
-  font-size: 14px;
+  font-size: var(--text-xs);
   font-weight: 400;
 }
 
@@ -641,7 +638,7 @@ details[open] summary::before {
 .limit-text {
   align-self: flex-end;
   color: var(--muted);
-  font-size: 13px;
+  font-size: var(--text-2xs);
 }
 
 .chips {
@@ -658,7 +655,7 @@ details[open] summary::before {
 }
 
 #generate-url-button {
-  height: 52px;
+  height: var(--control-lg);
   padding: 0 30px;
   box-shadow: 0 5px 0 var(--accent-deep);
 }
@@ -669,15 +666,15 @@ details[open] summary::before {
   gap: 6px;
   min-width: 0;
   max-width: 100%;
-  height: 52px;
+  height: var(--control-lg);
   padding: 0 6px 0 18px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--chip);
 }
 
 #generated-url {
   overflow: hidden;
-  font-size: 15px;
+  font-size: var(--text-sm);
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -689,11 +686,10 @@ details[open] summary::before {
   align-items: center;
   gap: 6px;
   min-width: 40px;
-  height: 40px;
   padding: 0 10px;
   background: var(--surface);
   color: var(--ink);
-  font-size: 14px;
+  font-size: var(--text-xs);
   font-weight: 600;
 }
 
@@ -702,7 +698,21 @@ details[open] summary::before {
   font-weight: 600;
 }
 
-/* Wrong guess */
+/* Utilities and states */
+
+/* Important, so hiding beats a component's own display set by id, such as the flex of #generated-url-container */
+.hide {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 
 @keyframes shake {
   0%,
@@ -726,12 +736,16 @@ details[open] summary::before {
   box-shadow: inset 0 0 0 3px var(--error);
 }
 
+/* Media */
+
 @media (prefers-reduced-motion: reduce) {
+  /* Shortened rather than removed, so animationend still fires and clears the class */
   .shake-and-error {
     animation-duration: 0.01s;
   }
 
-  #score-progress-bar {
+  #score-progress-bar,
+  summary::before {
     transition: none;
   }
 }
@@ -739,6 +753,10 @@ details[open] summary::before {
 /* Phone: the HUD docks to the bottom edge, where the thumb reaches it */
 
 @media (width <= 640px) {
+  :root {
+    --gutter: 12px;
+  }
+
   #site-header {
     padding: 12px 16px;
   }
@@ -750,7 +768,7 @@ details[open] summary::before {
   #logo-mark {
     width: 34px;
     height: 34px;
-    font-size: 20px;
+    font-size: var(--text-2xl);
   }
 
   #guessir,
@@ -759,15 +777,16 @@ details[open] summary::before {
   }
 
   #guessir {
-    padding: 0 12px;
+    padding: 0 var(--gutter);
   }
 
+  /* Bleeds over the page gutter, so the docked HUD spans the screen */
   #hud {
     top: auto;
     bottom: 0;
     order: 2;
     gap: 12px;
-    margin: 0 -12px;
+    margin: 0 calc(-1 * var(--gutter));
     padding: 14px;
     border-radius: 24px 24px 0 0;
     box-shadow: none;
@@ -785,15 +804,15 @@ details[open] summary::before {
   #score-badge {
     width: 56px;
     height: 56px;
-    border-radius: 16px;
+    border-radius: var(--radius-md);
   }
 
   #current-score {
-    font-size: 24px;
+    font-size: var(--text-3xl);
   }
 
   #score-label {
-    font-size: 16px;
+    font-size: var(--text-md);
   }
 
   #controls-container {
@@ -802,7 +821,7 @@ details[open] summary::before {
 
   #guess-input,
   #guess-button {
-    height: 52px;
+    height: var(--control-lg);
   }
 
   #guess-button {
@@ -825,20 +844,20 @@ details[open] summary::before {
     flex: 1 1 auto;
     justify-content: center;
     padding: 0 12px;
-    font-size: 14px;
+    font-size: var(--text-xs);
   }
 
   #title {
-    font-size: 30px;
+    font-size: var(--text-4xl);
   }
 
   #description {
     margin-bottom: 16px;
-    font-size: 15px;
+    font-size: var(--text-sm);
   }
 
   #lexemes {
-    font-size: 19px;
+    font-size: var(--text-xl);
     line-height: 2;
   }
 
@@ -847,6 +866,6 @@ details[open] summary::before {
   }
 
   .summary-title {
-    font-size: 24px;
+    font-size: var(--text-3xl);
   }
 }
