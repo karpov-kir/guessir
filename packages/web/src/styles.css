@@ -475,9 +475,9 @@ input[type='checkbox']:disabled {
   box-shadow: none;
 }
 
-/* The status keeps its line while empty, so a message does not grow the panel and push the text. Negative margins sink
-   the line into the gaps around it, so the guess row and the hints stay about 20px apart, empty or not. It holds one
-   line: a longer message is cut on screen, and a screen reader still reads it whole */
+/* The status keeps its line while empty, so a message does not grow the panel and push the text. The negative
+   margins let the line sink into the gaps around it, so the guess row and the hints stay about 20px apart, empty or
+   not. It holds one line: a longer message is cut on screen, and a screen reader still reads it whole */
 #guess-status {
   min-height: 16px;
   margin-block: -12px;
