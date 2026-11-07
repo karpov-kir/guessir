@@ -1,6 +1,7 @@
 import arrowIcon from '../icons/arrowIcon.svg?raw';
 import { PubSub } from '../pubSub/PubSub';
 import { onChangeAndEnter, onEnter } from '../utils/dom';
+import { icon } from '../utils/icon';
 import { ChildRenderer } from './types';
 
 export type GuessEvent = {
@@ -76,7 +77,7 @@ export class ControlsRenderer implements ChildRenderer {
         <label for="guess-input" class="visually-hidden">Your guess</label>
         <input id="guess-input" type="text" placeholder="Type a word" autocomplete="off" autocapitalize="off" spellcheck="false" />
         <button title="Please, input at least one letter to try to guess!" disabled id="guess-button" type="button">
-          Guess ${arrowIcon}
+          Guess ${icon(arrowIcon)}
         </button>
         <div id="guess-status" class="visually-hidden" role="status"></div>
       </div>
