@@ -449,7 +449,8 @@ input[type='checkbox']:disabled {
   color: var(--hud-field-placeholder);
 }
 
-/* Like the form fields, the border carries hover, focus and the error of a miss; the id outranks the shared field rules */
+/* Like the form fields, the border carries hover, focus and the error of a miss;
+   the id outranks the shared field rules */
 @media (hover: hover) {
   #guess-input:hover:not(:focus, .shake-and-error) {
     border-color: var(--hud-field-border-hover);
