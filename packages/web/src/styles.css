@@ -595,8 +595,7 @@ input[type='checkbox']:disabled {
   isolation: isolate;
 }
 
-/* A word and the punctuation that opens or closes it break as one, so no line starts with a comma;
-   see .lexeme-container for a word wider than the line */
+/* A word and the punctuation that opens or closes it break as one, so no line starts with a comma */
 .lexeme-group {
   white-space: nowrap;
 }
