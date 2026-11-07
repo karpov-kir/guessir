@@ -1,3 +1,5 @@
+import { createTextLimits } from '@guessir/shared/dist/CreateTextDto';
+
 import copyIcon from '../icons/copyIcon.svg?raw';
 import { ApiClient } from '../utils/ApiClient';
 import { onChangeAndEnter } from '../utils/dom';
@@ -42,9 +44,9 @@ export class CreateTextRenderer implements ChildRenderer {
 
     this.apiClient = options.apiClient || new ApiClient();
 
-    this.maxTitleLength = options.maxTitleLength ?? 500;
-    this.maxDescriptionLength = options.maxDescriptionLength ?? 4000;
-    this.maxTextLength = options.maxTextLength || 4000;
+    this.maxTitleLength = options.maxTitleLength ?? createTextLimits.title;
+    this.maxDescriptionLength = options.maxDescriptionLength ?? createTextLimits.description;
+    this.maxTextLength = options.maxTextLength ?? createTextLimits.text;
 
     this.copiedAlertElement.textContent = '(copied)';
 

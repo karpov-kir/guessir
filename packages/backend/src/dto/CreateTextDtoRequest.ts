@@ -1,21 +1,21 @@
-import { CreateTextDto } from '@guessir/shared/dist/CreateTextDto';
+import { CreateTextDto, createTextLimits } from '@guessir/shared/dist/CreateTextDto';
 import { IsBoolean, IsNotEmpty, IsOptional } from 'class-validator';
 
 import { HasNoNullCharacter, MaxCodePoints } from './dbTextValidators';
 
 export class CreateTextDtoRequest implements CreateTextDto {
   @IsNotEmpty()
-  @MaxCodePoints(500)
+  @MaxCodePoints(createTextLimits.title)
   @HasNoNullCharacter()
   title!: string;
 
-  @MaxCodePoints(4000)
+  @MaxCodePoints(createTextLimits.description)
   @HasNoNullCharacter()
   @IsOptional()
   description!: string;
 
   @IsNotEmpty()
-  @MaxCodePoints(4000)
+  @MaxCodePoints(createTextLimits.text)
   @HasNoNullCharacter()
   text!: string;
 

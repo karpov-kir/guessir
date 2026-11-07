@@ -1,3 +1,4 @@
+import { createTextLimits } from '@guessir/shared/dist/CreateTextDto';
 import { Text } from '@guessir/shared/dist/Text';
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
@@ -13,18 +14,18 @@ export class TextEntity implements Text {
   id!: string;
 
   @Column({
-    length: 500,
+    length: createTextLimits.title,
   })
   title!: string;
 
   @Column({
-    length: 4000,
+    length: createTextLimits.description,
     nullable: true,
   })
   description?: string;
 
   @Column({
-    length: 4000,
+    length: createTextLimits.text,
   })
   text!: string;
 
