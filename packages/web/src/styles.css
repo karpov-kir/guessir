@@ -572,6 +572,10 @@ input[type='checkbox']:disabled {
 
   /* Leaves a gap between two tiles, which bleed over the spaces */
   word-spacing: 4px;
+
+  /* The tiles (z-index -1) paint under all of the text here,
+     so a tile's bleed never covers the punctuation beside it */
+  isolation: isolate;
 }
 
 /*
@@ -582,7 +586,6 @@ input[type='checkbox']:disabled {
   --tile-bleed: 4px;
 
   position: relative;
-  isolation: isolate;
   display: inline-flex;
   min-height: 0;
   margin: 0;
