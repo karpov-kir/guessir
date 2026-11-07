@@ -475,12 +475,12 @@ input[type='checkbox']:disabled {
   box-shadow: none;
 }
 
-/* The status keeps its line while empty, so a message does not grow the panel and push the text. Negative margins sink
-   the line into the gaps around it, so the guess row and the hints stay about 20px apart, empty or not. It holds one
-   line: a longer message is cut on screen, and a screen reader still reads it whole */
+/* The status keeps its line while empty, so a message does not grow the panel and push the text. The line sinks into
+   the gap above it, and the hints row into the gap below, so the two rows stay about 20px apart, empty or not. It holds
+   one line: a longer message is cut on screen, and a screen reader still reads it whole */
 #guess-status {
   min-height: 16px;
-  margin-block: -12px;
+  margin-top: -12px;
   overflow: hidden;
   color: var(--on-accent);
   font-size: var(--text-xs);
@@ -499,6 +499,11 @@ input[type='checkbox']:disabled {
 
 #hints:not(:has(.chip:not(.hide))) {
   display: none;
+}
+
+/* Takes the status line's gap below it; with the hints hidden the status keeps that gap from the panel's edge */
+#guess-status + #hints {
+  margin-top: -12px;
 }
 
 #hints-label {
@@ -614,6 +619,12 @@ input[type='checkbox']:disabled {
   border-radius: 9px;
   background: var(--tile);
   box-shadow: inset 0 -3px 0 var(--tile-border);
+}
+
+/* A pressed button moves down 1px, and a transform would make the tile its own stacking context again, painting its
+   bleed over the punctuation beside it */
+.lexeme-container:active {
+  transform: none;
 }
 
 /* The ring goes round the painted tile rather than the narrower word box */
