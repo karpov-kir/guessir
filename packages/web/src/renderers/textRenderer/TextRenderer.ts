@@ -130,35 +130,65 @@ export class TextRenderer implements ChildRenderer {
       descriptionElement.textContent = this.description;
     }
 
-    // A word and the characters touching it (punctuation, quotes) share one group that does not wrap, so a line
-    // breaks only at whitespace. A tile is an atomic inline, and a browser may break right after it, which would
-    // start a line with the comma that follows the word.
+    // A word shares a group with the punctuation that closes it and the punctuation that opens it, and the group
+    // does not wrap, so no line starts with a comma or ends with an opening bracket. A tile is an atomic inline, and a
+    // browser may break right after it. Any other character, such as a dash or a slash, stays outside the groups, so
+    // a line can still break inside a hyphenated word or a link.
     let group: HTMLElement | undefined;
+    let groupHasWord = false;
+    const createGroup = () => {
+      const element = document.createElement('span');
+
+      element.classList.add('lexeme-group');
+      lexemesElement.append(element);
+
+      return element;
+    };
 
     for (const lexeme of this.lexemes) {
-      if ('character' in lexeme && /\s/.test(lexeme.character)) {
-        group = undefined;
-        lexemesElement.append(lexeme.character === '\n' ? document.createElement('br') : lexeme.character);
-        continue;
-      }
-
-      if (!group) {
-        group = document.createElement('span');
-        group.classList.add('lexeme-group');
-        lexemesElement.append(group);
-      }
-
-      if ('character' in lexeme) {
-        group.append(lexeme.character);
-      } else {
+      if (!('character' in lexeme)) {
         const wordRenderer = new WordRenderer(lexeme);
 
         wordRenderer.revealRequestEvent.subscribe((index) => this.revealRequestPubSub.publish(index));
         this.wordRenderers.set(lexeme.index, wordRenderer);
+
+        if (!group || groupHasWord) {
+          group = createGroup();
+        }
+
         group.append(wordRenderer.getElement());
+        groupHasWord = true;
+        continue;
+      }
+
+      const { character } = lexeme;
+
+      if (isClosing(character, groupHasWord)) {
+        (group ?? lexemesElement).append(character);
+      } else if (isOpening(character)) {
+        group = createGroup();
+        groupHasWord = false;
+        group.append(character);
+      } else {
+        group = undefined;
+        groupHasWord = false;
+        lexemesElement.append(character === '\n' ? document.createElement('br') : character);
       }
     }
   }
+}
+
+const closingCharacters = new Set([',', '.', ';', ':', '!', '?', ')', ']', '}', '%', '…', '»', '”', '’']);
+const openingCharacters = new Set(['(', '[', '{', '«', '“', '‘']);
+const straightQuotes = new Set(['"', "'"]);
+
+/** A straight quote right after a word closes it; anywhere else it opens the next one. */
+function isClosing(character: string, followsWord: boolean) {
+  return closingCharacters.has(character) || (followsWord && straightQuotes.has(character));
+}
+
+function isOpening(character: string) {
+  return openingCharacters.has(character) || straightQuotes.has(character);
 }
 
 export function getElements(containerElement: HTMLElement) {
