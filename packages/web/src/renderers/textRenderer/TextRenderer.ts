@@ -130,13 +130,19 @@ export class TextRenderer implements ChildRenderer {
       descriptionElement.textContent = this.description;
     }
 
-    // A word shares a group with the punctuation that closes it and the punctuation that opens it, and the group
-    // does not wrap, so no line starts with a comma or ends with an opening bracket. A tile is an atomic inline, and a
-    // browser may break right after it. Any other character, such as a dash or a slash, stays outside the groups, so
-    // a line can still break inside a hyphenated word or a link.
+    this.renderLexemes(lexemesElement);
+  }
+
+  /**
+   * Puts a word in one group with the punctuation that closes it and the punctuation that opens it. The group does
+   * not wrap, so no line starts with a comma or ends with an opening bracket: a tile is an atomic inline, and a browser
+   * may break right after it. Any other character, such as a dash or a slash, stays outside the groups, so a line can
+   * still break inside a hyphenated word or a link.
+   */
+  private renderLexemes(lexemesElement: HTMLElement) {
     let group: HTMLElement | undefined;
     let groupHasWord = false;
-    const createGroup = () => {
+    const newGroup = () => {
       const element = document.createElement('span');
 
       element.classList.add('lexeme-group');
@@ -153,7 +159,7 @@ export class TextRenderer implements ChildRenderer {
         this.wordRenderers.set(lexeme.index, wordRenderer);
 
         if (!group || groupHasWord) {
-          group = createGroup();
+          group = newGroup();
         }
 
         group.append(wordRenderer.getElement());
@@ -166,7 +172,7 @@ export class TextRenderer implements ChildRenderer {
       if (isClosing(character, groupHasWord)) {
         (group ?? lexemesElement).append(character);
       } else if (isOpening(character)) {
-        group = createGroup();
+        group = newGroup();
         groupHasWord = false;
         group.append(character);
       } else {
@@ -182,7 +188,7 @@ const closingCharacters = new Set([',', '.', ';', ':', '!', '?', ')', ']', '}', 
 const openingCharacters = new Set(['(', '[', '{', '«', '“', '‘']);
 const straightQuotes = new Set(['"', "'"]);
 
-/** A straight quote right after a word closes it; anywhere else it opens the next one. */
+/** Tells whether the character closes the word before it. A straight quote closes a word only right after it. */
 function isClosing(character: string, followsWord: boolean) {
   return closingCharacters.has(character) || (followsWord && straightQuotes.has(character));
 }
