@@ -8,13 +8,17 @@ import { Logger } from 'typeorm';
 export class ParameterFreeLogger implements Logger {
   private readonly logger = new NestLogger('typeorm');
 
-  logQuery() {}
+  logQuery() {
+    // A successful query is not logged: its parameters carry the stored texts
+  }
 
   logQueryError(error: string | Error, query: string) {
     this.logger.error(`Query failed: ${String(error)}; ${query}`);
   }
 
-  logQuerySlow() {}
+  logQuerySlow() {
+    // Nor a slow one, for the same reason
+  }
 
   logSchemaBuild(message: string) {
     this.logger.log(message);
