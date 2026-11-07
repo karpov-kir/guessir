@@ -80,12 +80,14 @@
   --field-border-hover: var(--muted);
   --link-hover: light-dark(#3a21b8, #e0d9ff);
 
-  /* The HUD is violet in both themes, so its guess field stays light in both */
+  /* The HUD is violet in both themes, so its guess field stays light in both, with the light theme's field borders */
   --hud-field: #fff;
   --on-hud-field: #1b1340;
   --hud-field-placeholder: #544d7a;
+  --hud-field-border: #cfc5ff;
+  --hud-field-border-hover: #544d7a;
+  --hud-field-border-focus: #5b3df5;
   --hud-chip-border: rgb(255 255 255 / 60%);
-  --hud-field-border-hover: var(--accent-hover);
 
   /* Without the user's own pick the page follows the system theme */
   color-scheme: light dark;
@@ -437,8 +439,8 @@ input[type='checkbox']:disabled {
   flex-grow: 1;
   min-width: 0;
   height: var(--control-xl);
-  padding: 0 22px;
-  border: 0;
+  padding: 0 20px;
+  border: 2px solid var(--hud-field-border);
   border-radius: var(--radius-pill);
   background: var(--hud-field);
   color: var(--on-hud-field);
@@ -449,11 +451,19 @@ input[type='checkbox']:disabled {
   color: var(--hud-field-placeholder);
 }
 
-/* The field has no border, so an inset ring stands in for the field border of the hover; the error ring of a miss wins */
+/* Like the form fields, the border carries hover, focus and the error of a miss; the id outranks the shared field rules */
 @media (hover: hover) {
   #guess-input:hover:not(:focus, .shake-and-error) {
-    box-shadow: inset 0 0 0 2px var(--hud-field-border-hover);
+    border-color: var(--hud-field-border-hover);
   }
+}
+
+#guess-input:focus {
+  border-color: var(--hud-field-border-focus);
+}
+
+#guess-input.shake-and-error {
+  border-color: var(--error);
 }
 
 #guess-button {
@@ -861,7 +871,6 @@ details[open] summary::before {
 
 .shake-and-error {
   animation: shake 0.3s;
-  box-shadow: inset 0 0 0 3px var(--error);
 }
 
 /* Media */
