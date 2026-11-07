@@ -66,7 +66,7 @@ describe(ControlsRenderer, () => {
     expect(guessPubSub.publish).toBeCalledWith({ word: 'TeST#' });
   });
 
-  it('should empty and focus the input, disable the button and clear the status on a guess', () => {
+  it('should keep the guess and the status, focus the input and disable the button while a guess is checked', () => {
     const controlsRenderer = new ControlsRenderer();
     const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
     const statusElement = controlsRenderer.getElement().querySelector('[role="status"]') as HTMLElement;
@@ -77,10 +77,43 @@ describe(ControlsRenderer, () => {
 
     guessButtonElement.click();
 
-    expect(guessInputElement.value).toBe('');
+    expect(guessInputElement.value).toBe('test');
     expect(guessInputElement.focus).toBeCalled();
     expect(guessButtonElement.disabled).toBe(true);
+    expect(statusElement.textContent).toBe('No new words for this guess');
+  });
+
+  it('should empty the input and clear the last status once a guess is found', () => {
+    const controlsRenderer = new ControlsRenderer();
+    const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
+    const statusElement = controlsRenderer.getElement().querySelector('[role="status"]') as HTMLElement;
+
+    controlsRenderer.announce('No new words for this guess');
+    typeGuess(guessInputElement, 'test');
+    guessButtonElement.click();
+
+    controlsRenderer.acceptGuess('test');
+
+    expect(guessInputElement.value).toBe('');
+    expect(guessButtonElement.disabled).toBe(true);
     expect(statusElement.textContent).toBe('');
+  });
+
+  it('should keep what was typed or announced while a found guess was checked', () => {
+    const controlsRenderer = new ControlsRenderer();
+    const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
+    const statusElement = controlsRenderer.getElement().querySelector('[role="status"]') as HTMLElement;
+
+    typeGuess(guessInputElement, 'test');
+    guessButtonElement.click();
+    typeGuess(guessInputElement, 'next');
+    controlsRenderer.announce('Could not open this word');
+
+    controlsRenderer.acceptGuess('test');
+
+    expect(guessInputElement.value).toBe('next');
+    expect(guessButtonElement.disabled).toBe(false);
+    expect(statusElement.textContent).toBe('Could not open this word');
   });
 
   it('should send a guess submitted twice only once', () => {
@@ -97,12 +130,26 @@ describe(ControlsRenderer, () => {
     expect(guessPubSub.publish).toBeCalledTimes(1);
   });
 
-  it('should hand a guess back into the empty input and enable the button, so the player can correct it', () => {
+  it('should leave a missed guess in the input and enable the button, so the player can correct it', () => {
     const controlsRenderer = new ControlsRenderer();
     const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
 
     typeGuess(guessInputElement, 'test');
     guessButtonElement.click();
+
+    controlsRenderer.returnGuess('test');
+
+    expect(guessInputElement.value).toBe('test');
+    expect(guessButtonElement.disabled).toBe(false);
+  });
+
+  it('should put a missed guess back if the player emptied the input while it was checked', () => {
+    const controlsRenderer = new ControlsRenderer();
+    const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
+
+    typeGuess(guessInputElement, 'test');
+    guessButtonElement.click();
+    typeGuess(guessInputElement, '');
 
     controlsRenderer.returnGuess('test');
 
