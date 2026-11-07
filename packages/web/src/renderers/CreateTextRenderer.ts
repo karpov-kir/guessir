@@ -33,9 +33,9 @@ export class CreateTextRenderer implements ChildRenderer {
   private readonly containerElement: HTMLElement;
   private generatedUrl = '';
   private readonly copiedAlertElement = document.createElement('div');
-  private readonly maxTitleLength: number = 0;
-  private readonly maxDescriptionLength: number = 0;
-  private readonly maxTextLength: number = 0;
+  private readonly maxTitleLength: number;
+  private readonly maxDescriptionLength: number;
+  private readonly maxTextLength: number;
   private readonly apiClient: ApiClient;
 
   constructor(options: CreateTextRendererOptions = {}) {
