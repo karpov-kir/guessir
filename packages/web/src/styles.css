@@ -78,7 +78,7 @@
   --surface-hover: light-dark(#e2dcff, #3a2f7a);
   --tile-hover: var(--tile-border);
   --field-border-hover: var(--muted);
-  --link-hover: light-dark(#3a21b8, #e0d9ff);
+  --link-hover: light-dark(#3a21b8, #a898ff);
 
   /* The HUD is violet in both themes, so its guess field stays light in both, with the light theme's field borders */
   --hud-field: #fff;
@@ -492,17 +492,17 @@ input[type='checkbox']:disabled {
   box-shadow: none;
 }
 
-/* The status keeps its line while empty, so a message does not grow the panel and push the text. The line sits in the
-   gap between the guess row and the hints, so an empty one reads as spacing. It holds one line: a longer message is
-   cut on screen, and a screen reader still reads it whole */
+/* The status keeps its line while empty, so a message does not grow the panel and push the text. Negative margins sink
+   the line into the gaps around it, so the guess row and the hints stay about 20px apart, empty or not. It holds one
+   line: a longer message is cut on screen, and a screen reader still reads it whole */
 #guess-status {
-  min-height: 18px;
-  margin-block: -4px;
+  min-height: 16px;
+  margin-block: -12px;
   overflow: hidden;
   color: var(--on-accent);
   font-size: var(--text-xs);
   font-weight: 600;
-  line-height: 18px;
+  line-height: 16px;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -537,11 +537,11 @@ input[type='checkbox']:disabled {
 
 /* On the violet panel an unchecked chip shows the panel through, so its hover takes the panel's own hover shade */
 @media (hover: hover) {
-  #hints .chip:hover {
+  #hints .chip:hover:not(:has(:disabled)) {
     background: var(--accent-hover);
   }
 
-  #hints .chip:hover:has(:checked) {
+  #hints .chip:hover:has(:checked):not(:has(:disabled)) {
     background: var(--yellow-hover);
   }
 }
