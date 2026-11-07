@@ -139,7 +139,7 @@ export class RenderController {
       isShown: isFirstLettersShown,
       load: () => this.loadFirstLetters(),
       uncheck: () => this.controlsRenderer.uncheckFirstLetters(),
-      failureStatus: 'Could not load the first letters',
+      failureStatus: 'Could not load first letters',
     });
   }
 
