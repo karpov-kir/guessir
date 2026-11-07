@@ -73,21 +73,13 @@
   --error: light-dark(#c0262d, #ff8a8f);
   --focus: light-dark(#5b3df5, #c9bfff);
   --track: light-dark(rgb(255 255 255 / 28%), rgb(18 13 43 / 35%));
+  --hud-chip-border: rgb(255 255 255 / 60%);
 
   /* Hover, one shade per kind: a fill changes shade, a field's border firms up, a text-only control recolours */
   --surface-hover: light-dark(#e2dcff, #3a2f7a);
   --tile-hover: var(--tile-border);
   --field-border-hover: var(--muted);
   --link-hover: light-dark(#3a21b8, #a898ff);
-
-  /* The HUD is violet in both themes, so its guess field stays light in both, with the light theme's field borders */
-  --hud-field: #fff;
-  --on-hud-field: #1b1340;
-  --hud-field-placeholder: #544d7a;
-  --hud-field-border: #cfc5ff;
-  --hud-field-border-hover: #544d7a;
-  --hud-field-border-focus: #5b3df5;
-  --hud-chip-border: rgb(255 255 255 / 60%);
 
   /* Without the user's own pick the page follows the system theme */
   color-scheme: light dark;
@@ -435,32 +427,23 @@ input[type='checkbox']:disabled {
   gap: 10px;
 }
 
+/* The HUD is violet in both themes, so the guess field stays white in both. Its light colour scheme makes the shared
+   field rules paint their light-theme colours, so its border shows hover, focus and a miss like a form field's */
 #guess-input {
   flex-grow: 1;
   min-width: 0;
   height: var(--control-xl);
   padding: 0 20px;
-  border: 2px solid var(--hud-field-border);
   border-radius: var(--radius-pill);
-  background: var(--hud-field);
-  color: var(--on-hud-field);
+  background: var(--surface);
+  color: var(--ink);
   font-size: var(--text-2xl);
+  color-scheme: light;
 }
 
-#guess-input::placeholder {
-  color: var(--hud-field-placeholder);
-}
-
-/* Like the form fields, the border carries hover, focus and the error of a miss;
-   the id outranks the shared field rules */
-@media (hover: hover) {
-  #guess-input:hover:not(:focus, .shake-and-error) {
-    border-color: var(--hud-field-border-hover);
-  }
-}
-
+/* The HUD turns the shared focus colour yellow for its rings, which would vanish as a border on the white field */
 #guess-input:focus {
-  border-color: var(--hud-field-border-focus);
+  border-color: var(--accent);
 }
 
 #guess-input.shake-and-error {
@@ -595,8 +578,7 @@ input[type='checkbox']:disabled {
   isolation: isolate;
 }
 
-/* A word and the punctuation that opens or closes it break as one, so no line starts with a comma;
-   see .lexeme-container for a word wider than the line */
+/* A word and the punctuation that opens or closes it break as one, so no line starts with a comma */
 .lexeme-group {
   white-space: nowrap;
 }
