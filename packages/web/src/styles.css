@@ -1,580 +1,1005 @@
-/* Variables */
+/* Font: JetBrains Mono (SIL OFL 1.1, public/fonts/OFL.txt), served from this site. One variable file per script carries
+   every weight in use; a browser fetches a file only for characters in its unicode-range */
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-latin-ext-wght-normal.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF,
+    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-cyrillic-wght-normal.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+/* Tokens */
 
 :root {
-  --text-contrast: #fff;
-  --text-primary: #333;
-  --text-secondary: #c7c7c7;
-  --primary: #09a598;
-  --primary-hover: #0db2a4;
-  --primary-active: #0a9b8f;
-  --primary-outline: #087a72;
-  --unchecked: #d1d1d6;
-  --unchecked-hover: rgb(194 193 193 / 30%);
-  --unchecked-active: rgb(194 193 193 / 50%);
-  --disabled: #ccc;
-  --error: #ff4949;
+  --font: 'JetBrains Mono', ui-monospace, monospace;
+  --text-2xs: 13px;
+  --text-xs: 14px;
+  --text-sm: 15px;
+  --text-md: 16px;
+  --text-lg: 17px;
+  --text-xl: 19px;
+  --text-2xl: 20px;
+  --text-3xl: 24px;
+  --text-4xl: 30px;
+  --radius-pill: 999px;
+  --radius-lg: 28px;
+  --radius-md: 16px;
+  --control-md: 44px;
+  --control-lg: 52px;
+  --control-xl: 56px;
+  --gutter: 32px;
+  --bg: light-dark(#f1eeff, #120d2b);
+  --surface: light-dark(#fff, #1d1645);
+  --ink: light-dark(#1b1340, #f1eeff);
+  --muted: light-dark(#544d7a, #b3abdd);
+  --accent: #5b3df5;
+  --accent-hover: #4a2ee0;
+  --accent-deep: #3a21b8;
+  --on-accent: #fff;
+  --yellow: #ffd23f;
+  --yellow-hover: #ffdc66;
+  --yellow-disabled: #ffe9a3;
+  --yellow-deep: #c99a00;
+  --on-yellow: #1b1340;
+  --tile: light-dark(#e6e0ff, #2e2468);
+  --tile-border: light-dark(#cfc5ff, #3f3484);
+  --chip: light-dark(#eeeaff, #2a2160);
+  --field: light-dark(#fbfaff, #160f38);
+  --link: light-dark(#4a2ee0, #c9bfff);
+  --error: light-dark(#c0262d, #ff8a8f);
+  --focus: light-dark(#5b3df5, #c9bfff);
+  --track: light-dark(rgb(255 255 255 / 28%), rgb(18 13 43 / 35%));
+
+  /* Hover, one shade per kind: a fill changes shade, a field's border firms up, a text-only control recolours */
+  --surface-hover: light-dark(#e2dcff, #3a2f7a);
+  --tile-hover: var(--tile-border);
+  --field-border-hover: var(--muted);
+  --link-hover: light-dark(#3a21b8, #e0d9ff);
+
+  /* The HUD is violet in both themes, so its guess field stays light in both, with the light theme's field borders */
+  --hud-field: #fff;
+  --on-hud-field: #1b1340;
+  --hud-field-placeholder: #544d7a;
+  --hud-field-border: #cfc5ff;
+  --hud-field-border-hover: #544d7a;
+  --hud-field-border-focus: #5b3df5;
+  --hud-chip-border: rgb(255 255 255 / 60%);
+
+  /* Without the user's own pick the page follows the system theme */
+  color-scheme: light dark;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
 }
 
 /* Reset */
 
-html,
-body {
-  margin: 0;
-  padding: 0;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-* {
-  box-sizing: border-box;
-  font-family: Circe, sans-serif;
+body,
+h1,
+p {
+  margin: 0;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* Base elements */
+
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--text-md);
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-*:focus-visible {
-  outline: 1px solid var(--primary-outline);
+a {
+  color: var(--link);
 }
 
-body {
-  color: var(--text-primary);
+/* Hover rules apply only where a pointer hovers: on touch a tap would leave the hover look stuck */
+@media (hover: hover) {
+  a:hover {
+    color: var(--link-hover);
+  }
 }
 
-/* Typography */
-
-h1 {
-  font-size: 24px;
-  line-height: 40px;
-  margin: 0;
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
 }
-
-p {
-  font-size: 16px;
-  line-height: 24px;
-  margin: 0;
-}
-
-/* Helpers */
-
-.hide {
-  display: none !important;
-}
-
-.invalid {
-  color: var(--error);
-}
-
-.w-100 {
-  width: 100%;
-}
-
-.flex {
-  display: flex;
-}
-
-.inline-flex {
-  display: inline-flex;
-}
-
-.relative {
-  position: relative;
-}
-
-.error {
-  color: var(--error);
-  position: absolute;
-  top: -18px;
-  left: 0;
-  font-size: 12px;
-}
-
-.limit-text {
-  color: var(--text-secondary);
-  font-size: 12px;
-  line-height: 12px;
-  position: absolute;
-  bottom: -16px;
-  right: 0;
-}
-
-/* Scrollbar */
-
-/* stylelint-disable-next-line no-descending-specificity, no-duplicate-selectors */
-* {
-  /* FF */
-  scrollbar-width: thin;
-  scrollbar-color: rgb(179 177 177) rgb(68 68 68);
-}
-
-*::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-*::-webkit-scrollbar-track {
-  background: rgb(179 177 177);
-  border-radius: 10px;
-}
-
-*::-webkit-scrollbar-thumb {
-  background: rgb(136 136 136);
-  border-radius: 10px;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-  background: rgb(100 100 100);
-  border-radius: 10px;
-}
-
-*::-webkit-scrollbar-thumb:active {
-  background: rgb(68 68 68);
-  border-radius: 10px;
-}
-
-/* Buttons */
 
 button {
-  font-size: 16px;
-  line-height: 24px;
-  color: var(--text-contrast);
-  background: var(--primary);
-  border-radius: 6px;
-  border: none;
-  padding: 4px 20px;
-}
-
-button:hover,
-button:focus-visible {
+  min-height: var(--control-md);
+  padding: 0 24px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: var(--text-lg);
+  font-weight: 800;
   cursor: pointer;
-  background: var(--primary-hover);
 }
 
 button:active {
-  background: var(--primary-active);
+  transform: translateY(1px);
 }
 
 button:disabled {
-  background: var(--disabled);
-  cursor: not-allowed;
+  transform: none;
 }
 
-/* Inputs */
-
-input {
-  border: 1px solid var(--text-secondary);
-  border-radius: 6px;
-  font-size: 16px;
-  line-height: 24px;
-  padding: 3px 20px;
+input[type='text'],
+textarea {
+  width: 100%;
+  min-height: var(--control-lg);
+  padding: 12px 18px;
+  border: 2px solid var(--tile-border);
+  border-radius: var(--radius-md);
+  background: var(--field);
+  font-size: var(--text-lg);
 }
 
-input::placeholder {
-  color: var(--text-secondary);
+input[type='text']::placeholder,
+textarea::placeholder {
+  color: var(--muted);
 }
-
-input.invalid {
-  border: 1px solid var(--error);
-}
-
-input.invalid:focus {
-  color: var(--text-primary);
-  border: 1px solid var(--text-secondary);
-}
-
-input.invalid::placeholder {
-  color: var(--error);
-}
-
-input.invalid:focus::placeholder {
-  color: var(--text-secondary);
-}
-
-/* Textareas */
 
 textarea {
-  border: 1px solid var(--text-secondary);
-  border-radius: 6px;
-  font-size: 16px;
-  line-height: 24px;
-  padding: 3px 20px;
   resize: vertical;
-  margin: 0 0 18px;
 }
 
-textarea::placeholder {
-  color: var(--text-secondary);
+/* Leaves a focused or invalid field alone, so its focus or error border keeps showing under the pointer */
+@media (hover: hover) {
+  input[type='text']:hover:not(:disabled, :focus, .invalid),
+  textarea:hover:not(:disabled, :focus, .invalid) {
+    border-color: var(--field-border-hover);
+  }
 }
 
+input[type='text']:focus,
+textarea:focus {
+  border-color: var(--focus);
+}
+
+/* After the focus rule and as specific, so a field keeps showing its error while focused */
+input[type='text'].invalid,
 textarea.invalid {
-  border: 1px solid var(--error);
+  border-color: var(--error);
 }
-
-textarea.invalid:focus {
-  color: var(--text-primary);
-  border: 1px solid var(--text-secondary);
-}
-
-textarea.invalid::placeholder {
-  color: var(--error);
-}
-
-textarea.invalid:focus::placeholder {
-  color: var(--text-secondary);
-}
-
-/* Checkboxes */
 
 input[type='checkbox'] {
   position: relative;
-  width: 24px;
-  height: 24px;
-  appearance: none;
-  border-radius: 6px;
-  color: transparent;
-  cursor: pointer;
-  border: none;
+  flex: none;
+  width: 22px;
+  height: 22px;
   margin: 0;
-  padding: 0;
-}
-
-input[type='checkbox']::before {
-  content: '';
-  display: block;
-  position: absolute;
-  left: 0;
-  top: 0;
-  border-radius: 6px;
-  border: 2px solid var(--unchecked);
-  width: calc(100% - 4px);
-  height: calc(100% - 4px);
-}
-
-input[type='checkbox']:focus-visible {
-  outline: none;
-}
-
-input[type='checkbox']:hover::before,
-input[type='checkbox']:focus-visible::before {
-  background: var(--unchecked-hover);
-}
-
-input[type='checkbox']:focus-visible::before {
-  outline: 1px solid var(--primary-outline);
-}
-
-input[type='checkbox']:active::before {
-  background: var(--unchecked-active);
-}
-
-input[type='checkbox']:disabled::before {
-  cursor: not-allowed;
-  background: var(--disabled);
-}
-
-label {
-  font-size: 16px;
-  line-height: 24px;
-  display: inline-flex;
-  align-items: center;
+  border: 2px solid currentcolor;
+  border-radius: 7px;
+  appearance: none;
+  background: transparent;
   cursor: pointer;
 }
 
-/* stylelint-disable-next-line no-descending-specificity */
-label input[type='checkbox'] {
-  margin-right: 10px;
-}
-
-/* Checkboxes checked */
-
-input[type='checkbox']:checked::before {
-  border: none;
-  background: var(--primary);
-  width: 100%;
-  height: 100%;
+input[type='checkbox']:checked {
+  border-color: var(--accent);
+  background: var(--accent);
 }
 
 input[type='checkbox']:checked::after {
-  width: 100%;
-  height: 100%;
   content: '';
-  display: block;
   position: absolute;
-  left: 0;
-  top: 0;
-  mask: url('./icons/checkIcon.svg') no-repeat 50% 50%;
-  mask-size: cover;
-  background: var(--text-contrast);
+  inset: 0;
+  background: var(--on-accent);
+  mask: url('./icons/checkIcon.svg') no-repeat 50% 50% / 80%;
 }
 
-input[type='checkbox']:checked:hover::before,
-input[type='checkbox']:checked:focus-visible::before {
-  background: var(--primary-hover);
-}
-
-input[type='checkbox']:checked:focus-visible::before {
-  outline: 1px solid var(--primary-outline);
-}
-
-input[type='checkbox']:checked:active::before {
-  background: var(--primary-active);
-}
-
-input[type='checkbox']:checked:disabled::before {
+button:disabled,
+input[type='checkbox']:disabled {
   cursor: not-allowed;
-  background: var(--disabled);
+  opacity: 0.55;
+}
+
+/* Shared components */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--control-md);
+  padding: 0 18px;
+  border-radius: var(--radius-pill);
+  background: var(--chip);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* The chip is the checkbox's label and its whole hit area, so the chip carries the hover of the box inside */
+@media (hover: hover) {
+  .chip:hover:not(:has(:disabled)) {
+    background: var(--surface-hover);
+  }
+}
+
+/* Header */
+
+#site-header,
+#guessir {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+#site-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px var(--gutter);
+}
+
+#logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: auto;
+  color: var(--ink);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  #logo:hover {
+    color: var(--link-hover);
+  }
+}
+
+#logo-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: var(--text-3xl);
+  transform: rotate(-8deg);
+}
+
+#theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-md);
+  padding: 0;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 2px var(--tile-border);
+}
+
+@media (hover: hover) {
+  #theme-toggle:hover {
+    background: var(--surface-hover);
+  }
+}
+
+#theme-toggle .icon-sun,
+#theme-toggle[aria-pressed='true'] .icon-moon {
+  display: none;
+}
+
+#theme-toggle[aria-pressed='true'] .icon-sun {
+  display: block;
 }
 
 /* Main */
 
-#logo {
-  font-size: 30px;
-  text-align: center;
-  margin: 20px 0;
-}
-
-#logo a {
-  text-decoration: none;
-  color: var(--text-secondary);
-}
-
-#logo a:hover {
-  color: var(--text-primary);
+#guessir,
+#game {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 #guessir {
-  margin: auto;
-  max-width: 1100px;
-  padding: 20px 50px 60px;
+  padding: 8px var(--gutter) 64px;
 }
 
-/* Words */
+/* HUD: the score and the controls */
+
+#hud {
+  --focus: var(--yellow);
+
+  position: sticky;
+  top: 12px;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 24px;
+  padding: 22px;
+  border-radius: var(--radius-lg);
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 10px 0 var(--accent-deep);
+}
+
+#score-container {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+#score-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 22px;
+  background: var(--yellow);
+  color: var(--on-yellow);
+  line-height: 1;
+}
+
+#current-score {
+  font-size: 32px;
+  font-weight: 800;
+}
+
+#score-total {
+  font-size: var(--text-2xs);
+  font-weight: 600;
+}
+
+#score-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#score-label {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+}
+
+#score-progress {
+  width: 160px;
+  height: 10px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--track);
+}
+
+#score-progress-bar {
+  height: 100%;
+  background: var(--yellow);
+  transition: width 0.3s ease-out;
+}
+
+#controls-container {
+  display: flex;
+  flex: 999 1 360px;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+#guess-container {
+  display: flex;
+  gap: 10px;
+}
+
+#guess-input {
+  flex-grow: 1;
+  min-width: 0;
+  height: var(--control-xl);
+  padding: 0 20px;
+  border: 2px solid var(--hud-field-border);
+  border-radius: var(--radius-pill);
+  background: var(--hud-field);
+  color: var(--on-hud-field);
+  font-size: var(--text-2xl);
+}
+
+#guess-input::placeholder {
+  color: var(--hud-field-placeholder);
+}
+
+/* Like the form fields, the border carries hover, focus and the error of a miss;
+   the id outranks the shared field rules */
+@media (hover: hover) {
+  #guess-input:hover:not(:focus, .shake-and-error) {
+    border-color: var(--hud-field-border-hover);
+  }
+}
+
+#guess-input:focus {
+  border-color: var(--hud-field-border-focus);
+}
+
+#guess-input.shake-and-error {
+  border-color: var(--error);
+}
+
+#guess-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--control-xl);
+  padding: 0 26px;
+  background: var(--yellow);
+  color: var(--on-yellow);
+  font-size: 18px;
+  box-shadow: 0 4px 0 var(--yellow-deep);
+}
+
+@media (hover: hover) {
+  #guess-button:not(:disabled):hover {
+    background: var(--yellow-hover);
+  }
+}
+
+/* Half-transparent yellow over the violet panel turns muddy, so the disabled button gets its own solid shade */
+#guess-button:disabled {
+  background: var(--yellow-disabled);
+  opacity: 1;
+  box-shadow: none;
+}
+
+#hints {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+#hints:not(:has(.chip:not(.hide))) {
+  display: none;
+}
+
+#hints-label {
+  margin-right: 4px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+#hints .chip {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--hud-chip-border);
+}
+
+#hints .chip:has(:checked) {
+  background: var(--yellow);
+  color: var(--on-yellow);
+  box-shadow: none;
+}
+
+/* On the violet panel an unchecked chip shows the panel through, so its hover takes the panel's own hover shade */
+@media (hover: hover) {
+  #hints .chip:hover {
+    background: var(--accent-hover);
+  }
+
+  #hints .chip:hover:has(:checked) {
+    background: var(--yellow-hover);
+  }
+}
+
+#hints input[type='checkbox']:checked {
+  border-color: var(--on-yellow);
+  background: var(--on-yellow);
+}
+
+#hints input[type='checkbox']:checked::after {
+  background: var(--yellow);
+}
+
+/* Text */
+
+#text-container,
+#utils-container details {
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 2px var(--tile-border);
+}
 
 #text-container {
+  padding: 40px 44px 44px;
+}
+
+#title {
+  margin-bottom: 8px;
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+#description {
+  margin-bottom: 28px;
+  color: var(--muted);
+  font-size: var(--text-xl);
+}
+
+#lexemes {
   font-size: 21px;
-  line-height: 36px;
-  margin-bottom: 30px;
+  line-height: 2.05;
+  overflow-wrap: anywhere;
+
+  /* Leaves a gap between two tiles, which bleed over the spaces */
+  word-spacing: 4px;
 }
 
-#text-container #title {
-  margin-bottom: 6px;
-}
-
-#text-container #description {
-  margin-bottom: 30px;
-}
-
+/*
+ * A word keeps one box in every state: its own glyphs, with no margin or padding, so revealing it moves no text.
+ * The tile is painted outside that box by ::before, which takes no room in the line.
+ */
 .lexeme-container {
+  --tile-bleed: 4px;
+
   position: relative;
-  border-bottom: 1px solid var(--text-secondary);
+  isolation: isolate;
   display: inline-flex;
-  margin-bottom: 5px;
-  background: transparent;
-  border-radius: 0;
-  font-size: inherit;
-  line-height: inherit;
+  min-height: 0;
+  margin: 0;
   padding: 0;
+  background: none;
+  color: var(--ink);
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: 1.3;
+  vertical-align: baseline;
 }
 
-.lexeme-container:hover,
+.lexeme-container::before {
+  content: '';
+  position: absolute;
+  inset: 0 calc(-1 * var(--tile-bleed));
+  z-index: -1;
+  border-radius: 9px;
+  background: var(--tile);
+  box-shadow: inset 0 -3px 0 var(--tile-border);
+}
+
+/* The ring goes round the painted tile rather than the narrower word box */
 .lexeme-container:focus-visible {
-  background: transparent;
+  outline: none;
 }
 
-.lexeme-container:hover {
-  border-color: var(--text-primary);
-  cursor: pointer;
+.lexeme-container:focus-visible::before {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* A shown word is no longer clickable, so only the words still hidden react to the pointer */
+@media (hover: hover) {
+  .lexeme-container:not(.show):hover::before {
+    background: var(--tile-hover);
+  }
 }
 
 .lexeme {
   visibility: hidden;
-  color: var(--text-primary);
 }
 
 .lexeme-first-letter {
-  visibility: hidden;
   position: absolute;
-  left: 0;
   top: 0;
-  color: var(--text-primary);
+  left: 0;
+  visibility: hidden;
+  color: var(--link);
+  font-weight: 800;
 }
 
+.lexeme-container.show {
+  cursor: default;
+}
+
+.show-text .lexeme-container::before,
+.lexeme-container.show::before {
+  background: none;
+  box-shadow: none;
+}
+
+.show-text .lexeme,
 .lexeme-container.show .lexeme {
   visibility: visible;
 }
 
-.lexeme-container.show .lexeme-first-letter {
-  visibility: hidden !important;
+/* While peeking, the words not found yet are muted and dotted, so the found ones stand out without relying on colour */
+.show-text .lexeme-container:not(.show) {
+  color: var(--muted);
+  text-decoration: underline dotted 2px;
+  text-underline-offset: 4px;
 }
 
-#text-container.show-text .lexeme {
+/* Only the words still hidden: a shown word needs no hint */
+.show-first-letters .lexeme-container:not(.show) .lexeme-first-letter {
   visibility: visible;
 }
 
-#text-container.show-first-letters .lexeme-first-letter {
-  visibility: visible;
+/* Last among the word rules, so the mark of the last guess beats the shown and peek rules of equal specificity */
+.lexeme-container.fresh {
+  color: var(--on-yellow);
+  font-weight: 800;
 }
 
-/* Controls */
-
-#controls-container {
-  margin-bottom: 20px;
-  display: flex;
-  align-items: flex-end;
+.lexeme-container.fresh::before {
+  background: var(--yellow);
 }
 
-#controls-container input[type='text'] {
-  width: 285px;
-  margin-right: 10px;
+/* Create a text */
+
+#utils-container details {
+  padding: 32px 44px;
 }
-
-#controls-container button {
-  margin-right: 30px;
-}
-
-#controls-container label {
-  margin-right: 30px;
-}
-
-/* Score */
-
-#score-container {
-  display: flex;
-  margin-bottom: 30px;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: bold;
-}
-
-/* Summary */
 
 summary {
-  cursor: pointer;
-  font-size: 16px;
-  line-height: 24px;
+  position: relative;
   display: flex;
-  align-items: center;
-  margin-bottom: 30px;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 40px;
+  list-style: none;
+  cursor: pointer;
 }
 
+summary::-webkit-details-marker {
+  display: none;
+}
+
+/* A chevron drawn from two borders, pointing right when closed and down when open */
 summary::before {
   content: '';
-  mask: url('./icons/arrowRightIcon.svg') no-repeat 50% 50%;
-  mask-size: cover;
-  width: 1em;
-  height: 1em;
-  display: block;
-  margin-right: 10px;
-  background: var(--primary);
-  position: relative;
-  top: -1px;
-}
-
-summary:hover::before,
-summary:focus-visible::before {
-  background: var(--primary-hover);
+  position: absolute;
+  top: 14px;
+  left: 4px;
+  width: 12px;
+  height: 12px;
+  border-right: 4px solid var(--accent);
+  border-bottom: 4px solid var(--accent);
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
 }
 
 details[open] summary::before {
-  transform: rotate(90deg);
+  transform: rotate(45deg);
 }
 
-summary::marker,
-summary::-webkit-details-marker {
-  display: none;
-  color: transparent;
+.summary-title {
+  font-size: var(--text-4xl);
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 
-summary:hover::marker,
-summary:focus-visible::marker {
-  /* color: var(--primaryHover); */
-  display: none;
-  color: transparent;
+@media (hover: hover) {
+  summary:hover .summary-title {
+    color: var(--link-hover);
+  }
 }
 
-/* Utils */
-
-#utils-container input[type='text'],
-#utils-container textarea {
-  margin-bottom: 32px;
-  position: relative;
+.summary-text {
+  color: var(--muted);
+  font-size: var(--text-lg);
 }
 
-#utils-container .limit-text {
-  bottom: 16px;
+#create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 28px;
 }
 
-#utils-container label {
-  margin-right: 50px;
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-#utils-container #title-input {
-  width: 285px;
+.field-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: var(--text-sm);
+  font-weight: 600;
 }
 
-#utils-container #description-input {
-  width: 470px;
+.field-hint {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 400;
 }
 
-#utils-container #generate-url-button-container {
-  margin-top: 40px;
-  margin-bottom: 30px;
+.field-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-#utils-container #generate-url-button {
-  width: 200px;
-  padding-top: 7px;
-  padding-bottom: 7px;
+.limit-text {
+  align-self: flex-end;
+  color: var(--muted);
+  font-size: var(--text-2xs);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+#generate-url-button-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+#generate-url-button {
+  height: var(--control-lg);
+  padding: 0 30px;
+  box-shadow: 0 5px 0 var(--accent-deep);
+}
+
+@media (hover: hover) {
+  #generate-url-button:not(:disabled):hover {
+    background: var(--accent-hover);
+  }
+}
+
+#generated-url-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  height: var(--control-lg);
+  padding: 0 6px 0 18px;
+  border-radius: var(--radius-pill);
+  background: var(--chip);
 }
 
 #generated-url {
-  color: var(--primary);
-  font-size: 16px;
-  line-height: 24px;
+  overflow: hidden;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 #copy-generated-url-button {
-  background: transparent;
-  padding: 0;
-  margin: 0 10px 0 0;
-  color: var(--primary);
   display: flex;
+  flex: none;
   align-items: center;
+  gap: 6px;
+  min-width: 40px;
+  padding: 0 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--text-xs);
+  font-weight: 600;
 }
 
-#copy-generated-url-button svg {
-  width: 1.5em;
-  height: 1.5em;
+@media (hover: hover) {
+  #copy-generated-url-button:hover {
+    background: var(--surface-hover);
+  }
 }
 
-#copy-generated-url-button:hover path {
-  fill: var(--primary);
+.error {
+  color: var(--error);
+  font-weight: 600;
 }
 
-@keyframes shake-and-error {
-  0% {
-    outline: 0 solid var(--error);
-    transform: skewY(-3deg);
-  }
+/* Utilities and states */
 
-  25% {
-    outline: 1px solid var(--error);
-    transform: skewY(3deg);
-  }
+/* Important, so hiding beats a component's own display set by id, such as the flex of #generated-url-container */
+.hide {
+  display: none !important;
+}
 
-  50% {
-    outline: 1px solid var(--error);
-    transform: skewY(-3deg);
-  }
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 
-  75% {
-    outline: 1px solid var(--error);
-    transform: skewY(3deg);
-  }
-
+@keyframes shake {
+  0%,
   100% {
-    outline: 0 solid var(--error);
-    transform: skewY(0deg);
+    transform: translateX(0);
+  }
+
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+
+  40%,
+  80% {
+    transform: translateX(6px);
   }
 }
 
 .shake-and-error {
-  animation: shake-and-error 0.2s;
+  animation: shake 0.3s;
+}
+
+/* Media */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Shortened rather than removed, so animationend still fires and clears the class */
+  .shake-and-error {
+    animation-duration: 0.01s;
+  }
+
+  #score-progress-bar,
+  summary::before {
+    transition: none;
+  }
+}
+
+/* Phone: the HUD docks to the bottom edge, where the thumb reaches it */
+
+@media (width <= 640px) {
+  :root {
+    --gutter: 12px;
+  }
+
+  #site-header {
+    padding: 12px 16px;
+  }
+
+  #logo {
+    font-size: 22px;
+  }
+
+  #logo-mark {
+    width: 34px;
+    height: 34px;
+    font-size: var(--text-2xl);
+  }
+
+  #guessir,
+  #game {
+    gap: 16px;
+  }
+
+  #guessir {
+    padding: 0 var(--gutter);
+  }
+
+  /*
+   * Floats above the bottom edge, inset and rounded like the cards, so it looks the same stuck and in the page flow.
+   * Only Chrome can style a stuck element apart (scroll-state queries), so the panel keeps one look in both.
+   */
+  #hud {
+    top: auto;
+    bottom: 12px;
+    order: 2;
+    gap: 12px;
+    padding: 14px;
+    box-shadow: none;
+  }
+
+  #text-container {
+    order: 1;
+    padding: 22px 18px;
+  }
+
+  #utils-container {
+    padding-bottom: 32px;
+  }
+
+  #score-badge {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-md);
+  }
+
+  #current-score {
+    font-size: var(--text-3xl);
+  }
+
+  #score-label {
+    font-size: var(--text-md);
+  }
+
+  #controls-container {
+    flex-basis: 100%;
+  }
+
+  #guess-input,
+  #guess-button {
+    height: var(--control-lg);
+  }
+
+  #guess-button {
+    padding: 0 18px;
+  }
+
+  #hints-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  #hints .chip {
+    flex: 1 1 auto;
+    justify-content: center;
+    padding: 0 8px;
+    white-space: nowrap;
+    font-size: var(--text-xs);
+  }
+
+  #title {
+    font-size: var(--text-4xl);
+  }
+
+  #description {
+    margin-bottom: 16px;
+    font-size: var(--text-sm);
+  }
+
+  #lexemes {
+    font-size: var(--text-xl);
+    line-height: 2;
+  }
+
+  #utils-container details {
+    padding: 24px 18px;
+  }
+
+  .summary-title {
+    font-size: var(--text-3xl);
+  }
 }

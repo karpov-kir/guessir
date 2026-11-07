@@ -1,3 +1,4 @@
+import arrowIcon from '../icons/arrowIcon.svg?raw';
 import { PubSub } from '../pubSub/PubSub';
 import { onChangeAndEnter, onEnter } from '../utils/dom';
 import { ChildRenderer } from './types';
@@ -44,19 +45,22 @@ export class ControlsRenderer implements ChildRenderer {
     return this.containerElement;
   }
 
-  // v8 ignore next: no logic
+  /** Empties and focuses the guess input, disables the guess button and clears the status message. */
   public clearAndFocusGuessInput() {
-    const { guessInputElement, guessButtonElement } = this.getElements();
+    const { guessInputElement, guessButtonElement, statusElement } = this.getElements();
 
     guessInputElement.value = '';
     guessInputElement.focus();
     guessButtonElement.disabled = true;
+    statusElement.textContent = '';
   }
 
   public shakeAndError() {
-    const { guessInputElement } = this.getElements();
+    const { guessInputElement, statusElement } = this.getElements();
 
     guessInputElement.classList.add('shake-and-error');
+    // The shake is visual only, so a screen reader hears the miss from this live region
+    statusElement.textContent = 'No new words for this guess';
 
     const removeAnimationClass = () => {
       guessInputElement.removeEventListener('animationend', removeAnimationClass);
@@ -68,14 +72,23 @@ export class ControlsRenderer implements ChildRenderer {
 
   private initElement(allowShowingText?: boolean, allowShowingFirstLetters?: boolean) {
     this.containerElement.innerHTML = `
-      <input id="guess-input" type="text" />
-      <button title="Please, input at least one letter to try to guess!" disabled id="guess-button" type="button">Guess</button>
-      <label>
-        <input type="checkbox" id="show-text-checkbox" /> Show text
-      </label>
-      <label>
-        <input type="checkbox" id="show-first-letters-checkbox"> Show first letters
-      </label>
+      <div id="guess-container">
+        <label for="guess-input" class="visually-hidden">Your guess</label>
+        <input id="guess-input" type="text" placeholder="Type a word" autocomplete="off" autocapitalize="off" spellcheck="false" />
+        <button title="Please, input at least one letter to try to guess!" disabled id="guess-button" type="button">
+          Guess ${arrowIcon}
+        </button>
+        <div id="guess-status" class="visually-hidden" role="status"></div>
+      </div>
+      <div id="hints" role="group" aria-labelledby="hints-label">
+        <span id="hints-label">Hints:</span>
+        <label class="chip">
+          <input type="checkbox" id="show-first-letters-checkbox"> First letters
+        </label>
+        <label class="chip">
+          <input type="checkbox" id="show-text-checkbox" /> Peek at text
+        </label>
+      </div>
     `;
 
     const { showTextCheckboxElement, showFirstLettersCheckboxElement } = this.getElements();
@@ -101,8 +114,15 @@ export class ControlsRenderer implements ChildRenderer {
     ) as HTMLInputElement;
     const guessButtonElement = this.containerElement.querySelector('#guess-button') as HTMLButtonElement;
     const guessInputElement = this.containerElement.querySelector('#guess-input') as HTMLInputElement;
+    const statusElement = this.containerElement.querySelector('#guess-status') as HTMLElement;
 
-    return { showTextCheckboxElement, showFirstLettersCheckboxElement, guessButtonElement, guessInputElement };
+    return {
+      showTextCheckboxElement,
+      showFirstLettersCheckboxElement,
+      guessButtonElement,
+      guessInputElement,
+      statusElement,
+    };
   }
 
   private getInputtedWord() {

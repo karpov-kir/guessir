@@ -11,6 +11,22 @@ interface CreateTextRendererOptions {
   apiClient?: ApiClient;
 }
 
+/**
+ * Returns the markup of a labelled form field. The limit counter sits in the control's direct parent,
+ * where `limitInputsLength` looks for it.
+ */
+function renderField({ id, label, hint, control }: { id: string; label: string; hint: string; control: string }) {
+  return `
+    <div class="field">
+      <div class="field-header"><label for="${id}">${label}</label><span class="field-hint">${hint}</span></div>
+      <div class="field-control">
+        ${control}
+        <div class="limit-text">0/0</div>
+      </div>
+    </div>
+  `;
+}
+
 export class CreateTextRenderer implements ChildRenderer {
   private readonly containerElement: HTMLElement;
   private generatedUrl = '';
@@ -42,43 +58,37 @@ export class CreateTextRenderer implements ChildRenderer {
   private initElement() {
     this.containerElement.innerHTML = `
       <details>
-        <summary>Create a new text</summary>
-        <div>
-          <div class="inline-flex relative">
-            <input id="title-input" type="text" placeholder="Title*">
-            <div class="limit-text">0/0</div>
+        <summary>
+          <span class="summary-title">Make your own game</span>
+          <span class="summary-text">Paste any English text, share the link and race your friends.</span>
+        </summary>
+        <div id="create-form">
+          ${renderField({ id: 'title-input', label: 'Title', hint: 'required', control: '<input id="title-input" type="text">' })}
+          ${renderField({
+            id: 'description-input',
+            label: 'Description',
+            hint: 'optional',
+            control: '<textarea rows="2" id="description-input"></textarea>',
+          })}
+          ${renderField({ id: 'text-input', label: 'Text', hint: 'required', control: '<textarea rows="6" id="text-input"></textarea>' })}
+          <div class="chips">
+            <label class="chip">
+              <input checked type="checkbox" id="allow-showing-first-letters-checkbox">Allow first-letter hints
+            </label>
+            <label class="chip">
+              <input checked type="checkbox" id="allow-showing-text-checkbox">Allow peeking at the text
+            </label>
           </div>
-        </div>
-        <div>
-          <div class="inline-flex relative">
-            <textarea rows="2" class="w-100" id="description-input" placeholder="Description"></textarea>
-            <div class="limit-text">0/0</div>
+          <div id="generate-url-button-container">
+            <button id="generate-url-button" type="button">Create game</button>
+            <div class="hide" id="generated-url-container">
+              <a href="#" id="generated-url" target="_blank">#</a>
+              <button id="copy-generated-url-button" type="button" aria-label="Copy link">
+                ${copyIcon}
+              </button>
+            </div>
           </div>
-        </div>
-        <div class="flex relative">
-            <textarea rows="5" class="w-100" id="text-input" placeholder="Text*"></textarea>
-            <div class="limit-text">0/0</div>
-        </div>
-        <div class="flex">
-          <label>
-            <input checked type="checkbox" id="allow-showing-first-letters-checkbox">Allow showing first letters
-          </label>
-          <br />
-          <label>
-            <input checked type="checkbox" id="allow-showing-text-checkbox">Allow showing text
-          </label>
-        </div>
-        <div id="generate-url-button-container">
-          <div class="relative">
-            <div id="generate-url-error" class="error hide"></div>
-            <button id="generate-url-button" type="button">Create</button>
-          </div>
-        </div>
-        <div class="hide flex" id="generated-url-container">
-          <button id="copy-generated-url-button" type="button">
-            ${copyIcon}
-          </button>
-          <a href="#" id="generated-url" target="_blank">#</a>
+          <div id="generate-url-error" class="error hide" role="alert"></div>
         </div>
       </details>
     `;
@@ -133,27 +143,27 @@ export class CreateTextRenderer implements ChildRenderer {
     limitLength(textInputElement, this.maxTextLength);
   }
 
+  /**
+   * Returns whether the title and the text are both filled in. When the caller gives `limitToElement`,
+   * the check marks only that field, so a user who is typing sees no error on other fields yet.
+   */
   private validateForm(limitToElement?: HTMLElement) {
     const { titleInputElement, textInputElement } = this.getElements();
 
     const { title, text } = this.getValues();
     const isValid = Boolean(title && text);
 
-    if (!limitToElement || limitToElement === titleInputElement) {
-      if (!title) {
-        titleInputElement.classList.add('invalid');
-      } else {
-        titleInputElement.classList.remove('invalid');
+    const markValidity = (element: HTMLElement, isElementValid: boolean) => {
+      if (limitToElement && limitToElement !== element) {
+        return;
       }
-    }
 
-    if (!limitToElement || limitToElement === textInputElement) {
-      if (!text) {
-        textInputElement.classList.add('invalid');
-      } else {
-        textInputElement.classList.remove('invalid');
-      }
-    }
+      element.classList.toggle('invalid', !isElementValid);
+      element.setAttribute('aria-invalid', String(!isElementValid));
+    };
+
+    markValidity(titleInputElement, Boolean(title));
+    markValidity(textInputElement, Boolean(text));
 
     return isValid;
   }
@@ -196,6 +206,8 @@ export class CreateTextRenderer implements ChildRenderer {
     [allowShowingFirstLettersCheckboxElement, allowShowingTextCheckboxElement].forEach((element) => {
       element.checked = true;
     });
+
+    this.limitInputsLength();
   }
 
   private attachInputHandlers() {
