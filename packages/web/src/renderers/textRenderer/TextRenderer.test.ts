@@ -42,11 +42,36 @@ describe(TextRenderer, () => {
     expect(textRenderer.getElement().querySelectorAll('br')).toHaveLength(2);
   });
 
-  it('should keep a word and the punctuation touching it in one group, so a line breaks only at whitespace', () => {
+  it('should keep a word with the punctuation that closes it, so no line starts with a comma', () => {
     const groups = Array.from(textRenderer.getElement().querySelectorAll('.lexeme-group'));
 
-    expect(groups.map((group) => group.textContent)).toEqual(['___', '___,', '@', '_____', '____!']);
-    expect(groups.every((group) => !/\s/.test(group.textContent ?? ''))).toBe(true);
+    expect(groups.map((group) => group.textContent)).toEqual(['___', '___,', '_____', '____!']);
+  });
+
+  it('should bind opening punctuation to the next word and leave other characters breakable', () => {
+    const game = new TextGame('He said "hi" (twice), see a/b.');
+    const lexemesElement = new TextRenderer({ lexemes: game.lexemes() }).getElement().querySelector('#lexemes');
+    const nodes = Array.from(lexemesElement?.childNodes ?? [], (node) =>
+      node instanceof HTMLElement && node.classList.contains('lexeme-group')
+        ? `[${node.textContent}]`
+        : node.textContent,
+    );
+
+    expect(nodes).toEqual([
+      '[__]',
+      ' ',
+      '[____]',
+      ' ',
+      '["__"]',
+      ' ',
+      '[(_____),]',
+      ' ',
+      '[___]',
+      ' ',
+      '[_]',
+      '/',
+      '[_.]',
+    ]);
   });
 
   it('should not render the title and description if they are empty', () => {
