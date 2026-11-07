@@ -3,6 +3,7 @@ import { createTextLimits } from '@guessir/shared/dist/CreateTextDto';
 import copyIcon from '../icons/copyIcon.svg?raw';
 import { ApiClient } from '../utils/ApiClient';
 import { onChangeAndEnter } from '../utils/dom';
+import { icon } from '../utils/icon';
 import { generateTextUrl } from '../utils/text';
 import { ChildRenderer } from './types';
 
@@ -86,7 +87,7 @@ export class CreateTextRenderer implements ChildRenderer {
             <div class="hide" id="generated-url-container">
               <a href="#" id="generated-url" target="_blank">#</a>
               <button id="copy-generated-url-button" type="button" aria-label="Copy link">
-                ${copyIcon}
+                ${icon(copyIcon)}
               </button>
             </div>
           </div>
