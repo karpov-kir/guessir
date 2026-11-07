@@ -136,8 +136,8 @@ export class TextRenderer implements ChildRenderer {
   /**
    * Puts a word in one group with the punctuation that closes it and the punctuation that opens it. The group does
    * not wrap, so no line starts with a comma or ends with an opening bracket: a tile is an atomic inline, and a browser
-   * may break right after it. Any other character, such as a dash or a slash, stays outside the groups, so a line can
-   * still break inside a hyphenated word or a link.
+   * may break right after it. Any other character, such as a standalone dash or a slash, stays outside the groups, so
+   * a line can still break there, inside a link for one.
    */
   private renderLexemes(lexemesElement: HTMLElement) {
     let group: HTMLElement | undefined;
@@ -184,7 +184,7 @@ export class TextRenderer implements ChildRenderer {
   }
 }
 
-const closingCharacters = new Set([',', '.', ';', ':', '!', '?', ')', ']', '}', '%', '…', '»', '”', '’']);
+const closingCharacters = new Set([',', '.', ';', ':', '!', '?', ')', ']', '}', '%', '…', '»', '”']);
 const openingCharacters = new Set(['(', '[', '{', '«', '“', '‘']);
 const straightQuotes = new Set(['"', "'"]);
 

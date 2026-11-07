@@ -74,6 +74,19 @@ describe(TextRenderer, () => {
     ]);
   });
 
+  it('should close a word with a quote that follows its punctuation and leave a standalone dash breakable', () => {
+    const game = new TextGame('He said "go," and \'no,\' - fast.');
+    const lexemesElement = new TextRenderer({ lexemes: game.lexemes() }).getElement().querySelector('#lexemes');
+    const groups = Array.from(lexemesElement?.querySelectorAll('.lexeme-group') ?? [], (group) => group.textContent);
+    const loose = Array.from(lexemesElement?.childNodes ?? [])
+      .filter((node) => node.nodeType === Node.TEXT_NODE)
+      .map((node) => node.textContent);
+
+    expect(groups).toContain('"__,"');
+    expect(groups).toContain("___,'");
+    expect(loose).toContain('-');
+  });
+
   it('should not render the title and description if they are empty', () => {
     const { titleElement, descriptionElement } = getElements(new TextRenderer({ lexemes }).getElement());
 
