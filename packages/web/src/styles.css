@@ -76,7 +76,7 @@
   --surface-hover: light-dark(#e2dcff, #3a2f7a);
   --tile-hover: var(--tile-border);
   --field-border-hover: var(--muted);
-  --link-hover: light-dark(#3a21b8, #e0d9ff);
+  --link-hover: light-dark(#3a21b8, #a898ff);
 
   /* The HUD is violet in both themes, so its guess field stays light in both, with the light theme's field borders */
   --hud-field: #fff;
