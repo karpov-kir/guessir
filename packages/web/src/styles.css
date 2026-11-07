@@ -475,12 +475,13 @@ input[type='checkbox']:disabled {
   box-shadow: none;
 }
 
-/* The status keeps its line while empty, so a message does not grow the panel and push the text. The line sinks into
-   the gap above it, and the hints row into the gap below, so the two rows stay about 20px apart, empty or not. It holds
-   one line: a longer message is cut on screen, and a screen reader still reads it whole */
+/* The status keeps its line while empty, so a message does not grow the panel and push the text. It sits in the
+   panel's own row gaps, which clear the 5px focus ring of the field above and the chips below, and its text starts
+   where the field's text does (20px padding and 2px border). It holds one line: a longer message is cut on screen,
+   and a screen reader still reads it whole */
 #guess-status {
   min-height: 16px;
-  margin-top: -12px;
+  padding-left: 22px;
   overflow: hidden;
   color: var(--on-accent);
   font-size: var(--text-xs);
@@ -499,11 +500,6 @@ input[type='checkbox']:disabled {
 
 #hints:not(:has(.chip:not(.hide))) {
   display: none;
-}
-
-/* Takes the status line's gap below it; with the hints hidden the status keeps that gap from the panel's edge */
-#guess-status + #hints {
-  margin-top: -12px;
 }
 
 #hints-label {

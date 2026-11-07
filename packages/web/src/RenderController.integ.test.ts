@@ -226,7 +226,7 @@ describe(RenderController, () => {
   });
 
   it.each([
-    { hint: 'first letters', load: 'firstLetters', status: 'Could not load the first letters' },
+    { hint: 'first letters', load: 'firstLetters', status: 'Could not load first letters' },
     { hint: 'text', load: 'words', status: 'Could not load the text' },
   ] as const)('should uncheck $hint and announce it when they fail to load', async ({ load, status }) => {
     const pubSub = load === 'firstLetters' ? showFirstLettersPubSub : showTextPubSub;
