@@ -22,6 +22,10 @@ export class ControlsRenderer implements ChildRenderer {
   private readonly showTextPubSub: PubSub<boolean>;
   private isTextShown = false;
   private isFirstLettersShown = false;
+  /** The word the server is checking, so a second click on it sends nothing */
+  private checkedWord?: string;
+  /** The status shown when the checked word was sent, which a hit clears unless something else was announced since */
+  private statusAtSend = '';
 
   public readonly guessEvent: PubSub<GuessEvent>['event'];
   public readonly showFirstLettersEvent: PubSub<boolean>['event'];
@@ -46,18 +50,39 @@ export class ControlsRenderer implements ChildRenderer {
   }
 
   /**
-   * Puts a missed or unchecked guess back into the empty input, so the player can correct it. The server checks a
-   * guess while the player may already type the next word, so a word typed since then stays.
+   * Empties the input for the next word after a hit, and clears the status of the last guess unless something was
+   * announced while the server checked it. A word the player typed since sending stays.
    */
-  public returnGuess(word: string) {
-    const { guessInputElement, guessButtonElement } = this.getElements();
+  public acceptGuess(word: string) {
+    const { guessInputElement, statusElement } = this.getElements();
 
-    if (this.getInputtedWord()) {
-      return;
+    this.checkedWord = undefined;
+
+    if (this.getInputtedWord() === word) {
+      guessInputElement.value = '';
     }
 
-    guessInputElement.value = word;
-    guessButtonElement.disabled = false;
+    if (statusElement.textContent === this.statusAtSend) {
+      statusElement.textContent = '';
+    }
+
+    this.renderGuessButton();
+  }
+
+  /**
+   * Leaves a missed or unchecked guess in the input, so the player can correct it, and puts it back if the player
+   * emptied the input meanwhile. A word typed since sending stays.
+   */
+  public returnGuess(word: string) {
+    const { guessInputElement } = this.getElements();
+
+    this.checkedWord = undefined;
+
+    if (!this.getInputtedWord()) {
+      guessInputElement.value = word;
+    }
+
+    this.renderGuessButton();
   }
 
   /** Shows the status on screen in the live region, which screen readers also read out. */
@@ -148,21 +173,17 @@ export class ControlsRenderer implements ChildRenderer {
   }
 
   private attachInputHandler() {
-    const { guessInputElement, guessButtonElement } = this.getElements();
+    const { guessInputElement } = this.getElements();
 
-    guessInputElement.addEventListener('input', () => {
-      guessButtonElement.disabled = !this.getInputtedWord();
-    });
+    guessInputElement.addEventListener('input', () => this.renderGuessButton());
   }
 
-  /** Empties and focuses the input for the next word, disables the button and clears the status of the last guess. */
-  private clearGuessInput() {
-    const { guessInputElement, guessButtonElement, statusElement } = this.getElements();
+  /** Enables the button for a typed word that is not already being checked. */
+  private renderGuessButton() {
+    const { guessButtonElement } = this.getElements();
+    const word = this.getInputtedWord();
 
-    guessInputElement.value = '';
-    guessInputElement.focus();
-    guessButtonElement.disabled = true;
-    statusElement.textContent = '';
+    guessButtonElement.disabled = !word || word === this.checkedWord;
   }
 
   private attachGuessHandler() {
@@ -170,11 +191,15 @@ export class ControlsRenderer implements ChildRenderer {
     const guessHandler = () => {
       const word = this.getInputtedWord();
 
-      if (!word) {
+      if (!word || word === this.checkedWord) {
         return;
       }
 
-      this.clearGuessInput();
+      // The word stays in the input while the server checks it: an emptied input would flash its placeholder
+      this.checkedWord = word;
+      this.statusAtSend = this.getElements().statusElement.textContent ?? '';
+      this.renderGuessButton();
+      guessInputElement.focus();
       this.guessPubSub.publish({
         word,
       });
