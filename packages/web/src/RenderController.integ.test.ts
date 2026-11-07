@@ -147,14 +147,23 @@ describe(RenderController, () => {
       word: 'one',
       mockGuess: () => vi.spyOn(game, 'guess').mockRejectedValue(new Error('Test')),
     },
-  ])('should hand the guess back into the empty input after $outcome', async ({ word, mockGuess }) => {
+  ])('should keep the guess in the input while it is checked and after $outcome', async ({ word, mockGuess }) => {
     mockGuess();
 
     submitGuess(word);
-    expect(getGuessInput().value).toBe('');
+    // An emptied input would show its placeholder for as long as the server takes to answer
+    expect(getGuessInput().value).toBe(word);
     await settle();
 
     expect(getGuessInput().value).toBe(word);
+  });
+
+  it('should empty the input once a guess is found', async () => {
+    submitGuess('one');
+    expect(getGuessInput().value).toBe('one');
+    await settle();
+
+    expect(getGuessInput().value).toBe('');
   });
 
   it.each([

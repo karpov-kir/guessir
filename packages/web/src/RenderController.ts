@@ -115,7 +115,9 @@ export class RenderController {
 
     const shownCount = this.textRenderer.showGuessedWords(guessedWords);
 
-    if (!shownCount) {
+    if (shownCount) {
+      this.controlsRenderer.acceptGuess(word);
+    } else {
       this.controlsRenderer.returnGuess(word);
       this.controlsRenderer.shakeAndError();
     }
