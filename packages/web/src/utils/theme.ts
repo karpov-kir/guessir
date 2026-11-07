@@ -1,3 +1,7 @@
+import moonIcon from '../icons/moonIcon.svg?raw';
+import sunIcon from '../icons/sunIcon.svg?raw';
+import { icon } from './icon';
+
 enum Theme {
   Light = 'light',
   Dark = 'dark',
@@ -51,6 +55,9 @@ export function initThemeToggle({
   getStorage = () => globalThis.localStorage,
   systemTheme = globalThis.matchMedia('(prefers-color-scheme: dark)'),
 }: ThemeToggleOptions) {
+  // The button shows the moon in the light theme and the sun in the dark one; styles.css hides the other
+  button.innerHTML = icon(moonIcon, 'icon-moon') + icon(sunIcon, 'icon-sun');
+
   const storedTheme = readStoredTheme(getStorage);
 
   if (storedTheme) {

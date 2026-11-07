@@ -55,6 +55,13 @@ describe(initThemeToggle, () => {
     storage = createStorage();
   });
 
+  it('should give the button a moon and a sun icon, both hidden from screen readers', () => {
+    initToggle();
+
+    expect(button.querySelector('svg.icon.icon-moon[aria-hidden="true"]')).not.toBeNull();
+    expect(button.querySelector('svg.icon.icon-sun[aria-hidden="true"]')).not.toBeNull();
+  });
+
   it('should follow the system theme when nothing is stored', () => {
     initToggle({ systemTheme: createSystemTheme(true) });
 
