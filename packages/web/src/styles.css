@@ -520,11 +520,11 @@ input[type='checkbox']:disabled {
 
 /* On the violet panel an unchecked chip shows the panel through, so its hover takes the panel's own hover shade */
 @media (hover: hover) {
-  #hints .chip:hover {
+  #hints .chip:hover:not(:has(:disabled)) {
     background: var(--accent-hover);
   }
 
-  #hints .chip:hover:has(:checked) {
+  #hints .chip:hover:has(:checked):not(:has(:disabled)) {
     background: var(--yellow-hover);
   }
 }
