@@ -543,6 +543,16 @@ input[type='checkbox']:disabled {
   word-spacing: 4px;
 }
 
+/* A word and the punctuation touching it break as one, so no line starts with a comma; a word still wraps inside its
+   own tile when it is wider than the line */
+.lexeme-group {
+  white-space: nowrap;
+}
+
+.lexeme-group .lexeme-container {
+  white-space: normal;
+}
+
 /*
  * A word keeps one box in every state: its own glyphs, with no margin or padding, so revealing it moves no text.
  * The tile is painted outside that box by ::before, which takes no room in the line.

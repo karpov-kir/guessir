@@ -82,11 +82,15 @@ export class WordRenderer implements ChildRenderer {
     } else if (this.hint === WordHint.FirstLetters && this.firstLetter) {
       this.containerElement.setAttribute(
         'aria-label',
-        `Hidden word starting with ${this.firstLetter}, ${this.length} letters`,
+        `Hidden word starting with ${this.firstLetter}, ${this.describeLength()}`,
       );
     } else {
-      this.containerElement.setAttribute('aria-label', `Hidden word, ${this.length} letters`);
+      this.containerElement.setAttribute('aria-label', `Hidden word, ${this.describeLength()}`);
     }
+  }
+
+  private describeLength() {
+    return this.length === 1 ? '1 letter' : `${this.length} letters`;
   }
 
   private initElement() {
