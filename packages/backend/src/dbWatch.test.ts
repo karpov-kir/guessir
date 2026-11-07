@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { waitForDb, watchDb } from './dbWatch';
 
@@ -18,15 +18,25 @@ const fakeDb = (answer: (ping: number) => Promise<unknown>) => {
 };
 
 describe(watchDb, () => {
-  it('should resolve with the last error once the database has failed every ping for the limit', async () => {
-    // Pings 2-4 fail (a short restart), 5-9 answer, and from 10 on the database is gone
-    const db = fakeDb((ping) => ((ping >= 2 && ping <= 4) || ping >= 10 ? Promise.reject(down) : Promise.resolve()));
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
-    const error = await watchDb(db.ping, { limitMs: 200, intervalMs: 5 });
+  it('should resolve with the last error once the database has failed every ping for the limit', async () => {
+    // The watch reads its time from a clock that each ping moves by one interval, so a slow machine cannot end it early
+    let now = 0;
+    vi.spyOn(Date, 'now').mockImplementation(() => now);
+    // Pings 2-4 fail (a short restart), 5-9 answer, and from 10 on the database is gone
+    const db = fakeDb((ping) => {
+      now += 5;
+      return (ping >= 2 && ping <= 4) || ping >= 10 ? Promise.reject(down) : Promise.resolve();
+    });
+
+    const error = await watchDb(db.ping, { limitMs: 20, intervalMs: 5 });
 
     expect(error).toBe(down);
-    // Past the short outage, and more than one failed ping after the database is gone
-    expect(db.pings).toBeGreaterThan(10);
+    // The short outage did not end the watch, and the limit counts from ping 9, the last one that answered
+    expect(db.pings).toBe(13);
   });
 
   it('should end the watch on a ping that never settles, with one ping in flight at a time', async () => {
@@ -35,6 +45,14 @@ describe(watchDb, () => {
     const error = await watchDb(db.ping, { limitMs: 30, intervalMs: 5 });
 
     expect(error).toEqual(new Error('Database ping has not returned for 30ms'));
+    expect(db.pings).toBe(1);
+  });
+
+  it('should ping before ending the watch, even when one wait outlasts the limit', async () => {
+    const db = fakeDb(() => new Promise(() => {}));
+
+    await watchDb(db.ping, { limitMs: 5, intervalMs: 30 });
+
     expect(db.pings).toBe(1);
   });
 });

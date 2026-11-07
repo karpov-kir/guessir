@@ -123,18 +123,20 @@ export class CreateTextRenderer implements ChildRenderer {
   private limitInputsLength() {
     const { titleInputElement, descriptionInputElement, textInputElement } = this.getElements();
 
+    // The function counts and cuts in code points, not UTF-16 units. The server and its Postgres columns count code
+    // points, so a value that the form keeps is one that the server accepts.
     const limitLength = (element: HTMLInputElement, maxLength: number) => {
-      let value = element.value.trim();
+      let codePoints = [...element.value.trim()];
 
-      if (value.length > maxLength) {
-        value = value.substring(0, maxLength);
-        element.value = value;
+      if (codePoints.length > maxLength) {
+        codePoints = codePoints.slice(0, maxLength);
+        element.value = codePoints.join('');
       }
 
       const limitTextElement = element.parentElement?.querySelector('.limit-text');
 
       if (limitTextElement) {
-        limitTextElement.innerHTML = `${value.length}/${maxLength}`;
+        limitTextElement.innerHTML = `${codePoints.length}/${maxLength}`;
       }
     };
 

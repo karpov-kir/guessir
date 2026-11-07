@@ -12,7 +12,7 @@ RUN npm run build -w @guessir/backend
 FROM base AS deps
 
 # The backend's production dependencies need only the root, shared and backend manifests
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json .npmrc ./
 COPY packages/shared/package.json packages/shared/
 COPY packages/backend/package.json packages/backend/
 # npm links a bin into node_modules/.bin only when its file exists, and `npx guessirBackend` needs that link

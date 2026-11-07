@@ -195,6 +195,20 @@ describe(CreateTextRenderer, () => {
     });
   });
 
+  it('should count and cut inputs in code points, as the server counts them', () => {
+    const { textInputElement, titleInputElement, descriptionInputElement } = getElements(
+      createTextRenderer.getElement(),
+    );
+
+    [textInputElement, titleInputElement, descriptionInputElement].forEach((element) => {
+      element.value = '\u{1F600}\u{1F600}\u{1F600}';
+      element.dispatchEvent(new Event('input'));
+
+      expect(element.value).toBe('\u{1F600}\u{1F600}');
+      expect(element.parentElement?.querySelector('.limit-text')?.textContent).toBe('2/2');
+    });
+  });
+
   it('should copy a generated URL on click', async () => {
     const mockedWriteText = vi.fn();
     const { copyGeneratedUrlButtonElement } = getElements(createTextRenderer.getElement());
