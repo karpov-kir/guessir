@@ -17,7 +17,7 @@ export class ParameterFreeLogger implements Logger {
   }
 
   logQuerySlow() {
-    // Nor a slow one, for the same reason
+    // A slow query is not logged either: its parameters carry the stored texts
   }
 
   logSchemaBuild(message: string) {

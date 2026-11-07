@@ -7,6 +7,7 @@ import { buildMessage, ValidateBy, ValidationOptions } from 'class-validator';
 export function MaxCodePoints(max: number, validationOptions?: ValidationOptions): PropertyDecorator {
   return ValidateBy(
     {
+      // The name of class-validator's `MaxLength`, so a too-long value fails under the same key on every DTO
       name: 'maxLength',
       constraints: [max],
       validator: {

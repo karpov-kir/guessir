@@ -136,7 +136,7 @@ export class CreateTextRenderer implements ChildRenderer {
       const limitTextElement = element.parentElement?.querySelector('.limit-text');
 
       if (limitTextElement) {
-        limitTextElement.innerHTML = `${codePoints.length}/${maxLength}`;
+        limitTextElement.textContent = `${codePoints.length}/${maxLength}`;
       }
     };
 
