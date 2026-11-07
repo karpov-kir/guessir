@@ -543,14 +543,10 @@ input[type='checkbox']:disabled {
   word-spacing: 4px;
 }
 
-/* A word and the punctuation touching it break as one, so no line starts with a comma; a word still wraps inside its
-   own tile when it is wider than the line */
+/* A word and the punctuation touching it break as one, so no line starts with a comma;
+   see .lexeme-container for a word wider than the line */
 .lexeme-group {
   white-space: nowrap;
-}
-
-.lexeme-group .lexeme-container {
-  white-space: normal;
 }
 
 /*
@@ -572,6 +568,9 @@ input[type='checkbox']:disabled {
   font-weight: inherit;
   line-height: 1.3;
   vertical-align: baseline;
+
+  /* The word group around the tile does not wrap; a word wider than the line still wraps inside its tile */
+  white-space: normal;
 }
 
 .lexeme-container::before {
