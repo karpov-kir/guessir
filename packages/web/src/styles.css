@@ -621,6 +621,12 @@ input[type='checkbox']:disabled {
   box-shadow: inset 0 -3px 0 var(--tile-border);
 }
 
+/* A pressed button moves down 1px, and a transform would make the tile its own stacking context again, painting its
+   bleed over the punctuation beside it */
+.lexeme-container:active {
+  transform: none;
+}
+
 /* The ring goes round the painted tile rather than the narrower word box */
 .lexeme-container:focus-visible {
   outline: none;
