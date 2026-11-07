@@ -42,6 +42,13 @@ describe(TextRenderer, () => {
     expect(textRenderer.getElement().querySelectorAll('br')).toHaveLength(2);
   });
 
+  it('should keep a word and the punctuation touching it in one group, so a line breaks only at whitespace', () => {
+    const groups = Array.from(textRenderer.getElement().querySelectorAll('.lexeme-group'));
+
+    expect(groups.map((group) => group.textContent)).toEqual(['___', '___,', '@', '_____', '____!']);
+    expect(groups.every((group) => !/\s/.test(group.textContent ?? ''))).toBe(true);
+  });
+
   it('should not render the title and description if they are empty', () => {
     const { titleElement, descriptionElement } = getElements(new TextRenderer({ lexemes }).getElement());
 
