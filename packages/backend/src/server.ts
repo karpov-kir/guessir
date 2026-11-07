@@ -3,13 +3,14 @@
 import 'reflect-metadata';
 
 import fastifyHelmet from '@fastify/helmet';
-import { Logger, NotAcceptableException, ValidationPipe } from '@nestjs/common';
+import { Logger, NotAcceptableException } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 
 import { createDbPing } from './dbUtils';
 import { waitForDb, watchDb } from './dbWatch';
 import { MainModule } from './MainModule';
+import { useGlobals } from './useGlobals';
 
 // The server waits for the database at start, because a deploy of a new postgres:17 patch restarts it, and a new task
 // that exits at once pauses the rolling update. Once the database is gone for `lostAfterMs`, the server exits so Swarm
@@ -56,16 +57,7 @@ export async function boot(host = '0.0.0.0', port = 3020) {
     },
   });
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      // If set to true, validator will strip validated (returned) object of any properties that do not use any validation decorators
-      whitelist: true,
-      // With the auto-transformation option enabled, the ValidationPipe will also perform conversion of primitive types
-      transform: false,
-      // If set to true, instead of stripping non-whitelisted properties validator will throw an exception
-      forbidNonWhitelisted: true,
-    }),
-  );
+  useGlobals(app);
 
   await app.listen(port, host);
 

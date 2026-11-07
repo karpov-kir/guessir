@@ -20,12 +20,7 @@ export async function watchDb(ping: () => Promise<unknown>, { limitMs, intervalM
   let pending: Promise<void> | undefined;
 
   for (;;) {
-    await sleep(intervalMs);
-
-    if (Date.now() - lastAnswerAt >= limitMs) {
-      return lastError ?? new Error(`Database ping has not returned for ${limitMs}ms`);
-    }
-
+    // The ping goes out before the wait, so a stalled event loop cannot end the watch before a single ping
     pending ??= ping()
       .then(
         () => {
@@ -43,6 +38,12 @@ export async function watchDb(ping: () => Promise<unknown>, { limitMs, intervalM
       .finally(() => {
         pending = undefined;
       });
+
+    await sleep(intervalMs);
+
+    if (Date.now() - lastAnswerAt >= limitMs) {
+      return lastError ?? new Error(`Database ping has not returned for ${limitMs}ms`);
+    }
   }
 }
 

@@ -1,18 +1,14 @@
 {
-  "extends": "../../tsconfig.build.json",
+  // The package options come from ./tsconfig.json, the build excludes from the root
+  "extends": ["../../tsconfig.build.json", "./tsconfig.json"],
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
-    // thread-stream, which fastify 5 pulls in through pino, does not type-check against @types/node 26
-    "skipLibCheck": true
+    "sourceMap": true
   },
   "references": [
     {
       "path": "../shared/tsconfig.build.json"
     }
-  ],
+  ]
 }

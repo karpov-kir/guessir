@@ -1,6 +1,5 @@
 .idea
 .vscode
-build
 tsconfig.build.tsbuildinfo
 dist
 node_modules
