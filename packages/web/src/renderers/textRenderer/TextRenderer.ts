@@ -130,25 +130,34 @@ export class TextRenderer implements ChildRenderer {
       descriptionElement.textContent = this.description;
     }
 
+    // A word and the characters touching it (punctuation, quotes) share one group that does not wrap, so a line
+    // breaks only at whitespace. A tile is an atomic inline, and a browser may break right after it, which would
+    // start a line with the comma that follows the word.
+    let group: HTMLElement | undefined;
+
     for (const lexeme of this.lexemes) {
+      if ('character' in lexeme && /\s/.test(lexeme.character)) {
+        group = undefined;
+        lexemesElement.append(lexeme.character === '\n' ? document.createElement('br') : lexeme.character);
+        continue;
+      }
+
+      if (!group) {
+        group = document.createElement('span');
+        group.classList.add('lexeme-group');
+        lexemesElement.append(group);
+      }
+
       if ('character' in lexeme) {
-        lexemesElement.append(this.wrapSpecialCharacter(lexeme.character));
+        group.append(lexeme.character);
       } else {
         const wordRenderer = new WordRenderer(lexeme);
 
         wordRenderer.revealRequestEvent.subscribe((index) => this.revealRequestPubSub.publish(index));
         this.wordRenderers.set(lexeme.index, wordRenderer);
-        lexemesElement.appendChild(wordRenderer.getElement());
+        group.append(wordRenderer.getElement());
       }
     }
-  }
-
-  private wrapSpecialCharacter(character: string): HTMLElement | string {
-    if (character === '\n') {
-      return document.createElement('br');
-    }
-
-    return character;
   }
 }
 

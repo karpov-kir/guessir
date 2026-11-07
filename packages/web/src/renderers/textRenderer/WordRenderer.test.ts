@@ -34,6 +34,17 @@ describe(WordRenderer, () => {
     expect(wordRenderer.isShown).toBe(false);
   });
 
+  it('should name a one-letter hidden word in the singular', () => {
+    wordRenderer = new WordRenderer({ index: 0, length: 1 });
+
+    expect(getLabel()).toBe('Hidden word, 1 letter');
+
+    wordRenderer.setFirstLetter('A');
+    wordRenderer.setHint(WordHint.FirstLetters);
+
+    expect(getLabel()).toBe('Hidden word starting with A, 1 letter');
+  });
+
   it('should name a hidden word for screen readers until it is shown', () => {
     expect(getLabel()).toBe('Hidden word, 4 letters');
 
