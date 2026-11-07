@@ -1,22 +1,22 @@
-import { LexemeNormalizer } from '../../lexemeAnalyzer/LexemeNormalizer';
-import { Lexeme, LexemeAnalysis } from '../../lexemeAnalyzer/types';
+import { RevealedWord, SkeletonLexeme } from '@guessir/shared/dist/game/types';
+
 import { PubSub } from '../../pubSub/PubSub';
 import { ChildRenderer } from '../types';
 import { WordHint, WordRenderer } from './WordRenderer';
 
 type TextRendererOptions = {
-  lexemesAnalysis: LexemeAnalysis;
+  lexemes: SkeletonLexeme[];
   title?: string;
   description?: string;
-  userWordShowPubSub?: PubSub<Lexeme>;
+  revealRequestPubSub?: PubSub<number>;
 };
 
 export class TextRenderer implements ChildRenderer {
   private readonly containerElement: HTMLElement;
-  private readonly lexemesAnalysis: LexemeAnalysis;
+  private readonly lexemes: SkeletonLexeme[];
   private readonly title?: string;
   private readonly description?: string;
-  private readonly userWordShowPubSub: PubSub<Lexeme>;
+  private readonly revealRequestPubSub: PubSub<number>;
   private readonly wordRenderers = new Map<
     // Lexeme index
     number,
@@ -25,12 +25,13 @@ export class TextRenderer implements ChildRenderer {
   /** Words of the last successful guess, highlighted so the user sees where they landed */
   private freshWordRenderers: WordRenderer[] = [];
 
-  public userWordShowEvent: PubSub<Lexeme>['event'];
+  /** Publishes the lexeme index of a hidden word the user clicks. */
+  public revealRequestEvent: PubSub<number>['event'];
 
   constructor(options: TextRendererOptions) {
-    this.userWordShowPubSub = options.userWordShowPubSub || new PubSub<Lexeme>();
-    this.userWordShowEvent = this.userWordShowPubSub.event;
-    this.lexemesAnalysis = options.lexemesAnalysis;
+    this.revealRequestPubSub = options.revealRequestPubSub || new PubSub<number>();
+    this.revealRequestEvent = this.revealRequestPubSub.event;
+    this.lexemes = options.lexemes;
     this.title = options.title;
     this.description = options.description;
     this.containerElement = document.createElement('article');
@@ -44,34 +45,25 @@ export class TextRenderer implements ChildRenderer {
   }
 
   /**
-   * Shows every lexeme that matches `word` and returns how many of them were hidden before.
+   * Shows the guessed words and returns how many of them were hidden before.
    * Moves the fresh highlight to these words only when at least one word was newly shown.
    */
-  public showLexemesByWord(word: string): number {
-    const lexemes = this.lexemesAnalysis.lexemesByWordLike.get(word);
+  public showGuessedWords(words: RevealedWord[]): number {
+    const guessedWordRenderers: WordRenderer[] = [];
     let shownCount = 0;
 
-    if (!lexemes) {
-      return shownCount;
-    }
-
-    const guessedWordRenderers: WordRenderer[] = [];
-
-    for (const [index] of lexemes) {
-      const wordRenderer = this.wordRenderers.get(index);
+    for (const revealedWord of words) {
+      const wordRenderer = this.wordRenderers.get(revealedWord.index);
 
       if (!wordRenderer) {
         continue;
       }
 
-      const isShownBefore = wordRenderer.isShown;
-
-      wordRenderer.show();
-      guessedWordRenderers.push(wordRenderer);
-
-      if (!isShownBefore) {
+      if (this.showWord(revealedWord)) {
         shownCount++;
       }
+
+      guessedWordRenderers.push(wordRenderer);
     }
 
     // A guess that opens nothing new is a miss, so the highlight stays on the last guess that opened words
@@ -84,15 +76,28 @@ export class TextRenderer implements ChildRenderer {
     return shownCount;
   }
 
-  public toggleText(isShown: boolean) {
-    this.setHint(isShown ? WordHint.Text : WordHint.None);
+  /** Shows one revealed word and returns whether it was hidden before. */
+  public showWord({ index, word }: RevealedWord): boolean {
+    const wordRenderer = this.wordRenderers.get(index);
+
+    if (!wordRenderer || wordRenderer.isShown) {
+      return false;
+    }
+
+    wordRenderer.show(word);
+
+    return true;
   }
 
-  public toggleFirstLetters(isShown: boolean) {
-    this.setHint(isShown ? WordHint.FirstLetters : WordHint.None);
+  public fillFirstLetters(firstLetters: RevealedWord[]) {
+    firstLetters.forEach(({ index, word }) => this.wordRenderers.get(index)?.setFirstLetter(word));
   }
 
-  private setHint(hint: WordHint) {
+  public fillWords(words: RevealedWord[]) {
+    words.forEach(({ index, word }) => this.wordRenderers.get(index)?.setWord(word));
+  }
+
+  public setHint(hint: WordHint) {
     this.containerElement.classList.remove('show-text', 'show-first-letters');
 
     if (hint === WordHint.Text) {
@@ -125,29 +130,34 @@ export class TextRenderer implements ChildRenderer {
       descriptionElement.textContent = this.description;
     }
 
-    for (const [index, lexeme] of this.lexemesAnalysis.lexemes) {
-      if (LexemeNormalizer.isLexemeOtherCharacter(lexeme)) {
-        lexemesElement.append(this.wrapSpecialCharacter(lexeme));
-      } else {
-        const wordRenderer = new WordRenderer({ lexeme });
+    // A word and the characters touching it (punctuation, quotes) share one group that does not wrap, so a line
+    // breaks only at whitespace. A tile is an atomic inline, and a browser may break right after it, which would
+    // start a line with the comma that follows the word.
+    let group: HTMLElement | undefined;
 
-        wordRenderer.userWordShowEvent.subscribe((shownLexeme) => this.handleUserWordShow(shownLexeme));
-        this.wordRenderers.set(index, wordRenderer);
-        lexemesElement.appendChild(wordRenderer.getElement());
+    for (const lexeme of this.lexemes) {
+      if ('character' in lexeme && /\s/.test(lexeme.character)) {
+        group = undefined;
+        lexemesElement.append(lexeme.character === '\n' ? document.createElement('br') : lexeme.character);
+        continue;
+      }
+
+      if (!group) {
+        group = document.createElement('span');
+        group.classList.add('lexeme-group');
+        lexemesElement.append(group);
+      }
+
+      if ('character' in lexeme) {
+        group.append(lexeme.character);
+      } else {
+        const wordRenderer = new WordRenderer(lexeme);
+
+        wordRenderer.revealRequestEvent.subscribe((index) => this.revealRequestPubSub.publish(index));
+        this.wordRenderers.set(lexeme.index, wordRenderer);
+        group.append(wordRenderer.getElement());
       }
     }
-  }
-
-  private wrapSpecialCharacter(lexeme: Lexeme): HTMLElement | string {
-    if (lexeme.normalized === '\n') {
-      return document.createElement('br');
-    }
-
-    return lexeme.normalized;
-  }
-
-  private handleUserWordShow(lexeme: Lexeme) {
-    this.userWordShowPubSub.publish(lexeme);
   }
 }
 

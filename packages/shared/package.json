@@ -2,10 +2,16 @@
   "name": "@guessir/shared",
   "type": "module",
   "version": "1.0.0",
+  "exports": {
+    "./dist/*": "./dist/*.js"
+  },
   "scripts": {
     "build": "npm run clean && tsc -b tsconfig.build.json",
     "clean": "del-cli ./dist ./tsconfig.build.tsbuildinfo"
   },
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {},
+  "files": [
+    "./dist"
+  ]
 }

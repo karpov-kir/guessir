@@ -37,6 +37,8 @@ export async function boot(host = '0.0.0.0', port = 3020) {
     MainModule,
     new FastifyAdapter({
       logger: true,
+      // Fastify answers HEAD with the GET handler, which would read a text outside the rate limit set for GET
+      exposeHeadRoutes: false,
     }),
   );
 

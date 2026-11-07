@@ -114,7 +114,7 @@ export class LexemeAnalyzer {
   }
 
   private static canAddLexeme(lexemeAnalyzerStore: LexemeAnalyzerStore, lexemeToAdd: Lexeme) {
-    const lastLexeme = lexemeAnalyzerStore.lexemes.get(lexemeAnalyzerStore.lastLexemeIndex);
+    const lastLexeme = lexemeAnalyzerStore.getLexeme(lexemeAnalyzerStore.lastLexemeIndex);
     const isVeryFirstLexeme = !lastLexeme;
 
     if (isVeryFirstLexeme) {

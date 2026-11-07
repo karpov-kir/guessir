@@ -45,22 +45,51 @@ export class ControlsRenderer implements ChildRenderer {
     return this.containerElement;
   }
 
-  /** Empties and focuses the guess input, disables the guess button and clears the status message. */
-  public clearAndFocusGuessInput() {
-    const { guessInputElement, guessButtonElement, statusElement } = this.getElements();
+  /**
+   * Puts a missed or unchecked guess back into the empty input, so the player can correct it. The server checks a
+   * guess while the player may already type the next word, so a word typed since then stays.
+   */
+  public returnGuess(word: string) {
+    const { guessInputElement, guessButtonElement } = this.getElements();
 
-    guessInputElement.value = '';
-    guessInputElement.focus();
-    guessButtonElement.disabled = true;
-    statusElement.textContent = '';
+    if (this.getInputtedWord()) {
+      return;
+    }
+
+    guessInputElement.value = word;
+    guessButtonElement.disabled = false;
   }
 
+  /** Shows the status on screen in the live region, which screen readers also read out. */
+  public announce(status: string) {
+    const { statusElement } = this.getElements();
+
+    statusElement.textContent = status;
+  }
+
+  /** Unchecks the first letters hint without publishing, for a hint that could not turn on. */
+  public uncheckFirstLetters() {
+    const { showFirstLettersCheckboxElement } = this.getElements();
+
+    this.isFirstLettersShown = false;
+    showFirstLettersCheckboxElement.checked = false;
+  }
+
+  /** Unchecks the peek hint without publishing, for a hint that could not turn on. */
+  public uncheckText() {
+    const { showTextCheckboxElement } = this.getElements();
+
+    this.isTextShown = false;
+    showTextCheckboxElement.checked = false;
+  }
+
+  /** Shakes the input in error and announces the miss, for a guess that revealed no new words. */
   public shakeAndError() {
-    const { guessInputElement, statusElement } = this.getElements();
+    const { guessInputElement } = this.getElements();
 
     guessInputElement.classList.add('shake-and-error');
     // The shake is visual only, so a screen reader hears the miss from this live region
-    statusElement.textContent = 'No new words for this guess';
+    this.announce('No new words for this guess');
 
     const removeAnimationClass = () => {
       guessInputElement.removeEventListener('animationend', removeAnimationClass);
@@ -78,8 +107,8 @@ export class ControlsRenderer implements ChildRenderer {
         <button title="Please, input at least one letter to try to guess!" disabled id="guess-button" type="button">
           Guess ${arrowIcon}
         </button>
-        <div id="guess-status" class="visually-hidden" role="status"></div>
       </div>
+      <div id="guess-status" role="status"></div>
       <div id="hints" role="group" aria-labelledby="hints-label">
         <span id="hints-label">Hints:</span>
         <label class="chip">
@@ -108,39 +137,32 @@ export class ControlsRenderer implements ChildRenderer {
   }
 
   private getElements() {
-    const showTextCheckboxElement = this.containerElement.querySelector('#show-text-checkbox') as HTMLInputElement;
-    const showFirstLettersCheckboxElement = this.containerElement.querySelector(
-      '#show-first-letters-checkbox',
-    ) as HTMLInputElement;
-    const guessButtonElement = this.containerElement.querySelector('#guess-button') as HTMLButtonElement;
-    const guessInputElement = this.containerElement.querySelector('#guess-input') as HTMLInputElement;
-    const statusElement = this.containerElement.querySelector('#guess-status') as HTMLElement;
-
-    return {
-      showTextCheckboxElement,
-      showFirstLettersCheckboxElement,
-      guessButtonElement,
-      guessInputElement,
-      statusElement,
-    };
+    return getElements(this.containerElement);
   }
 
+  /** Returns the typed word without surrounding spaces, in its typed case: the game ignores case when it matches. */
   private getInputtedWord() {
     const { guessInputElement } = this.getElements();
 
-    return guessInputElement.value.trim().toLowerCase();
+    return guessInputElement.value.trim();
   }
 
   private attachInputHandler() {
     const { guessInputElement, guessButtonElement } = this.getElements();
 
     guessInputElement.addEventListener('input', () => {
-      if (this.getInputtedWord()) {
-        guessButtonElement.disabled = false;
-      } else {
-        guessButtonElement.disabled = true;
-      }
+      guessButtonElement.disabled = !this.getInputtedWord();
     });
+  }
+
+  /** Empties and focuses the input for the next word, disables the button and clears the status of the last guess. */
+  private clearGuessInput() {
+    const { guessInputElement, guessButtonElement, statusElement } = this.getElements();
+
+    guessInputElement.value = '';
+    guessInputElement.focus();
+    guessButtonElement.disabled = true;
+    statusElement.textContent = '';
   }
 
   private attachGuessHandler() {
@@ -152,6 +174,7 @@ export class ControlsRenderer implements ChildRenderer {
         return;
       }
 
+      this.clearGuessInput();
       this.guessPubSub.publish({
         word,
       });
@@ -188,4 +211,22 @@ export class ControlsRenderer implements ChildRenderer {
       this.showFirstLettersPubSub.publish(this.isFirstLettersShown);
     });
   }
+}
+
+export function getElements(containerElement: HTMLElement) {
+  const showTextCheckboxElement = containerElement.querySelector('#show-text-checkbox') as HTMLInputElement;
+  const showFirstLettersCheckboxElement = containerElement.querySelector(
+    '#show-first-letters-checkbox',
+  ) as HTMLInputElement;
+  const guessButtonElement = containerElement.querySelector('#guess-button') as HTMLButtonElement;
+  const guessInputElement = containerElement.querySelector('#guess-input') as HTMLInputElement;
+  const statusElement = containerElement.querySelector('#guess-status') as HTMLElement;
+
+  return {
+    showTextCheckboxElement,
+    showFirstLettersCheckboxElement,
+    guessButtonElement,
+    guessInputElement,
+    statusElement,
+  };
 }

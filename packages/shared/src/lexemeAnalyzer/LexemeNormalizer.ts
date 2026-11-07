@@ -81,12 +81,23 @@ export class LexemeNormalizer {
   }
 
   public static normalizeCharacter(character: string) {
-    const lowerCasedCharacter = character.toLowerCase();
+    const lowerCasedCharacter = LexemeNormalizer.toLowerCaseCharacter(character);
 
     return (
       LexemeNormalizer.CHARACTERS_TO_NORMALIZED_CHARACTERS.get(lowerCasedCharacter) ||
       (lowerCasedCharacter as NormalizedPrimitiveLexemeNominal)
     );
+  }
+
+  /**
+   * Returns the lower case of `character`, or `character` unchanged when its lower case is longer than one
+   * character, such as `İ`, whose lower case is `i̇`. The analysis reads the text one character at a time, so `İ`
+   * stays one character, becomes an other-character lexeme, and the text stays playable.
+   */
+  private static toLowerCaseCharacter(character: string) {
+    const lowerCasedCharacter = character.toLowerCase();
+
+    return lowerCasedCharacter.length === 1 ? lowerCasedCharacter : character;
   }
 
   public static uncontractPrimitiveLexeme(normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal) {
