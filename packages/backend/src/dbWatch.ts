@@ -1,4 +1,5 @@
 import { setTimeout as sleep } from "node:timers/promises";
+import { inspect } from "node:util";
 
 import { Logger } from "@nestjs/common";
 
@@ -32,7 +33,7 @@ export async function watchDb(
         },
         (error: unknown) => {
           if (lastError === undefined) {
-            logger.warn(`DB is not reachable: ${String(error)}`);
+            logger.warn(`DB is not reachable: ${errorText(error)}`);
           }
 
           lastError = error;
@@ -80,4 +81,9 @@ export async function waitForDb(
 
     await sleep(intervalMs);
   }
+}
+
+/** Returns an error the way it reads in a log line; a thrown value that is no Error is inspected, not "[object Object]". */
+export function errorText(error: unknown): string {
+  return error instanceof Error ? String(error) : inspect(error);
 }

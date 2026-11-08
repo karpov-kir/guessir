@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { waitForDb, watchDb } from "./dbWatch.js";
+import { errorText, waitForDb, watchDb } from "./dbWatch.js";
 
 const down = new Error("getaddrinfo ENOTFOUND guessir_database");
 
@@ -88,5 +88,12 @@ describe(waitForDb, () => {
       new Error("Database ping has not returned for 30ms"),
     );
     expect(db.pings).toBe(1);
+  });
+});
+
+describe(errorText, () => {
+  it("should read an Error as its name and message, and inspect any other thrown value", () => {
+    expect(errorText(new Error("ping failed"))).toBe("Error: ping failed");
+    expect(errorText({ code: "ECONNREFUSED" })).toBe("{ code: 'ECONNREFUSED' }");
   });
 });
