@@ -13,8 +13,8 @@ import { plainToClass } from 'class-transformer';
 import { nanoid } from 'nanoid';
 import { Repository } from 'typeorm';
 
-import { CreateTextDtoRequest } from '../dto/CreateTextDtoRequest';
-import { TextEntity } from '../entities/TextEntity';
+import { CreateTextDtoRequest } from '../dto/CreateTextDtoRequest.js';
+import { TextEntity } from '../entities/TextEntity.js';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('texts')

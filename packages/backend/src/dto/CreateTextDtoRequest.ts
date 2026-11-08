@@ -1,4 +1,4 @@
-import { CreateTextDto } from '@guessir/shared/dist/CreateTextDto';
+import { CreateTextDto } from '@guessir/shared/dist/CreateTextDto.js';
 import { IsBoolean, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
 
 export class CreateTextDtoRequest implements CreateTextDto {

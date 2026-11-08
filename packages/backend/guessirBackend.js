@@ -1,2 +1,4 @@
 #!/usr/bin/env node
-import './dist/main.js';
+process.setSourceMapsEnabled(true);
+
+await import('./dist/main.js');

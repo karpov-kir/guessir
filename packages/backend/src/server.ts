@@ -7,9 +7,9 @@ import { Logger, NotAcceptableException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 
-import { createDbPing } from './dbUtils';
-import { waitForDb, watchDb } from './dbWatch';
-import { MainModule } from './MainModule';
+import { createDbPing } from './dbUtils.js';
+import { waitForDb, watchDb } from './dbWatch.js';
+import { MainModule } from './MainModule.js';
 
 // The server waits for the database at start, because a deploy of a new postgres:17 patch restarts it, and a new task
 // that exits at once pauses the rolling update. Once the database is gone for `lostAfterMs`, the server exits so Swarm
@@ -49,7 +49,7 @@ export async function boot(host = '0.0.0.0', port = 3020) {
       if (isAllowed) {
         callback(null, true);
       } else {
-        callback(new NotAcceptableException('Not allowed by CORS'));
+        callback(new NotAcceptableException('Not allowed by CORS'), false);
       }
     },
   });
