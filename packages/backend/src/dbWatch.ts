@@ -83,7 +83,10 @@ export async function waitForDb(
   }
 }
 
-/** Returns an error the way it reads in a log line; a thrown value that is no Error is inspected, not "[object Object]". */
+/**
+ * Returns an error the way it reads in a log line. A thrown value that is not
+ * an Error is inspected, so it never reads "[object Object]".
+ */
 export function errorText(error: unknown): string {
   return error instanceof Error ? String(error) : inspect(error);
 }
