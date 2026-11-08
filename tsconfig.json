@@ -1,13 +1,6 @@
 {
-  "compilerOptions": {
-    "strict": true,
-    "module": "ES2022",
-    "target": "ES2022",
-    "moduleResolution": "Bundler",
-    "lib": ["ES2022"],
-    "paths": {
-      "@guessir/shared/dist/*": ["./packages/shared/src/*"]
-    },
-    "types": []
-  }
+  // Covers only the files at the root: a package checks its own files, and a program built from this config never
+  // reads a package build output that a parallel build is rewriting
+  "extends": "./tsconfig.base.json",
+  "include": ["*.ts"]
 }
