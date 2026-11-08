@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 
 const requireEnv = (name: string): string => {
   const value = process.env[name];
@@ -21,7 +21,7 @@ const readPassword = (passwordFile: string): string => {
 // The password only ever comes as a file: a Docker secret on the server, env/database-password.development locally
 export const getDbSettings = () => ({
   host: requireEnv('DATABASE_HOST'),
-  port: process.env.DATABASE_PORT ? parseInt(process.env.DATABASE_PORT) : 5432,
+  port: process.env.DATABASE_PORT ? Number.parseInt(process.env.DATABASE_PORT) : 5432,
   username: requireEnv('DATABASE_USER'),
   password: readPassword(requireEnv('DATABASE_PASSWORD_FILE')),
   database: requireEnv('DATABASE_NAME'),
