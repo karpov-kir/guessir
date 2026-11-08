@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { LruCache } from './LruCache';
+import { LruCache } from './LruCache.js';
 
 describe(LruCache, () => {
   it('should give back a stored value, and undefined for a key it never stored', () => {

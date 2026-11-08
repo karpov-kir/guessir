@@ -12,7 +12,7 @@
     "build": "lerna run build",
     "build:web": "npm run build -w @guessir/web",
     "clean": "lerna run clean",
-    "lint:eslint": "eslint \"packages/**/src/**/*.ts\" \"packages/**/tests/**/*.ts\" \"packages/**/loaders/**/*.{ts,mjs}\"",
+    "lint:eslint": "eslint \"packages/**/src/**/*.ts\" \"packages/**/tests/**/*.ts\"",
     "lint:eslint:fix": "npm run lint:eslint -- --fix",
     "lint:tsc": "tsc --noEmit -p packages/backend/tsconfig.json && tsc --noEmit -p packages/shared/tsconfig.json && tsc --noEmit -p packages/web/tsconfig.json",
     "lint:stylelint": "stylelint \"packages/**/src/**/*.{css,scss}\"",

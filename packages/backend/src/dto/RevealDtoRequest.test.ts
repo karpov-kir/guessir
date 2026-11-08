@@ -2,7 +2,7 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { describe, expect, it } from 'vitest';
 
-import { RevealDtoRequest } from './RevealDtoRequest';
+import { RevealDtoRequest } from './RevealDtoRequest.js';
 
 describe(RevealDtoRequest, () => {
   it('should accept an index', async () => {

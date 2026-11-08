@@ -1,4 +1,4 @@
-import { Text } from '@guessir/shared/dist/Text';
+import { Text } from '@guessir/shared/dist/Text.js';
 import { Exclude } from 'class-transformer';
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
