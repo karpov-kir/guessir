@@ -29,8 +29,8 @@ class TestModule {}
 
 describe('the texts API over HTTP', () => {
   let app: NestFastifyApplication;
-  const request = (method: 'GET' | 'HEAD' | 'POST', url: string, payload?: object) =>
-    app.getHttpAdapter().getInstance().inject({ method, url, payload });
+  const request = (method: 'GET' | 'HEAD' | 'POST', url: string, payload?: object, headers?: Record<string, string>) =>
+    app.getHttpAdapter().getInstance().inject({ method, url, payload, headers });
 
   beforeAll(async () => {
     app = await newApp(TestModule, { logger: false });
@@ -58,10 +58,7 @@ describe('the texts API over HTTP', () => {
   });
 
   it('should send the security headers and allow the web origin', async () => {
-    const response = await app
-      .getHttpAdapter()
-      .getInstance()
-      .inject({ method: 'GET', url: '/texts/text-id', headers: { origin: 'https://guessir.kk-forge.com' } });
+    const response = await request('GET', '/texts/text-id', undefined, { origin: 'https://guessir.kk-forge.com' });
 
     expect(response.headers['x-content-type-options']).toBe('nosniff');
     expect(response.headers['access-control-allow-origin']).toBe('https://guessir.kk-forge.com');

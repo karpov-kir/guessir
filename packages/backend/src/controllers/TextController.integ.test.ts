@@ -169,13 +169,16 @@ describe(TextsController, () => {
         Array.isArray(options.where) ? null : { ...text, id: String(options.where?.id) },
       );
 
-      for (let i = 0; i < 1000; i++) {
+      // More texts than the controller caches
+      const textCount = 1000;
+
+      for (let i = 0; i < textCount; i++) {
         await textsController.findById(`id-${i}`);
       }
 
       await textsController.findById('id-0');
 
-      expect(textsRepository.findOne).toBeCalledTimes(1001);
+      expect(textsRepository.findOne).toBeCalledTimes(textCount + 1);
     });
   });
 
