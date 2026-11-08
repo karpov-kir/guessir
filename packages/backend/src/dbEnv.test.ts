@@ -3,7 +3,7 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { getDbSettings } from './dbEnv';
+import { getDbSettings } from './dbEnv.js';
 
 describe(getDbSettings, () => {
   let tempDir: string;

@@ -3,10 +3,10 @@ import { plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { mockRepository } from '../../tests/utils/mockRepository';
-import { CreateTextDtoRequest } from '../dto/CreateTextDtoRequest';
-import { TextEntity } from '../entities/TextEntity';
-import { TextsController as TextController } from './TextController';
+import { mockRepository } from '../../tests/utils/mockRepository.js';
+import { CreateTextDtoRequest } from '../dto/CreateTextDtoRequest.js';
+import { TextEntity } from '../entities/TextEntity.js';
+import { TextsController as TextController } from './TextController.js';
 
 const text: TextEntity = {
   pk: 1,
