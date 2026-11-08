@@ -8,6 +8,7 @@ export default defineConfig({
       include: ["packages/*/src/**/*.ts"],
       exclude: ["**/migrations/**"],
       reporter: ["lcovonly"],
+      thresholds: { lines: 80, branches: 80, functions: 80, statements: 80 },
     },
   },
 });
