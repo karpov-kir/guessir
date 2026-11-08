@@ -33,7 +33,7 @@ export class Deferred<T> implements Promise<T> {
     return this._promise.catch(onrejected);
   }
 
-  public finally(onfinally?: (() => void) | undefined | null): Promise<T> {
+  public finally(onfinally?: (() => void) | null): Promise<T> {
     return this._promise.finally(onfinally);
   }
 

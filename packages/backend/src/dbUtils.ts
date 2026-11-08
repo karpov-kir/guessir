@@ -1,10 +1,11 @@
 /* v8 ignore start */
 
-import { Logger } from '@nestjs/common';
 import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+import { Logger } from '@nestjs/common';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { MigrationFn as UmzugMigrationFn, Umzug } from 'umzug';
-import { fileURLToPath } from 'url';
 
 import { getDbSettings } from './dbEnv.js';
 import { TextEntity } from './entities/TextEntity.js';

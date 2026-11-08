@@ -1,6 +1,9 @@
 {
   "name": "@guessir/backend",
   "version": "1.0.0",
+  "bin": {
+    "guessirBackend": "./guessirBackend.js"
+  },
   "type": "module",
   "scripts": {
     "build": "npm run clean && tsc -b tsconfig.build.json",
@@ -30,8 +33,5 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.6"
-  },
-  "bin": {
-    "guessirBackend": "./guessirBackend.js"
   }
 }

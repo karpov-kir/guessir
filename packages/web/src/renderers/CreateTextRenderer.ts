@@ -304,7 +304,7 @@ export class CreateTextRenderer implements ChildRenderer {
     let changeTextTimeoutId: ReturnType<typeof setTimeout> | undefined;
 
     copyGeneratedUrlButtonElement.addEventListener('click', () => {
-      navigator.clipboard.writeText(this.generatedUrl);
+      void navigator.clipboard.writeText(this.generatedUrl);
       copyGeneratedUrlButtonElement.appendChild(this.copiedAlertElement);
 
       if (changeTextTimeoutId) {

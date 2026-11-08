@@ -1,7 +1,6 @@
 /* v8 ignore start */
 
 import 'reflect-metadata';
-
 import { Logger } from '@nestjs/common';
 
 import { createDbPing } from './dbUtils.js';

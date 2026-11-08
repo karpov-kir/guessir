@@ -2,6 +2,6 @@
 
 import { boot } from './server.js';
 
-boot(process.env.HOST, process.env.PORT ? parseInt(process.env.PORT) : undefined);
+void boot(process.env.HOST, process.env.PORT ? parseInt(process.env.PORT) : undefined);
 
 /* v8 ignore stop */

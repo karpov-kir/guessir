@@ -165,8 +165,8 @@ describe(TextsController, () => {
     });
 
     it('should keep a bounded number of texts and ask the repository again for one it dropped', async () => {
-      vi.spyOn(textsRepository, 'findOne').mockImplementation(async (options) =>
-        Array.isArray(options.where) ? null : { ...text, id: String(options.where?.id) },
+      vi.spyOn(textsRepository, 'findOne').mockImplementation(async ({ where }) =>
+        !Array.isArray(where) && typeof where?.id === 'string' ? { ...text, id: where.id } : null,
       );
 
       // More texts than the controller caches
