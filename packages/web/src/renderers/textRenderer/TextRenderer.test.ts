@@ -58,6 +58,39 @@ describe(TextRenderer, () => {
     expect(shownElements[1].querySelector('.lexeme')?.textContent).toBe('one');
   });
 
+  it('should mark only the words of the last successful guess as just guessed', () => {
+    const getFreshTexts = () =>
+      Array.from(textRenderer.getElement().querySelectorAll('.lexeme-container.fresh')).map(
+        (element) => element.querySelector('.lexeme')?.textContent,
+      );
+
+    textRenderer.showLexemesByWord('one');
+    expect(getFreshTexts()).toEqual(['One', 'one']);
+
+    textRenderer.showLexemesByWord('not-known');
+    expect(getFreshTexts()).toEqual(['One', 'one']);
+
+    textRenderer.showLexemesByWord("she's");
+    expect(getFreshTexts()).toEqual(["she's"]);
+
+    // Repeating a guess opens nothing new, so it counts as a miss and leaves the highlight where it was
+    textRenderer.showLexemesByWord('one');
+    expect(getFreshTexts()).toEqual(["she's"]);
+  });
+
+  it('should tell screen readers what each hint mode shows', () => {
+    const getLabels = () => Array.from(getLexemeElements()).map((element) => element.getAttribute('aria-label'));
+
+    textRenderer.toggleFirstLetters(true);
+    expect(getLabels()[0]).toBe('Hidden word starting with O, 3 letters');
+
+    textRenderer.toggleText(true);
+    expect(getLabels()).toEqual([null, null, null, null]);
+
+    textRenderer.toggleText(false);
+    expect(getLabels()[0]).toBe('Hidden word, 3 letters');
+  });
+
   it('should not count already shown lexemes as shown', () => {
     const lexemeElements = getLexemeElements();
 

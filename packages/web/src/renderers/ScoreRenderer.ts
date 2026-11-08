@@ -27,20 +27,42 @@ export class ScoreRenderer implements ChildRenderer {
     const { currentScoreElement } = this.getElements();
 
     currentScoreElement.textContent = this.score.toString();
+    this.renderProgress();
   }
 
   private initElement() {
     this.containerElement.innerHTML = `
-      Score:&nbsp;
-      <div id="current-score">${this.score}</div>
-      /
-      <div id="total-score">${this.wordLikeCount}</div>
+      <div id="score-badge">
+        <div id="current-score">${this.score}</div>
+        <div id="score-total"><span aria-hidden="true">/ </span><span class="visually-hidden">of </span><span id="total-score">${this.wordLikeCount}</span></div>
+      </div>
+      <div id="score-details">
+        <div id="score-label" aria-live="polite"><span id="score-percent"></span> found</div>
+        <div id="score-progress" role="progressbar" aria-label="Words found" aria-valuemin="0" aria-valuemax="${this.wordLikeCount}">
+          <div id="score-progress-bar"></div>
+        </div>
+      </div>
     `;
+
+    this.renderProgress();
+  }
+
+  private renderProgress() {
+    const { percentElement, progressElement, progressBarElement } = this.getElements();
+    // Rounded down, so 100% appears only once every word is found
+    const percent = this.wordLikeCount ? Math.floor((this.score / this.wordLikeCount) * 100) : 0;
+
+    percentElement.textContent = `${percent}%`;
+    progressElement.setAttribute('aria-valuenow', this.score.toString());
+    progressBarElement.style.width = `${percent}%`;
   }
 
   private getElements() {
     const currentScoreElement = this.containerElement.querySelector('#current-score') as HTMLElement;
+    const percentElement = this.containerElement.querySelector('#score-percent') as HTMLElement;
+    const progressElement = this.containerElement.querySelector('#score-progress') as HTMLElement;
+    const progressBarElement = this.containerElement.querySelector('#score-progress-bar') as HTMLElement;
 
-    return { currentScoreElement };
+    return { currentScoreElement, percentElement, progressElement, progressBarElement };
   }
 }

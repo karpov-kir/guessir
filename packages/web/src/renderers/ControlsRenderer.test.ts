@@ -245,6 +245,19 @@ describe(ControlsRenderer, () => {
     expect(guessInputElement.classList.contains('shake-and-error')).toBe(false);
   });
 
+  it('should announce a wrong guess and clear the announcement after a right one', () => {
+    const controlsRenderer = new ControlsRenderer();
+    const statusElement = controlsRenderer.getElement().querySelector('[role="status"]') as HTMLElement;
+
+    expect(statusElement.textContent).toBe('');
+
+    controlsRenderer.shakeAndError();
+    expect(statusElement.textContent).toBe('No new words for this guess');
+
+    controlsRenderer.clearAndFocusGuessInput();
+    expect(statusElement.textContent).toBe('');
+  });
+
   it('should clear and focus the input', () => {
     const controlsRenderer = new ControlsRenderer();
     const guessInputElement = controlsRenderer.getElement().querySelector('#guess-input') as HTMLInputElement;
