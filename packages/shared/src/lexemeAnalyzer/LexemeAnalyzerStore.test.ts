@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { LexemeAnalyzerStore } from './LexemeAnalyzerStore';
-import { LexemeAnalyzerUtils } from './lexemeAnalyzerUtils';
-import { NormalizedPrimitiveLexemeNominal, PrimitiveLexemeNominal } from './types';
+import { LexemeAnalyzerStore } from './LexemeAnalyzerStore.js';
+import { LexemeAnalyzerUtils } from './lexemeAnalyzerUtils.js';
+import { NormalizedPrimitiveLexemeNominal, PrimitiveLexemeNominal } from './types.js';
 
 const lexeme = LexemeAnalyzerUtils.createLexeme(
   'One' as PrimitiveLexemeNominal,

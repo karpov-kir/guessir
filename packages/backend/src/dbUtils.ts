@@ -6,8 +6,8 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { MigrationFn as UmzugMigrationFn, Umzug } from 'umzug';
 import { fileURLToPath } from 'url';
 
-import { getDbSettings } from './dbEnv';
-import { TextEntity } from './entities/TextEntity';
+import { getDbSettings } from './dbEnv.js';
+import { TextEntity } from './entities/TextEntity.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

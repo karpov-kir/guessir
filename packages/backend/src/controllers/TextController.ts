@@ -1,6 +1,6 @@
-import { CreateTextDtoResponse } from '@guessir/shared/dist/CreateTextDtoResponse';
-import { TextGame } from '@guessir/shared/dist/game/TextGame';
-import { RevealedWord, RevealedWords, TextSkeleton } from '@guessir/shared/dist/game/types';
+import { CreateTextDtoResponse } from '@guessir/shared/dist/CreateTextDtoResponse.js';
+import { TextGame } from '@guessir/shared/dist/game/TextGame.js';
+import { RevealedWord, RevealedWords, TextSkeleton } from '@guessir/shared/dist/game/types.js';
 import {
   Body,
   Controller,
@@ -16,11 +16,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { nanoid } from 'nanoid';
 import { Repository } from 'typeorm';
 
-import { CreateTextDtoRequest } from '../dto/CreateTextDtoRequest';
-import { GuessDtoRequest } from '../dto/GuessDtoRequest';
-import { RevealDtoRequest } from '../dto/RevealDtoRequest';
-import { TextEntity } from '../entities/TextEntity';
-import { LruCache } from '../LruCache';
+import { CreateTextDtoRequest } from '../dto/CreateTextDtoRequest.js';
+import { GuessDtoRequest } from '../dto/GuessDtoRequest.js';
+import { RevealDtoRequest } from '../dto/RevealDtoRequest.js';
+import { TextEntity } from '../entities/TextEntity.js';
+import { LruCache } from '../LruCache.js';
 
 type PlayedText = { text: TextEntity; textGame: TextGame };
 

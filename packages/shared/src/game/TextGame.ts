@@ -1,7 +1,7 @@
-import { LexemeAnalyzer } from '../lexemeAnalyzer/LexemeAnalyzer';
-import { LexemeNormalizer } from '../lexemeAnalyzer/LexemeNormalizer';
-import { LexemeAnalysis } from '../lexemeAnalyzer/types';
-import { RevealedWord, SkeletonLexeme } from './types';
+import { LexemeAnalyzer } from '../lexemeAnalyzer/LexemeAnalyzer.js';
+import { LexemeNormalizer } from '../lexemeAnalyzer/LexemeNormalizer.js';
+import { LexemeAnalysis } from '../lexemeAnalyzer/types.js';
+import { RevealedWord, SkeletonLexeme } from './types.js';
 
 /** Answers the moves of a word guessing game over one text, giving out only the words a move opens. */
 export class TextGame {

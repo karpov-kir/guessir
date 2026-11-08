@@ -2,7 +2,7 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { describe, expect, it } from 'vitest';
 
-import { GuessDtoRequest } from './GuessDtoRequest';
+import { GuessDtoRequest } from './GuessDtoRequest.js';
 
 describe(GuessDtoRequest, () => {
   it('should accept a word', async () => {

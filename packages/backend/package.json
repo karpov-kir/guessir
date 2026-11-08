@@ -34,8 +34,7 @@
     "lerna": "^10.1.1"
   },
   "files": [
-    "./dist",
-    "./loaders/*.mjs"
+    "./dist"
   ],
   "bin": {
     "guessirBackend": "./guessirBackend.js"
