@@ -3,9 +3,9 @@
 import { Logger, Module, OnApplicationBootstrap } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { TextsController } from './controllers/TextController';
-import { applyDbMigrations, getTypeOrmConfig } from './dbUtils';
-import { TextEntity } from './entities/TextEntity';
+import { TextsController } from './controllers/TextController.js';
+import { applyDbMigrations, getTypeOrmConfig } from './dbUtils.js';
+import { TextEntity } from './entities/TextEntity.js';
 
 @Module({
   imports: [TypeOrmModule.forRoot(getTypeOrmConfig()), TypeOrmModule.forFeature([TextEntity])],

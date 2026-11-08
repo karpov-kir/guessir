@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { waitForDb, watchDb } from './dbWatch';
+import { waitForDb, watchDb } from './dbWatch.js';
 
 const down = new Error('getaddrinfo ENOTFOUND guessir_database');
 

@@ -6,7 +6,7 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 import { QueryFailedError } from 'typeorm';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { QueryErrorFilter } from './QueryErrorFilter';
+import { QueryErrorFilter } from './QueryErrorFilter.js';
 
 const secretText = 'the whole hidden text of a game';
 const insertQuery = 'INSERT INTO "texts"("title", "text") VALUES ($1, $2)';

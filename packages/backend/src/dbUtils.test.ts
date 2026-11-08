@@ -3,8 +3,8 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { getTypeOrmConfig } from './dbUtils';
-import { ParameterFreeLogger } from './ParameterFreeLogger';
+import { getTypeOrmConfig } from './dbUtils.js';
+import { ParameterFreeLogger } from './ParameterFreeLogger.js';
 
 describe(getTypeOrmConfig, () => {
   let tempDir: string;

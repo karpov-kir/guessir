@@ -1,5 +1,5 @@
-import { createTextLimits } from '@guessir/shared/dist/CreateTextDto';
-import { Text } from '@guessir/shared/dist/Text';
+import { createTextLimits } from '@guessir/shared/dist/CreateTextDto.js';
+import { Text } from '@guessir/shared/dist/Text.js';
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('texts')

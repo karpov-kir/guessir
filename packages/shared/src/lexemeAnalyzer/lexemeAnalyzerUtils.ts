@@ -1,5 +1,5 @@
-import { LexemeNormalizer } from './LexemeNormalizer';
-import { BaseLexeme, Lexeme, NormalizedPrimitiveLexemeNominal, PrimitiveLexemeNominal } from './types';
+import { LexemeNormalizer } from './LexemeNormalizer.js';
+import { BaseLexeme, Lexeme, NormalizedPrimitiveLexemeNominal, PrimitiveLexemeNominal } from './types.js';
 
 interface Buffer {
   primitiveLexeme: PrimitiveLexemeNominal;

@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import { Logger as TypeOrmLogger } from 'typeorm';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ParameterFreeLogger } from './ParameterFreeLogger';
+import { ParameterFreeLogger } from './ParameterFreeLogger.js';
 
 const secretText = 'the whole hidden text of a game';
 const insertQuery = 'INSERT INTO texts VALUES ($1)';

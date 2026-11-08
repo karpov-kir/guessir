@@ -5,7 +5,7 @@ import {
   LexemeType,
   NormalizedPrimitiveLexemeNominal,
   PrimitiveLexemeNominal,
-} from './types';
+} from './types.js';
 
 export class LexemeNormalizer {
   private static readonly CHARACTERS_TO_NORMALIZED_CHARACTERS = new Map<string, NormalizedPrimitiveLexemeNominal>([

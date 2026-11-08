@@ -1,6 +1,6 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 
-import { QueryErrorFilter } from './QueryErrorFilter';
+import { QueryErrorFilter } from './QueryErrorFilter.js';
 
 /**
  * Registers the app-wide validation pipe and the failed-query filter. It lives apart from `boot`, which tests do not

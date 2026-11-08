@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { TextGame } from './TextGame';
+import { TextGame } from './TextGame.js';
 
 const textGame = new TextGame("One, she's\none!");
 

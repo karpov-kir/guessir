@@ -1,5 +1,5 @@
-import { LexemeNormalizer } from './LexemeNormalizer';
-import { GroupWordLikeNominal, Lexeme, LexemeAnalysis } from './types';
+import { LexemeNormalizer } from './LexemeNormalizer.js';
+import { GroupWordLikeNominal, Lexeme, LexemeAnalysis } from './types.js';
 
 export class LexemeAnalyzerStore implements LexemeAnalysis {
   #lexemes: Map<number, Lexeme> = new Map<number, Lexeme>();

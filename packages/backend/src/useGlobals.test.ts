@@ -1,8 +1,8 @@
 import { ValidationPipe } from '@nestjs/common';
 import { describe, expect, it, vi } from 'vitest';
 
-import { QueryErrorFilter } from './QueryErrorFilter';
-import { useGlobals } from './useGlobals';
+import { QueryErrorFilter } from './QueryErrorFilter.js';
+import { useGlobals } from './useGlobals.js';
 
 describe(useGlobals, () => {
   it('should register the validation pipe and the filter that keeps query parameters out of the logs', () => {

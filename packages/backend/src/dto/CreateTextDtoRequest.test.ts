@@ -2,7 +2,7 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { describe, expect, it } from 'vitest';
 
-import { CreateTextDtoRequest } from './CreateTextDtoRequest';
+import { CreateTextDtoRequest } from './CreateTextDtoRequest.js';
 
 describe(CreateTextDtoRequest, () => {
   it('should throw correct validation errors', async () => {

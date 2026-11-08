@@ -26,7 +26,6 @@ FROM base AS runner
 COPY --from=deps /app .
 COPY --from=build /app/packages/shared/dist packages/shared/dist
 COPY --from=build /app/packages/backend/dist packages/backend/dist
-COPY packages/backend/loaders/extensionless.mjs packages/backend/loaders/
 
 EXPOSE 3020
 

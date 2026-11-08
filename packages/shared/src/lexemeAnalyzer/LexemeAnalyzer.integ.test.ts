@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { LexemeAnalyzer } from './LexemeAnalyzer';
+import { LexemeAnalyzer } from './LexemeAnalyzer.js';
 
 describe(LexemeAnalyzer, () => {
   // TODO make tests more granular.

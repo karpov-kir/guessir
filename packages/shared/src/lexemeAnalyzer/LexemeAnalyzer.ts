@@ -1,7 +1,13 @@
-import { LexemeAnalyzerStore } from './LexemeAnalyzerStore';
-import { LexemeAnalyzerUtils } from './lexemeAnalyzerUtils';
-import { LexemeNormalizer } from './LexemeNormalizer';
-import { Lexeme, LexemeAnalysis, LexemeType, NormalizedPrimitiveLexemeNominal, PrimitiveLexemeNominal } from './types';
+import { LexemeAnalyzerStore } from './LexemeAnalyzerStore.js';
+import { LexemeAnalyzerUtils } from './lexemeAnalyzerUtils.js';
+import { LexemeNormalizer } from './LexemeNormalizer.js';
+import {
+  Lexeme,
+  LexemeAnalysis,
+  LexemeType,
+  NormalizedPrimitiveLexemeNominal,
+  PrimitiveLexemeNominal,
+} from './types.js';
 
 export class LexemeAnalyzer {
   private static readonly PUNCTUATION_CHARACTERS = [',', '.', '!', '?', ';'];
