@@ -1,11 +1,11 @@
-import { RevealedWord } from '@guessir/shared/dist/game/types';
+import { RevealedWord } from "@guessir/shared/dist/game/types";
 
-import { Game } from './game/Game';
-import { ControlsRenderer, GuessEvent } from './renderers/ControlsRenderer';
-import { CreateTextRenderer } from './renderers/CreateTextRenderer';
-import { ScoreRenderer } from './renderers/ScoreRenderer';
-import { TextRenderer } from './renderers/textRenderer/TextRenderer';
-import { WordHint } from './renderers/textRenderer/WordRenderer';
+import { Game } from "./game/Game";
+import { ControlsRenderer, GuessEvent } from "./renderers/ControlsRenderer";
+import { CreateTextRenderer } from "./renderers/CreateTextRenderer";
+import { ScoreRenderer } from "./renderers/ScoreRenderer";
+import { TextRenderer } from "./renderers/textRenderer/TextRenderer";
+import { WordHint } from "./renderers/textRenderer/WordRenderer";
 
 export type RenderControllerOptions = {
   game: Game;
@@ -33,8 +33,8 @@ export class RenderController {
     const { skeleton } = options.game;
 
     this.game = options.game;
-    this.guessirContainer = document.createElement('main');
-    this.guessirContainer.id = 'guessir';
+    this.guessirContainer = document.createElement("main");
+    this.guessirContainer.id = "guessir";
     this.textRenderer =
       options.textRenderer ||
       new TextRenderer({
@@ -62,7 +62,9 @@ export class RenderController {
     this.textRenderer.revealRequestEvent.subscribe((index) => void this.handleRevealRequest(index));
 
     this.controlsRenderer.guessEvent.subscribe((guessEvent) => void this.handleGuess(guessEvent));
-    this.controlsRenderer.showTextEvent.subscribe((isTextShown) => void this.handleShowText(isTextShown));
+    this.controlsRenderer.showTextEvent.subscribe(
+      (isTextShown) => void this.handleShowText(isTextShown),
+    );
     this.controlsRenderer.showFirstLettersEvent.subscribe(
       (isFirstLettersShown) => void this.handleShowFirstLetters(isFirstLettersShown),
     );
@@ -70,12 +72,12 @@ export class RenderController {
     // The score and the controls stay together and stick to the screen edge, so a long text never scrolls them away.
     // They share a wrapper with the text alone, so they stop sticking at the text end and leave the create-text form
     // below them uncovered.
-    const gameElement = document.createElement('div');
-    const hudElement = document.createElement('section');
+    const gameElement = document.createElement("div");
+    const hudElement = document.createElement("section");
 
-    gameElement.id = 'game';
-    hudElement.id = 'hud';
-    hudElement.setAttribute('aria-label', 'Game controls');
+    gameElement.id = "game";
+    hudElement.id = "hud";
+    hudElement.setAttribute("aria-label", "Game controls");
     hudElement.appendChild(this.scoreRenderer.getElement());
     hudElement.appendChild(this.controlsRenderer.getElement());
 
@@ -91,8 +93,8 @@ export class RenderController {
     try {
       revealedWord = await this.game.reveal(index);
     } catch (error) {
-      console.error('Failed to reveal the word', { index }, error);
-      this.controlsRenderer.announce('Could not open this word');
+      console.error("Failed to reveal the word", { index }, error);
+      this.controlsRenderer.announce("Could not open this word");
       return;
     }
 
@@ -107,9 +109,9 @@ export class RenderController {
     try {
       guessedWords = await this.game.guess(word);
     } catch (error) {
-      console.error('Failed to check the guess', { word }, error);
+      console.error("Failed to check the guess", { word }, error);
       this.controlsRenderer.returnGuess(word);
-      this.controlsRenderer.announce('Could not check this guess');
+      this.controlsRenderer.announce("Could not check this guess");
       return;
     }
 
@@ -131,7 +133,7 @@ export class RenderController {
       isShown: isTextShown,
       load: () => this.loadWords(),
       uncheck: () => this.controlsRenderer.uncheckText(),
-      failureStatus: 'Could not load the text',
+      failureStatus: "Could not load the text",
     });
   }
 
@@ -141,7 +143,7 @@ export class RenderController {
       isShown: isFirstLettersShown,
       load: () => this.loadFirstLetters(),
       uncheck: () => this.controlsRenderer.uncheckFirstLetters(),
-      failureStatus: 'Could not load first letters',
+      failureStatus: "Could not load first letters",
     });
   }
 
@@ -167,7 +169,7 @@ export class RenderController {
     try {
       await options.load();
     } catch (error) {
-      console.error('Failed to load the hint', { hint: options.hint }, error);
+      console.error("Failed to load the hint", { hint: options.hint }, error);
 
       if (this.wantedHint === options.hint) {
         this.wantedHint = WordHint.None;

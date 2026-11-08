@@ -1,19 +1,13 @@
 {
-  "extends": "../../tsconfig.build.json",
+  // The package options come from ./tsconfig.json, the build excludes from the root
+  "extends": ["../../tsconfig.build.json", "./tsconfig.json"],
   "compilerOptions": {
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
     "rootDir": "./src",
-    "outDir": "./dist",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
-    "skipLibCheck": true
+    "outDir": "./dist"
   },
   "references": [
     {
       "path": "../shared/tsconfig.build.json"
     }
-  ],
+  ]
 }

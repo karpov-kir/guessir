@@ -1,17 +1,22 @@
-import { CreateTextDto } from '@guessir/shared/dist/CreateTextDto.js';
-import { IsBoolean, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
+import { CreateTextDto, createTextLimits } from "@guessir/shared/dist/CreateTextDto.js";
+import { IsBoolean, IsNotEmpty, IsOptional } from "class-validator";
+
+import { HasNoNullCharacter, MaxCodePoints } from "./dbTextValidators.js";
 
 export class CreateTextDtoRequest implements CreateTextDto {
   @IsNotEmpty()
-  @MaxLength(500)
+  @MaxCodePoints(createTextLimits.title)
+  @HasNoNullCharacter()
   title!: string;
 
-  @MaxLength(4000)
+  @MaxCodePoints(createTextLimits.description)
+  @HasNoNullCharacter()
   @IsOptional()
   description!: string;
 
   @IsNotEmpty()
-  @MaxLength(4000)
+  @MaxCodePoints(createTextLimits.text)
+  @HasNoNullCharacter()
   text!: string;
 
   @IsBoolean()

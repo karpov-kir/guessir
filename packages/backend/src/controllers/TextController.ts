@@ -1,6 +1,6 @@
-import { CreateTextDtoResponse } from '@guessir/shared/dist/CreateTextDtoResponse.js';
-import { TextGame } from '@guessir/shared/dist/game/TextGame.js';
-import { RevealedWord, RevealedWords, TextSkeleton } from '@guessir/shared/dist/game/types.js';
+import { CreateTextDtoResponse } from "@guessir/shared/dist/CreateTextDtoResponse.js";
+import { TextGame } from "@guessir/shared/dist/game/TextGame.js";
+import { RevealedWord, RevealedWords, TextSkeleton } from "@guessir/shared/dist/game/types.js";
 import {
   Body,
   Controller,
@@ -11,16 +11,16 @@ import {
   NotFoundException,
   Param,
   Post,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { nanoid } from 'nanoid';
-import { Repository } from 'typeorm';
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { nanoid } from "nanoid";
+import { Repository } from "typeorm";
 
-import { CreateTextDtoRequest } from '../dto/CreateTextDtoRequest.js';
-import { GuessDtoRequest } from '../dto/GuessDtoRequest.js';
-import { RevealDtoRequest } from '../dto/RevealDtoRequest.js';
-import { TextEntity } from '../entities/TextEntity.js';
-import { LruCache } from '../LruCache.js';
+import { CreateTextDtoRequest } from "../dto/CreateTextDtoRequest.js";
+import { GuessDtoRequest } from "../dto/GuessDtoRequest.js";
+import { RevealDtoRequest } from "../dto/RevealDtoRequest.js";
+import { TextEntity } from "../entities/TextEntity.js";
+import { LruCache } from "../LruCache.js";
 
 type PlayedText = { text: TextEntity; textGame: TextGame };
 
@@ -30,7 +30,7 @@ const cachedTextCount = 200;
  * Serves each text as a game: the browser gets the text skeleton and asks for each word that a move opens.
  * The text stays on the server, so a player cannot read the hidden words in the browser.
  */
-@Controller('texts')
+@Controller("texts")
 export class TextsController {
   /**
    * Keeps the analysed game of recently played texts, so a move does not reload and re-analyse its text.
@@ -43,8 +43,8 @@ export class TextsController {
     private readonly textsRepository: Repository<TextEntity>,
   ) {}
 
-  @Get('/:id')
-  async findById(@Param('id') id: string): Promise<TextSkeleton> {
+  @Get("/:id")
+  async findById(@Param("id") id: string): Promise<TextSkeleton> {
     const { text, textGame } = await this.findPlayedText(id);
 
     return {
@@ -57,17 +57,20 @@ export class TextsController {
     };
   }
 
-  @Post('/:id/guesses')
+  @Post("/:id/guesses")
   @HttpCode(HttpStatus.OK)
-  async guess(@Param('id') id: string, @Body() { word }: GuessDtoRequest): Promise<RevealedWords> {
+  async guess(@Param("id") id: string, @Body() { word }: GuessDtoRequest): Promise<RevealedWords> {
     const { textGame } = await this.findPlayedText(id);
 
     return { words: textGame.guess(word) };
   }
 
-  @Post('/:id/reveals')
+  @Post("/:id/reveals")
   @HttpCode(HttpStatus.OK)
-  async reveal(@Param('id') id: string, @Body() { index }: RevealDtoRequest): Promise<RevealedWord> {
+  async reveal(
+    @Param("id") id: string,
+    @Body() { index }: RevealDtoRequest,
+  ): Promise<RevealedWord> {
     const { textGame } = await this.findPlayedText(id);
     const revealedWord = textGame.reveal(index);
 
@@ -78,8 +81,8 @@ export class TextsController {
     return revealedWord;
   }
 
-  @Get('/:id/first-letters')
-  async firstLetters(@Param('id') id: string): Promise<RevealedWords> {
+  @Get("/:id/first-letters")
+  async firstLetters(@Param("id") id: string): Promise<RevealedWords> {
     const { text, textGame } = await this.findPlayedText(id);
 
     if (!text.allowShowingFirstLetters) {
@@ -89,8 +92,8 @@ export class TextsController {
     return { words: textGame.firstLetters() };
   }
 
-  @Get('/:id/words')
-  async words(@Param('id') id: string): Promise<RevealedWords> {
+  @Get("/:id/words")
+  async words(@Param("id") id: string): Promise<RevealedWords> {
     const { text, textGame } = await this.findPlayedText(id);
 
     if (!text.allowShowingText) {

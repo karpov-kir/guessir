@@ -1,8 +1,8 @@
-import { TextSkeleton } from '@guessir/shared/dist/game/types';
+import { TextSkeleton } from "@guessir/shared/dist/game/types";
 
 export function newTextSkeleton(): TextSkeleton {
   return {
-    title: 'Title',
+    title: "Title",
     allowShowingFirstLetters: true,
     allowShowingText: true,
     wordCount: 1,

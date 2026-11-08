@@ -5,54 +5,61 @@ import {
   LexemeType,
   NormalizedPrimitiveLexemeNominal,
   PrimitiveLexemeNominal,
-} from './types.js';
+} from "./types.js";
 
 export class LexemeNormalizer {
-  private static readonly CHARACTERS_TO_NORMALIZED_CHARACTERS = new Map<string, NormalizedPrimitiveLexemeNominal>([
-    ['—', '-'],
-    ['’', "'"],
-    ['`', "'"],
+  private static readonly CHARACTERS_TO_NORMALIZED_CHARACTERS = new Map<
+    string,
+    NormalizedPrimitiveLexemeNominal
+  >([
+    ["—", "-"],
+    ["’", "'"],
+    ["`", "'"],
   ] as Array<[string, NormalizedPrimitiveLexemeNominal]>);
   private static readonly NORMALIZED_WORDS_TO_NORMALIZED_WORDS = new Map<
     NormalizedPrimitiveLexemeNominal,
     NormalizedPrimitiveLexemeNominal
-  >([['i', 'I']] as Array<[NormalizedPrimitiveLexemeNominal, NormalizedPrimitiveLexemeNominal]>);
-  private static readonly NORMALIZED_CONTRACTION_CHARACTERS = ["'"] as NormalizedPrimitiveLexemeNominal[];
-  private static readonly NORMALIZED_WORD_SEPARATION_CHARACTERS = ['-'] as NormalizedPrimitiveLexemeNominal[];
+  >([["i", "I"]] as Array<[NormalizedPrimitiveLexemeNominal, NormalizedPrimitiveLexemeNominal]>);
+  private static readonly NORMALIZED_CONTRACTION_CHARACTERS = [
+    "'",
+  ] as NormalizedPrimitiveLexemeNominal[];
+  private static readonly NORMALIZED_WORD_SEPARATION_CHARACTERS = [
+    "-",
+  ] as NormalizedPrimitiveLexemeNominal[];
   private static readonly LETTER_RE = /^[A-Za-z]$/;
 
   private static readonly NORMALIZED_CONTRACTION_TO_NORMALIZED_NORMAL = new Map<string, string>([
-    ["don't", 'do not'],
-    ["doesn't", 'does not'],
-    ["didn't", 'did not'],
+    ["don't", "do not"],
+    ["doesn't", "does not"],
+    ["didn't", "did not"],
 
-    ["haven't", 'have not'],
-    ["hadn't", 'had not'],
+    ["haven't", "have not"],
+    ["hadn't", "had not"],
 
-    ["shouldn't", 'should'],
-    ["wouldn't", 'would not'],
-    ["couldn't", 'could not'],
-    ["mustn't", 'must not'],
-    ["can't", 'cannot'],
-    ["needn't", 'need not'],
+    ["shouldn't", "should"],
+    ["wouldn't", "would not"],
+    ["couldn't", "could not"],
+    ["mustn't", "must not"],
+    ["can't", "cannot"],
+    ["needn't", "need not"],
 
-    ["won't", 'will not'],
+    ["won't", "will not"],
 
-    ["I'm", 'I am'],
-    ["I've", 'I have'],
-    ["I'll", 'I will'],
+    ["I'm", "I am"],
+    ["I've", "I have"],
+    ["I'll", "I will"],
 
-    ["she'll", 'she will'],
+    ["she'll", "she will"],
 
-    ["he'll", 'he will'],
+    ["he'll", "he will"],
 
-    ["we're", 'we are'],
-    ["we've", 'we have'],
-    ["we'll", 'we will'],
+    ["we're", "we are"],
+    ["we've", "we have"],
+    ["we'll", "we will"],
 
-    ["they're", 'they are'],
-    ["they've", 'they have'],
-    ["they'll", 'they will'],
+    ["they're", "they are"],
+    ["they've", "they have"],
+    ["they'll", "they will"],
 
     // I'd, She'd, He'd, He's, She's covered in `getGroupingWords`, read more there.
   ]);
@@ -62,7 +69,10 @@ export class LexemeNormalizer {
     originalLexeme: PrimitiveLexemeNominal | NormalizedPrimitiveLexemeNominal,
     newNormalizedLexeme: NormalizedPrimitiveLexemeNominal,
   ) {
-    if (newNormalizedLexeme[0] !== originalLexeme[0] && newNormalizedLexeme[0].toUpperCase() === originalLexeme[0]) {
+    if (
+      !originalLexeme.startsWith(newNormalizedLexeme[0]) &&
+      originalLexeme.startsWith(newNormalizedLexeme[0].toUpperCase())
+    ) {
       newNormalizedLexeme = (newNormalizedLexeme[0].toUpperCase() +
         newNormalizedLexeme.substring(1)) as NormalizedPrimitiveLexemeNominal;
     }
@@ -75,7 +85,8 @@ export class LexemeNormalizer {
     normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal,
   ): NormalizedPrimitiveLexemeNominal {
     const converted =
-      LexemeNormalizer.NORMALIZED_WORDS_TO_NORMALIZED_WORDS.get(normalizedPrimitiveLexeme) || normalizedPrimitiveLexeme;
+      LexemeNormalizer.NORMALIZED_WORDS_TO_NORMALIZED_WORDS.get(normalizedPrimitiveLexeme) ||
+      normalizedPrimitiveLexeme;
 
     return this.syncCase(originalPrimitiveLexeme, converted);
   }
@@ -100,7 +111,9 @@ export class LexemeNormalizer {
     return lowerCasedCharacter.length === 1 ? lowerCasedCharacter : character;
   }
 
-  public static uncontractPrimitiveLexeme(normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal) {
+  public static uncontractPrimitiveLexeme(
+    normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal,
+  ) {
     const converted = LexemeNormalizer.NORMALIZED_CONTRACTION_TO_NORMALIZED_NORMAL.get(
       normalizedPrimitiveLexeme.toLowerCase(),
     ) as NormalizedPrimitiveLexemeNominal;
@@ -114,7 +127,7 @@ export class LexemeNormalizer {
 
   public static isWordCharacter(normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal) {
     if (normalizedPrimitiveLexeme.length !== 1) {
-      throw new Error('Can be used only for characters');
+      throw new Error("Can be used only for characters");
     }
 
     return (
@@ -127,7 +140,9 @@ export class LexemeNormalizer {
     return LexemeNormalizer.LETTER_RE.test(normalizedPrimitiveLexeme);
   }
 
-  public static isWordHelpingCharacter(normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal) {
+  public static isWordHelpingCharacter(
+    normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal,
+  ) {
     return (
       LexemeNormalizer.NORMALIZED_CONTRACTION_CHARACTERS.includes(normalizedPrimitiveLexeme) ||
       LexemeNormalizer.NORMALIZED_WORD_SEPARATION_CHARACTERS.includes(normalizedPrimitiveLexeme)
@@ -151,7 +166,9 @@ export class LexemeNormalizer {
   }
 
   /** Returns the lower-cased word, preceded by its base word when it ends in `'s` or `'d`. */
-  public static getGroupingWords(normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal): GroupWordLikeNominal[] {
+  public static getGroupingWords(
+    normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal,
+  ): GroupWordLikeNominal[] {
     const length = normalizedPrimitiveLexeme.length;
     // Keep as lower-cased for easy access
     const groupWordLikeNominal = normalizedPrimitiveLexeme.toLowerCase() as GroupWordLikeNominal;
@@ -160,7 +177,7 @@ export class LexemeNormalizer {
     // The check skips a bare `'s`, which has no base word.
     if (
       length > 2 &&
-      ['s', 'd'].includes(groupWordLikeNominal[length - 1]) &&
+      ["s", "d"].includes(groupWordLikeNominal[length - 1]) &&
       groupWordLikeNominal[length - 2] === "'"
     ) {
       return [groupWordLikeNominal.slice(0, -2) as GroupWordLikeNominal, groupWordLikeNominal];

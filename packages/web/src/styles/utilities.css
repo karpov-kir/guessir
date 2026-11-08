@@ -1,0 +1,41 @@
+/* Important, so hiding beats a component's own display set by id, such as the flex of #generated-url-container */
+.hide {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+.shake-and-error {
+  animation: shake 0.3s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Shortened rather than removed, so animationend still fires and clears the class */
+  .shake-and-error {
+    animation-duration: 0.01s;
+  }
+}

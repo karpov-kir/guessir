@@ -7,15 +7,15 @@ export interface HttpClient {
 export class FetchHttpClient implements HttpClient {
   async post(url: string, payload: unknown): Promise<unknown> {
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(payload),
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
 
     if (!response.ok) {
-      throw new Error('Request failed');
+      throw new Error("Request failed");
     }
 
     return response.json();
@@ -23,11 +23,11 @@ export class FetchHttpClient implements HttpClient {
 
   async get(url: string): Promise<unknown> {
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
     });
 
     if (!response.ok) {
-      throw new Error('Request failed');
+      throw new Error("Request failed");
     }
 
     return response.json();
