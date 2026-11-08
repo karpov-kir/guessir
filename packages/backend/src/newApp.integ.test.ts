@@ -1,8 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { QueryFailedError, Repository } from 'typeorm';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { mockRepository } from '../tests/utils/mockRepository.js';
 import { TextsController } from './controllers/TextController.js';
@@ -40,6 +40,10 @@ describe('the texts API over HTTP', () => {
 
   afterAll(() => app.close());
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   beforeEach(() => {
     vi.spyOn(textsRepository, 'findOne').mockResolvedValue(text);
     vi.spyOn(textsRepository, 'save').mockResolvedValue(text);
@@ -62,6 +66,26 @@ describe('the texts API over HTTP', () => {
 
     expect(response.headers['x-content-type-options']).toBe('nosniff');
     expect(response.headers['access-control-allow-origin']).toBe('https://guessir.kk-forge.com');
+  });
+
+  it('should answer and log a failed query without the text it carried', async () => {
+    const errorLog = vi.spyOn(Logger.prototype, 'error');
+
+    vi.spyOn(textsRepository, 'save').mockRejectedValue(
+      new QueryFailedError('INSERT INTO "texts"', ['One two'], new Error('value too long')),
+    );
+
+    const response = await request('POST', '/texts', {
+      title: 'Title',
+      text: 'One two',
+      allowShowingFirstLetters: true,
+      allowShowingText: true,
+    });
+
+    expect(response.statusCode).toBe(500);
+    expect(response.json()).toEqual({ statusCode: 500, message: 'Internal server error' });
+    expect(errorLog).toBeCalled();
+    expect(JSON.stringify(errorLog.mock.calls)).not.toContain('One two');
   });
 
   it('should not list texts', async () => {
