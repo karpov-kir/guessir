@@ -12,7 +12,11 @@ export class QueryErrorFilter implements ExceptionFilter<QueryFailedError> {
   private static readonly logger = new Logger("ExceptionsHandler");
 
   catch(error: QueryFailedError, host: ArgumentsHost) {
-    const code = "code" in error.driverError ? String(error.driverError.code) : undefined;
+    // pg reports the SQLSTATE as a string; other drivers may give no code
+    const code =
+      "code" in error.driverError && typeof error.driverError.code === "string"
+        ? error.driverError.code
+        : undefined;
 
     QueryErrorFilter.logger.error(
       `Query failed: ${error.name}: ${error.message}; ${error.query}; code ${code}`,

@@ -70,8 +70,8 @@ export class LexemeNormalizer {
     newNormalizedLexeme: NormalizedPrimitiveLexemeNominal,
   ) {
     if (
-      newNormalizedLexeme[0] !== originalLexeme[0] &&
-      newNormalizedLexeme[0].toUpperCase() === originalLexeme[0]
+      !originalLexeme.startsWith(newNormalizedLexeme[0]) &&
+      originalLexeme.startsWith(newNormalizedLexeme[0].toUpperCase())
     ) {
       newNormalizedLexeme = (newNormalizedLexeme[0].toUpperCase() +
         newNormalizedLexeme.substring(1)) as NormalizedPrimitiveLexemeNominal;
