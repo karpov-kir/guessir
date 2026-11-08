@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 
 import { getDbSettings } from './dbEnv.js';
 import { TextEntity } from './entities/TextEntity.js';
+import { ParameterFreeLogger } from './ParameterFreeLogger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -31,7 +32,7 @@ export const getTypeOrmConfig = (): DataSourceOptions => ({
   ...getDbSettings(),
   // Handled manually using Umzug
   synchronize: false,
-  logging: true,
+  logger: new ParameterFreeLogger(),
   entities,
   subscribers: [],
   migrations: [],
