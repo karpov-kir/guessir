@@ -4,6 +4,8 @@ tsconfig.build.tsbuildinfo
 dist
 node_modules
 coverage
+# Vitest writes its run artifacts here
+.vitest
 
 *.orig
 *.DS_Store
