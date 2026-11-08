@@ -1,7 +1,7 @@
-import { Text } from '@guessir/shared/dist/Text';
+import { CreateTextDtoResponse } from '@guessir/shared/dist/CreateTextDtoResponse';
 
 // v8 ignore next: nothing worth testing (no logic)
-export function generateTextUrl(apiText: Text) {
+export function generateTextUrl(apiText: CreateTextDtoResponse) {
   return `${window.location.origin}?textId=${apiText.id}`;
 }
 

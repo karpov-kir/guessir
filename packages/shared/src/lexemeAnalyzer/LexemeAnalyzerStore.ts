@@ -1,10 +1,15 @@
-import { LexemeNormalizer } from './LexemeNormalizer';
-import { GroupWordLikeNominal, Lexeme, LexemeAnalysis } from './types';
+import { LexemeNormalizer } from './LexemeNormalizer.js';
+import { GroupWordLikeNominal, Lexeme, LexemeAnalysis } from './types.js';
 
 export class LexemeAnalyzerStore implements LexemeAnalysis {
   #lexemes: Map<number, Lexeme> = new Map<number, Lexeme>();
   public get lexemes() {
     return new Map(this.#lexemes);
+  }
+
+  /** Returns the lexeme at `index` without copying the lexemes, or undefined where there is none. */
+  public getLexeme(index: number) {
+    return this.#lexemes.get(index);
   }
 
   #lexemesByWordLike: Map<GroupWordLikeNominal, Map<number, Lexeme>> = new Map<

@@ -2,7 +2,12 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { PubSub } from '../pubSub/PubSub';
 import { Deferred } from '../utils/Deferred';
-import { ControlsRenderer, GuessEvent } from './ControlsRenderer';
+import { ControlsRenderer, getElements, GuessEvent } from './ControlsRenderer';
+
+const typeGuess = (guessInputElement: HTMLInputElement, word: string) => {
+  guessInputElement.value = word;
+  guessInputElement.dispatchEvent(new Event('input'));
+};
 
 describe(ControlsRenderer, () => {
   it('should be initialized with default values', () => {
@@ -10,12 +15,7 @@ describe(ControlsRenderer, () => {
       allowShowingFirstLetters: true,
       allowShowingText: true,
     });
-    const showTextCheckboxElement = controlsRenderer
-      .getElement()
-      .querySelector('#show-text-checkbox') as HTMLInputElement;
-    const showFirstLettersCheckboxElement = controlsRenderer
-      .getElement()
-      .querySelector('#show-first-letters-checkbox') as HTMLInputElement;
+    const { showTextCheckboxElement, showFirstLettersCheckboxElement } = getElements(controlsRenderer.getElement());
 
     expect(showTextCheckboxElement.checked).toBe(false);
     expect(showFirstLettersCheckboxElement.checked).toBe(false);
@@ -43,41 +43,147 @@ describe(ControlsRenderer, () => {
     expect(hiddenElements?.[0].querySelector('#show-text-checkbox')).toEqual(expect.any(HTMLElement));
   });
 
-  it('should publish a guess event with a sanitized word', () => {
+  it.each([
+    { trigger: 'a click', submit: (element: HTMLElement) => element.click() },
+    {
+      trigger: 'Enter',
+      submit: (element: HTMLElement) => element.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter' })),
+    },
+    {
+      trigger: 'NumpadEnter',
+      submit: (element: HTMLElement) => element.dispatchEvent(new KeyboardEvent('keypress', { key: 'NumpadEnter' })),
+    },
+  ])('should publish a guess event with a trimmed word in its typed case on $trigger', ({ trigger, submit }) => {
     const guessPubSub = new PubSub<GuessEvent>();
-    const controlsRenderer = new ControlsRenderer({
-      allowShowingFirstLetters: true,
-      allowShowingText: true,
-      guessPubSub,
-    });
-    const guessButtonElement = controlsRenderer.getElement().querySelector('#guess-button') as HTMLButtonElement;
-    const guessInputElement = controlsRenderer.getElement().querySelector('#guess-input') as HTMLInputElement;
+    const controlsRenderer = new ControlsRenderer({ guessPubSub });
+    const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
 
     vi.spyOn(guessPubSub, 'publish');
 
-    // Input a value to guess
-    guessInputElement.value = ' TeST# ';
-    guessInputElement.dispatchEvent(new Event('input'));
+    typeGuess(guessInputElement, ' TeST# ');
+    submit(trigger === 'a click' ? guessButtonElement : guessInputElement);
+
+    expect(guessPubSub.publish).toBeCalledWith({ word: 'TeST#' });
+  });
+
+  it('should keep the guess and the status, focus the input and disable the button while a guess is checked', () => {
+    const controlsRenderer = new ControlsRenderer();
+    const { guessButtonElement, guessInputElement, statusElement } = getElements(controlsRenderer.getElement());
+
+    controlsRenderer.announce('No new words for this guess');
+    vi.spyOn(guessInputElement, 'focus');
+    typeGuess(guessInputElement, 'test');
 
     guessButtonElement.click();
-    guessInputElement.dispatchEvent(
-      new KeyboardEvent('keypress', {
-        key: 'Enter',
-      }),
-    );
-    guessInputElement.dispatchEvent(
-      new KeyboardEvent('keypress', {
-        key: 'NumpadEnter',
-      }),
-    );
 
-    const expectedPayload = {
-      word: 'test#',
-    };
+    expect(guessInputElement.value).toBe('test');
+    expect(guessInputElement.focus).toBeCalled();
+    expect(guessButtonElement.disabled).toBe(true);
+    expect(statusElement.textContent).toBe('No new words for this guess');
+  });
 
-    expect(guessPubSub.publish).nthCalledWith(1, expectedPayload);
-    expect(guessPubSub.publish).nthCalledWith(2, expectedPayload);
-    expect(guessPubSub.publish).nthCalledWith(3, expectedPayload);
+  it('should empty the input and clear the last status once a guess is found', () => {
+    const controlsRenderer = new ControlsRenderer();
+    const { guessButtonElement, guessInputElement, statusElement } = getElements(controlsRenderer.getElement());
+
+    controlsRenderer.announce('No new words for this guess');
+    typeGuess(guessInputElement, 'test');
+    guessButtonElement.click();
+
+    controlsRenderer.acceptGuess('test');
+
+    expect(guessInputElement.value).toBe('');
+    expect(guessButtonElement.disabled).toBe(true);
+    expect(statusElement.textContent).toBe('');
+  });
+
+  it('should keep what was typed or announced while a found guess was checked', () => {
+    const controlsRenderer = new ControlsRenderer();
+    const { guessButtonElement, guessInputElement, statusElement } = getElements(controlsRenderer.getElement());
+
+    typeGuess(guessInputElement, 'test');
+    guessButtonElement.click();
+    typeGuess(guessInputElement, 'next');
+    controlsRenderer.announce('Could not open this word');
+
+    controlsRenderer.acceptGuess('test');
+
+    expect(guessInputElement.value).toBe('next');
+    expect(guessButtonElement.disabled).toBe(false);
+    expect(statusElement.textContent).toBe('Could not open this word');
+  });
+
+  it('should send a guess submitted twice only once', () => {
+    const guessPubSub = new PubSub<GuessEvent>();
+    const controlsRenderer = new ControlsRenderer({ guessPubSub });
+    const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
+
+    vi.spyOn(guessPubSub, 'publish');
+    typeGuess(guessInputElement, 'test');
+
+    guessButtonElement.click();
+    guessInputElement.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter' }));
+
+    expect(guessPubSub.publish).toBeCalledTimes(1);
+  });
+
+  it('should not send a guess again while it is checked, after an earlier guess is answered', () => {
+    const guessPubSub = new PubSub<GuessEvent>();
+    const controlsRenderer = new ControlsRenderer({ guessPubSub });
+    const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
+
+    vi.spyOn(guessPubSub, 'publish');
+    typeGuess(guessInputElement, 'one');
+    guessButtonElement.click();
+    typeGuess(guessInputElement, 'two');
+    guessButtonElement.click();
+
+    controlsRenderer.acceptGuess('one');
+    guessInputElement.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter' }));
+
+    expect(guessButtonElement.disabled).toBe(true);
+    expect(guessPubSub.publish).toBeCalledTimes(2);
+  });
+
+  it('should leave a missed guess in the input and enable the button, so the player can correct it', () => {
+    const controlsRenderer = new ControlsRenderer();
+    const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
+
+    typeGuess(guessInputElement, 'test');
+    guessButtonElement.click();
+
+    controlsRenderer.returnGuess('test');
+
+    expect(guessInputElement.value).toBe('test');
+    expect(guessButtonElement.disabled).toBe(false);
+  });
+
+  it('should put a missed guess back if the player emptied the input while it was checked', () => {
+    const controlsRenderer = new ControlsRenderer();
+    const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
+
+    typeGuess(guessInputElement, 'test');
+    guessButtonElement.click();
+    typeGuess(guessInputElement, '');
+
+    controlsRenderer.returnGuess('test');
+
+    expect(guessInputElement.value).toBe('test');
+    expect(guessButtonElement.disabled).toBe(false);
+  });
+
+  it('should keep the word the player typed while the guess was checked', () => {
+    const controlsRenderer = new ControlsRenderer();
+    const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
+
+    typeGuess(guessInputElement, 'test');
+    guessButtonElement.click();
+    typeGuess(guessInputElement, 'next');
+
+    controlsRenderer.returnGuess('test');
+
+    expect(guessInputElement.value).toBe('next');
+    expect(guessButtonElement.disabled).toBe(false);
   });
 
   it('should not publish a guess event if the word is empty', () => {
@@ -87,8 +193,7 @@ describe(ControlsRenderer, () => {
       allowShowingText: true,
       guessPubSub,
     });
-    const guessButtonElement = controlsRenderer.getElement().querySelector('#guess-button') as HTMLButtonElement;
-    const guessInputElement = controlsRenderer.getElement().querySelector('#guess-input') as HTMLInputElement;
+    const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
 
     vi.spyOn(guessPubSub, 'publish');
 
@@ -97,18 +202,6 @@ describe(ControlsRenderer, () => {
     guessButtonElement.click();
 
     expect(guessPubSub.publish).not.toBeCalled();
-  });
-
-  it('should show first letters on a click', () => {
-    const controlsRenderer = new ControlsRenderer({
-      allowShowingFirstLetters: true,
-      allowShowingText: true,
-    });
-    const showFirstLettersCheckboxElement = controlsRenderer
-      .getElement()
-      .querySelector('#show-first-letters-checkbox') as HTMLInputElement;
-
-    showFirstLettersCheckboxElement.click();
   });
 
   it.each([
@@ -201,31 +294,25 @@ describe(ControlsRenderer, () => {
   it('should enable the guess button on input', () => {
     const controlsRenderer = new ControlsRenderer();
 
-    const guessButtonElement = controlsRenderer.getElement().querySelector('#guess-button') as HTMLButtonElement;
-    const guessInputElement = controlsRenderer.getElement().querySelector('#guess-input') as HTMLInputElement;
+    const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
 
-    // Input a value to guess
-    guessInputElement.value = ' TeST# ';
-    guessInputElement.dispatchEvent(new Event('input'));
+    typeGuess(guessInputElement, ' TeST# ');
 
     expect(guessButtonElement.disabled).toBe(false);
   });
 
   it('should not enable the guess button on input that consists of spaces only', () => {
     const controlsRenderer = new ControlsRenderer();
-    const guessButtonElement = controlsRenderer.getElement().querySelector('#guess-button') as HTMLButtonElement;
-    const guessInputElement = controlsRenderer.getElement().querySelector('#guess-input') as HTMLInputElement;
+    const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
 
-    // Input a value to guess
-    guessInputElement.value = '   ';
-    guessInputElement.dispatchEvent(new Event('input'));
+    typeGuess(guessInputElement, '   ');
 
     expect(guessButtonElement.disabled).toBe(true);
   });
 
   it('should animate the guess button on input that does not exist', async () => {
     const controlsRenderer = new ControlsRenderer();
-    const guessInputElement = controlsRenderer.getElement().querySelector('#guess-input') as HTMLInputElement;
+    const { guessInputElement } = getElements(controlsRenderer.getElement());
     const hasShakeAndErrorBefore = guessInputElement.classList.contains('shake-and-error');
 
     controlsRenderer.shakeAndError();
@@ -245,40 +332,54 @@ describe(ControlsRenderer, () => {
     expect(guessInputElement.classList.contains('shake-and-error')).toBe(false);
   });
 
-  it('should announce a wrong guess and clear the announcement after a right one', () => {
+  it('should announce a wrong guess', () => {
     const controlsRenderer = new ControlsRenderer();
-    const statusElement = controlsRenderer.getElement().querySelector('[role="status"]') as HTMLElement;
+    const { statusElement } = getElements(controlsRenderer.getElement());
 
     expect(statusElement.textContent).toBe('');
 
     controlsRenderer.shakeAndError();
     expect(statusElement.textContent).toBe('No new words for this guess');
-
-    controlsRenderer.clearAndFocusGuessInput();
-    expect(statusElement.textContent).toBe('');
   });
 
-  it('should clear and focus the input', () => {
+  it('should show a status on screen under the guess row and announce it to screen readers', () => {
     const controlsRenderer = new ControlsRenderer();
-    const guessInputElement = controlsRenderer.getElement().querySelector('#guess-input') as HTMLInputElement;
+    const statusElement = controlsRenderer.getElement().querySelector('[role="status"]') as HTMLElement;
+    const guessContainerElement = controlsRenderer.getElement().querySelector('#guess-container') as HTMLElement;
 
-    guessInputElement.value = 'test';
-    vi.spyOn(guessInputElement, 'focus');
+    controlsRenderer.announce('Could not check this guess');
 
-    controlsRenderer.clearAndFocusGuessInput();
-
-    expect(guessInputElement.value).toBe('');
-    expect(guessInputElement.focus).toBeCalled();
+    expect(statusElement.textContent).toBe('Could not check this guess');
+    expect(statusElement.classList.contains('visually-hidden')).toBe(false);
+    expect(guessContainerElement.nextElementSibling).toBe(statusElement);
   });
 
-  it('should disable the guess button on clear and focus the input', () => {
-    const controlsRenderer = new ControlsRenderer();
-    const guessButtonElement = controlsRenderer.getElement().querySelector('#guess-button') as HTMLButtonElement;
+  it.each([
+    { type: 'first letters', selector: '#show-first-letters-checkbox', uncheck: 'uncheckFirstLetters' },
+    { type: 'text', selector: '#show-text-checkbox', uncheck: 'uncheckText' },
+  ] as const)('should uncheck $type without publishing, so the next change turns it on', ({ selector, uncheck }) => {
+    const showFirstLettersPubSub = new PubSub<boolean>();
+    const showTextPubSub = new PubSub<boolean>();
+    const controlsRenderer = new ControlsRenderer({
+      allowShowingFirstLetters: true,
+      allowShowingText: true,
+      showFirstLettersPubSub,
+      showTextPubSub,
+    });
+    const checkboxElement = controlsRenderer.getElement().querySelector(selector) as HTMLInputElement;
 
-    guessButtonElement.disabled = false;
+    checkboxElement.dispatchEvent(new Event('change'));
+    vi.spyOn(showFirstLettersPubSub, 'publish');
+    vi.spyOn(showTextPubSub, 'publish');
 
-    controlsRenderer.clearAndFocusGuessInput();
+    controlsRenderer[uncheck]();
 
-    expect(guessButtonElement.disabled).toBe(true);
+    expect(checkboxElement.checked).toBe(false);
+    expect(showFirstLettersPubSub.publish).not.toBeCalled();
+    expect(showTextPubSub.publish).not.toBeCalled();
+
+    checkboxElement.dispatchEvent(new Event('change'));
+
+    expect(checkboxElement.checked).toBe(true);
   });
 });
