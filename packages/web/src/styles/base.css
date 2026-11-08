@@ -2,33 +2,34 @@
    every weight in use; a browser fetches a file only for characters in its unicode-range */
 
 @font-face {
-  font-family: 'JetBrains Mono';
+  font-family: "JetBrains Mono";
   font-style: normal;
   font-weight: 100 800;
   font-display: swap;
-  src: url('/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2');
+  src: url("/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2");
   unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
-    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
-  font-family: 'JetBrains Mono';
+  font-family: "JetBrains Mono";
   font-style: normal;
   font-weight: 100 800;
   font-display: swap;
-  src: url('/fonts/jetbrains-mono-latin-ext-wght-normal.woff2') format('woff2');
+  src: url("/fonts/jetbrains-mono-latin-ext-wght-normal.woff2") format("woff2");
   unicode-range:
-    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F,
-    U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
 }
 
 @font-face {
-  font-family: 'JetBrains Mono';
+  font-family: "JetBrains Mono";
   font-style: normal;
   font-weight: 100 800;
   font-display: swap;
-  src: url('/fonts/jetbrains-mono-cyrillic-wght-normal.woff2') format('woff2');
+  src: url("/fonts/jetbrains-mono-cyrillic-wght-normal.woff2") format("woff2");
   unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
 
@@ -102,7 +103,7 @@ button:disabled {
   transform: none;
 }
 
-input[type='text'],
+input[type="text"],
 textarea {
   width: 100%;
   min-height: var(--control-lg);
@@ -113,7 +114,7 @@ textarea {
   font-size: var(--text-lg);
 }
 
-input[type='text']::placeholder,
+input[type="text"]::placeholder,
 textarea::placeholder {
   color: var(--muted);
 }
@@ -124,24 +125,24 @@ textarea {
 
 /* Leaves a focused or invalid field alone, so its focus or error border keeps showing under the pointer */
 @media (hover: hover) {
-  input[type='text']:hover:not(:disabled, :focus, .invalid),
+  input[type="text"]:hover:not(:disabled, :focus, .invalid),
   textarea:hover:not(:disabled, :focus, .invalid) {
     border-color: var(--field-border-hover);
   }
 }
 
-input[type='text']:focus,
+input[type="text"]:focus,
 textarea:focus {
   border-color: var(--focus);
 }
 
 /* After the focus rule and as specific, so a field keeps showing its error while focused */
-input[type='text'].invalid,
+input[type="text"].invalid,
 textarea.invalid {
   border-color: var(--error);
 }
 
-input[type='checkbox'] {
+input[type="checkbox"] {
   position: relative;
   flex: none;
   width: 22px;
@@ -154,21 +155,21 @@ input[type='checkbox'] {
   cursor: pointer;
 }
 
-input[type='checkbox']:checked {
+input[type="checkbox"]:checked {
   border-color: var(--accent);
   background: var(--accent);
 }
 
-input[type='checkbox']:checked::after {
-  content: '';
+input[type="checkbox"]:checked::after {
+  content: "";
   position: absolute;
   inset: 0;
   background: var(--on-accent);
-  mask: url('../icons/checkIcon.svg') no-repeat 50% 50% / 80%;
+  mask: url("../icons/checkIcon.svg") no-repeat 50% 50% / 80%;
 }
 
 button:disabled,
-input[type='checkbox']:disabled {
+input[type="checkbox"]:disabled {
   cursor: not-allowed;
   opacity: 0.55;
 }

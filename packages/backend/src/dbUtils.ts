@@ -1,15 +1,15 @@
 /* v8 ignore start */
 
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
-import { Logger } from '@nestjs/common';
-import { DataSource, DataSourceOptions } from 'typeorm';
-import { MigrationFn as UmzugMigrationFn, Umzug } from 'umzug';
+import { Logger } from "@nestjs/common";
+import { DataSource, DataSourceOptions } from "typeorm";
+import { MigrationFn as UmzugMigrationFn, Umzug } from "umzug";
 
-import { getDbSettings } from './dbEnv.js';
-import { TextEntity } from './entities/TextEntity.js';
-import { ParameterFreeLogger } from './ParameterFreeLogger.js';
+import { getDbSettings } from "./dbEnv.js";
+import { TextEntity } from "./entities/TextEntity.js";
+import { ParameterFreeLogger } from "./ParameterFreeLogger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -24,12 +24,12 @@ interface MigrationLog {
   name: string;
 }
 
-const migrationTable = 'migrations';
+const migrationTable = "migrations";
 
 const entities = [TextEntity];
 
 export const getTypeOrmConfig = (): DataSourceOptions => ({
-  type: 'postgres',
+  type: "postgres",
   ...getDbSettings(),
   // Handled manually using Umzug
   synchronize: false,
@@ -43,7 +43,7 @@ export const getTypeOrmConfig = (): DataSourceOptions => ({
 // healthy server exit. The timeouts end a dial to a database host that is gone and a query on a dropped connection.
 export const createDbPing = () => {
   const dataSource = new DataSource({
-    type: 'postgres',
+    type: "postgres",
     ...getDbSettings(),
     connectTimeoutMS: 2_000,
     extra: { max: 1, query_timeout: 2_000 },
@@ -54,7 +54,7 @@ export const createDbPing = () => {
       await dataSource.initialize();
     }
 
-    await dataSource.query('SELECT 1');
+    await dataSource.query("SELECT 1");
   };
 };
 
@@ -68,12 +68,12 @@ const getContext = async (): Promise<MigrationContext> => {
   };
 };
 
-const logger = new Logger('dbUtils');
+const logger = new Logger("dbUtils");
 
 export async function applyDbMigrations() {
   const migrator = new Umzug({
     migrations: {
-      glob: ['migrations/*.{js,ts}', { cwd: __dirname }],
+      glob: ["migrations/*.{js,ts}", { cwd: __dirname }],
     },
     context: await getContext(),
     storage: {

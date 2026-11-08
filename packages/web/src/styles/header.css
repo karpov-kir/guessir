@@ -54,11 +54,11 @@
 }
 
 #theme-toggle .icon-sun,
-#theme-toggle[aria-pressed='true'] .icon-moon {
+#theme-toggle[aria-pressed="true"] .icon-moon {
   display: none;
 }
 
-#theme-toggle[aria-pressed='true'] .icon-sun {
+#theme-toggle[aria-pressed="true"] .icon-sun {
   display: block;
 }
 

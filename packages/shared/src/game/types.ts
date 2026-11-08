@@ -1,5 +1,7 @@
 /** A word-like lexeme gives only its length, so the text stays on the server until the player opens a word. */
-export type SkeletonLexeme = { index: number; length: number } | { index: number; character: string };
+export type SkeletonLexeme =
+  | { index: number; length: number }
+  | { index: number; character: string };
 
 export type RevealedWord = { index: number; word: string };
 

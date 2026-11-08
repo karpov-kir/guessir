@@ -1,8 +1,8 @@
-import { RevealedWord, RevealedWords, TextSkeleton } from '@guessir/shared/dist/game/types';
-import urlJoin from 'url-join';
+import { RevealedWord, RevealedWords, TextSkeleton } from "@guessir/shared/dist/game/types";
+import urlJoin from "url-join";
 
-import { HttpClient } from '../utils/HttpClient';
-import { Game } from './Game';
+import { HttpClient } from "../utils/HttpClient";
+import { Game } from "./Game";
 
 /** Plays a stored text, asking the server for every word a move opens. */
 export class RemoteGame implements Game {
@@ -17,19 +17,21 @@ export class RemoteGame implements Game {
   }
 
   async guess(word: string): Promise<RevealedWord[]> {
-    return this.readWords(this.httpClient.post(urlJoin(this.textUrl, 'guesses'), { word }));
+    return this.readWords(this.httpClient.post(urlJoin(this.textUrl, "guesses"), { word }));
   }
 
   async reveal(index: number): Promise<RevealedWord> {
-    return (await this.httpClient.post(urlJoin(this.textUrl, 'reveals'), { index })) as RevealedWord;
+    return (await this.httpClient.post(urlJoin(this.textUrl, "reveals"), {
+      index,
+    })) as RevealedWord;
   }
 
   async firstLetters(): Promise<RevealedWord[]> {
-    return this.readWords(this.httpClient.get(urlJoin(this.textUrl, 'first-letters')));
+    return this.readWords(this.httpClient.get(urlJoin(this.textUrl, "first-letters")));
   }
 
   async words(): Promise<RevealedWord[]> {
-    return this.readWords(this.httpClient.get(urlJoin(this.textUrl, 'words')));
+    return this.readWords(this.httpClient.get(urlJoin(this.textUrl, "words")));
   }
 
   private async readWords(response: Promise<unknown>): Promise<RevealedWord[]> {

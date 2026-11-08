@@ -1,13 +1,13 @@
 /* The one entry stylesheet: imports every part in cascade order. A later part wins a tie of equal specificity */
 
-@import url('./tokens.css');
-@import url('./base.css');
-@import url('./components.css');
-@import url('./header.css');
-@import url('../RenderController.css');
-@import url('../renderers/ScoreRenderer.css');
-@import url('../renderers/ControlsRenderer.css');
-@import url('../renderers/textRenderer/TextRenderer.css');
-@import url('../renderers/textRenderer/WordRenderer.css');
-@import url('../renderers/CreateTextRenderer.css');
-@import url('./utilities.css');
+@import url("./tokens.css");
+@import url("./base.css");
+@import url("./components.css");
+@import url("./header.css");
+@import url("../RenderController.css");
+@import url("../renderers/ScoreRenderer.css");
+@import url("../renderers/ControlsRenderer.css");
+@import url("../renderers/textRenderer/TextRenderer.css");
+@import url("../renderers/textRenderer/WordRenderer.css");
+@import url("../renderers/CreateTextRenderer.css");
+@import url("./utilities.css");

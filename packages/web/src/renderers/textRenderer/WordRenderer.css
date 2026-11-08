@@ -22,7 +22,7 @@
 }
 
 .lexeme-container::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0 calc(-1 * var(--tile-bleed));
   z-index: -1;

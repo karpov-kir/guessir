@@ -18,7 +18,7 @@ summary::-webkit-details-marker {
 
 /* A chevron drawn from two borders, pointing right when closed and down when open */
 summary::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 14px;
   left: 4px;

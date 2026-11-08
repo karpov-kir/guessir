@@ -27,8 +27,6 @@ COPY --from=deps /app .
 COPY --from=build /app/packages/shared/dist packages/shared/dist
 COPY --from=build /app/packages/backend/dist packages/backend/dist
 
-EXPOSE 3020
-
 USER node
 
 ENTRYPOINT ["npx", "guessirBackend"]

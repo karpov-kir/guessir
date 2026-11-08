@@ -1,13 +1,13 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-import { mock, MockProxy } from 'vitest-mock-extended';
+import { beforeEach, describe, expect, it } from "vitest";
+import { mock, MockProxy } from "vitest-mock-extended";
 
-import { newTextSkeleton } from '../../tests/utils/textSkeleton';
-import { HttpClient } from '../utils/HttpClient';
-import { RemoteGame } from './RemoteGame';
+import { newTextSkeleton } from "../../tests/utils/textSkeleton";
+import { HttpClient } from "../utils/HttpClient";
+import { RemoteGame } from "./RemoteGame";
 
-const textUrl = 'https://api.test/texts/text-id';
+const textUrl = "https://api.test/texts/text-id";
 const skeleton = newTextSkeleton();
-const words = [{ index: 0, word: 'One' }];
+const words = [{ index: 0, word: "One" }];
 let httpClient: MockProxy<HttpClient>;
 let remoteGame: RemoteGame;
 
@@ -17,32 +17,32 @@ describe(RemoteGame, () => {
     remoteGame = new RemoteGame({ httpClient, textUrl, skeleton });
   });
 
-  it('should keep the skeleton', () => {
+  it("should keep the skeleton", () => {
     expect(remoteGame.skeleton).toBe(skeleton);
   });
 
-  it('should ask the server about a guess', async () => {
+  it("should ask the server about a guess", async () => {
     httpClient.post.mockResolvedValue({ words });
 
-    await expect(remoteGame.guess('one')).resolves.toEqual(words);
-    expect(httpClient.post).toBeCalledWith(`${textUrl}/guesses`, { word: 'one' });
+    await expect(remoteGame.guess("one")).resolves.toEqual(words);
+    expect(httpClient.post).toBeCalledWith(`${textUrl}/guesses`, { word: "one" });
   });
 
-  it('should ask the server to reveal a word', async () => {
+  it("should ask the server to reveal a word", async () => {
     httpClient.post.mockResolvedValue(words[0]);
 
     await expect(remoteGame.reveal(0)).resolves.toEqual(words[0]);
     expect(httpClient.post).toBeCalledWith(`${textUrl}/reveals`, { index: 0 });
   });
 
-  it('should ask the server for the first letters', async () => {
+  it("should ask the server for the first letters", async () => {
     httpClient.get.mockResolvedValue({ words });
 
     await expect(remoteGame.firstLetters()).resolves.toEqual(words);
     expect(httpClient.get).toBeCalledWith(`${textUrl}/first-letters`);
   });
 
-  it('should ask the server for the words', async () => {
+  it("should ask the server for the words", async () => {
     httpClient.get.mockResolvedValue({ words });
 
     await expect(remoteGame.words()).resolves.toEqual(words);

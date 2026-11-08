@@ -3,7 +3,7 @@
  * stroke width; `.icon` in `src/styles/components.css` gives them their size and draws them in the text colour.
  */
 export function icon(svg: string, className?: string) {
-  const classes = className ? `icon ${className}` : 'icon';
+  const classes = className ? `icon ${className}` : "icon";
 
-  return svg.replace('<svg', `<svg class="${classes}" aria-hidden="true" focusable="false"`);
+  return svg.replace("<svg", `<svg class="${classes}" aria-hidden="true" focusable="false"`);
 }

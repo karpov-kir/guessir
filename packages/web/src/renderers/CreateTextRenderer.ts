@@ -1,11 +1,11 @@
-import { createTextLimits } from '@guessir/shared/dist/CreateTextDto';
+import { createTextLimits } from "@guessir/shared/dist/CreateTextDto";
 
-import copyIcon from '../icons/copyIcon.svg?raw';
-import { ApiClient } from '../utils/ApiClient';
-import { onChangeAndEnter } from '../utils/dom';
-import { icon } from '../utils/icon';
-import { generateTextUrl } from '../utils/text';
-import { ChildRenderer } from './types';
+import copyIcon from "../icons/copyIcon.svg?raw";
+import { ApiClient } from "../utils/ApiClient";
+import { onChangeAndEnter } from "../utils/dom";
+import { icon } from "../utils/icon";
+import { generateTextUrl } from "../utils/text";
+import { ChildRenderer } from "./types";
 
 interface CreateTextRendererOptions {
   maxTitleLength?: number;
@@ -18,7 +18,17 @@ interface CreateTextRendererOptions {
  * Returns the markup of a labelled form field. The limit counter sits in the control's direct parent,
  * where `limitInputsLength` looks for it.
  */
-function renderField({ id, label, hint, control }: { id: string; label: string; hint: string; control: string }) {
+function renderField({
+  id,
+  label,
+  hint,
+  control,
+}: {
+  id: string;
+  label: string;
+  hint: string;
+  control: string;
+}) {
   return `
     <div class="field">
       <div class="field-header"><label for="${id}">${label}</label><span class="field-hint">${hint}</span></div>
@@ -32,16 +42,16 @@ function renderField({ id, label, hint, control }: { id: string; label: string; 
 
 export class CreateTextRenderer implements ChildRenderer {
   private readonly containerElement: HTMLElement;
-  private generatedUrl = '';
-  private readonly copiedAlertElement = document.createElement('div');
+  private generatedUrl = "";
+  private readonly copiedAlertElement = document.createElement("div");
   private readonly maxTitleLength: number;
   private readonly maxDescriptionLength: number;
   private readonly maxTextLength: number;
   private readonly apiClient: ApiClient;
 
   constructor(options: CreateTextRendererOptions = {}) {
-    this.containerElement = document.createElement('div');
-    this.containerElement.id = 'utils-container';
+    this.containerElement = document.createElement("div");
+    this.containerElement.id = "utils-container";
 
     this.apiClient = options.apiClient || new ApiClient();
 
@@ -49,7 +59,7 @@ export class CreateTextRenderer implements ChildRenderer {
     this.maxDescriptionLength = options.maxDescriptionLength ?? createTextLimits.description;
     this.maxTextLength = options.maxTextLength ?? createTextLimits.text;
 
-    this.copiedAlertElement.textContent = '(copied)';
+    this.copiedAlertElement.textContent = "(copied)";
 
     this.initElement();
   }
@@ -66,14 +76,14 @@ export class CreateTextRenderer implements ChildRenderer {
           <span class="summary-text">Paste any English text, share the link and race your friends.</span>
         </summary>
         <div id="create-form">
-          ${renderField({ id: 'title-input', label: 'Title', hint: 'required', control: '<input id="title-input" type="text">' })}
+          ${renderField({ id: "title-input", label: "Title", hint: "required", control: '<input id="title-input" type="text">' })}
           ${renderField({
-            id: 'description-input',
-            label: 'Description',
-            hint: 'optional',
+            id: "description-input",
+            label: "Description",
+            hint: "optional",
             control: '<textarea rows="2" id="description-input"></textarea>',
           })}
-          ${renderField({ id: 'text-input', label: 'Text', hint: 'required', control: '<textarea rows="6" id="text-input"></textarea>' })}
+          ${renderField({ id: "text-input", label: "Text", hint: "required", control: '<textarea rows="6" id="text-input"></textarea>' })}
           <div class="chips">
             <label class="chip">
               <input checked type="checkbox" id="allow-showing-first-letters-checkbox">Allow first-letter hints
@@ -120,7 +130,13 @@ export class CreateTextRenderer implements ChildRenderer {
     const allowShowingFirstLetters = allowShowingFirstLettersCheckboxElement.checked;
     const allowShowingText = allowShowingTextCheckboxElement.checked;
 
-    return { title, description: rawDescription || undefined, text, allowShowingFirstLetters, allowShowingText };
+    return {
+      title,
+      description: rawDescription || undefined,
+      text,
+      allowShowingFirstLetters,
+      allowShowingText,
+    };
   }
 
   private limitInputsLength() {
@@ -133,10 +149,10 @@ export class CreateTextRenderer implements ChildRenderer {
 
       if (codePoints.length > maxLength) {
         codePoints = codePoints.slice(0, maxLength);
-        element.value = codePoints.join('');
+        element.value = codePoints.join("");
       }
 
-      const limitTextElement = element.parentElement?.querySelector('.limit-text');
+      const limitTextElement = element.parentElement?.querySelector(".limit-text");
 
       if (limitTextElement) {
         limitTextElement.textContent = `${codePoints.length}/${maxLength}`;
@@ -163,8 +179,8 @@ export class CreateTextRenderer implements ChildRenderer {
         return;
       }
 
-      element.classList.toggle('invalid', !isElementValid);
-      element.setAttribute('aria-invalid', String(!isElementValid));
+      element.classList.toggle("invalid", !isElementValid);
+      element.setAttribute("aria-invalid", String(!isElementValid));
     };
 
     markValidity(titleInputElement, Boolean(title));
@@ -205,12 +221,14 @@ export class CreateTextRenderer implements ChildRenderer {
     } = this.getElements();
 
     [titleInputElement, descriptionInputElement, textInputElement].forEach((element) => {
-      element.value = '';
+      element.value = "";
     });
 
-    [allowShowingFirstLettersCheckboxElement, allowShowingTextCheckboxElement].forEach((element) => {
-      element.checked = true;
-    });
+    [allowShowingFirstLettersCheckboxElement, allowShowingTextCheckboxElement].forEach(
+      (element) => {
+        element.checked = true;
+      },
+    );
 
     this.limitInputsLength();
   }
@@ -227,29 +245,31 @@ export class CreateTextRenderer implements ChildRenderer {
     this.limitInputsLength();
 
     [titleInputElement, descriptionInputElement, textInputElement].forEach((element) => {
-      element.addEventListener('input', (event) => {
+      element.addEventListener("input", (event) => {
         this.handleInputsChange(event.currentTarget as HTMLElement);
       });
     });
 
-    [allowShowingFirstLettersCheckboxElement, allowShowingTextCheckboxElement].forEach((element) => {
-      onChangeAndEnter(
-        element,
-        (event) => {
-          this.handleInputsChange(event.currentTarget as HTMLElement);
-        },
-        {
-          toggleChecked: true,
-        },
-      );
-    });
+    [allowShowingFirstLettersCheckboxElement, allowShowingTextCheckboxElement].forEach(
+      (element) => {
+        onChangeAndEnter(
+          element,
+          (event) => {
+            this.handleInputsChange(event.currentTarget as HTMLElement);
+          },
+          {
+            toggleChecked: true,
+          },
+        );
+      },
+    );
   }
 
   private handleInputsChange(inputElement: HTMLElement) {
     const { errorElement, generatedUrlContainerElement } = this.getElements();
 
-    errorElement.classList.add('hide');
-    generatedUrlContainerElement.classList.add('hide');
+    errorElement.classList.add("hide");
+    generatedUrlContainerElement.classList.add("hide");
 
     this.removeCopyAlert();
     this.limitInputsLength();
@@ -257,16 +277,20 @@ export class CreateTextRenderer implements ChildRenderer {
   }
 
   private attachGenerateUrlHandler() {
-    const { generateUrlButtonElement, errorElement, generatedUrlContainerElement, generatedUrlElement } =
-      this.getElements();
+    const {
+      generateUrlButtonElement,
+      errorElement,
+      generatedUrlContainerElement,
+      generatedUrlElement,
+    } = this.getElements();
 
-    generateUrlButtonElement.addEventListener('click', () => {
+    generateUrlButtonElement.addEventListener("click", () => {
       if (!this.validateForm()) {
         return;
       }
 
       this.blockForm(true);
-      generatedUrlContainerElement.classList.add('hide');
+      generatedUrlContainerElement.classList.add("hide");
 
       this.apiClient
         .createText(this.getValues())
@@ -275,14 +299,14 @@ export class CreateTextRenderer implements ChildRenderer {
 
           this.generatedUrl = generateTextUrl(apiText);
 
-          generatedUrlContainerElement.classList.remove('hide');
+          generatedUrlContainerElement.classList.remove("hide");
 
           generatedUrlElement.textContent = this.generatedUrl;
           generatedUrlElement.href = this.generatedUrl;
         })
         .catch((error: Error) => {
           console.error(error);
-          errorElement.classList.remove('hide');
+          errorElement.classList.remove("hide");
           errorElement.textContent = error.message;
         })
         .finally(() => {
@@ -303,7 +327,7 @@ export class CreateTextRenderer implements ChildRenderer {
     const { copyGeneratedUrlButtonElement } = this.getElements();
     let changeTextTimeoutId: ReturnType<typeof setTimeout> | undefined;
 
-    copyGeneratedUrlButtonElement.addEventListener('click', () => {
+    copyGeneratedUrlButtonElement.addEventListener("click", () => {
       void navigator.clipboard.writeText(this.generatedUrl);
       copyGeneratedUrlButtonElement.appendChild(this.copiedAlertElement);
 
@@ -319,21 +343,27 @@ export class CreateTextRenderer implements ChildRenderer {
 }
 
 export function getElements(containerElement: HTMLElement) {
-  const titleInputElement = containerElement.querySelector('#title-input') as HTMLInputElement;
-  const descriptionInputElement = containerElement.querySelector('#description-input') as HTMLInputElement;
-  const textInputElement = containerElement.querySelector('#text-input') as HTMLInputElement;
+  const titleInputElement = containerElement.querySelector("#title-input") as HTMLInputElement;
+  const descriptionInputElement = containerElement.querySelector(
+    "#description-input",
+  ) as HTMLInputElement;
+  const textInputElement = containerElement.querySelector("#text-input") as HTMLInputElement;
   const allowShowingFirstLettersCheckboxElement = containerElement.querySelector(
-    '#allow-showing-first-letters-checkbox',
+    "#allow-showing-first-letters-checkbox",
   ) as HTMLInputElement;
   const allowShowingTextCheckboxElement = containerElement.querySelector(
-    '#allow-showing-text-checkbox',
+    "#allow-showing-text-checkbox",
   ) as HTMLInputElement;
-  const generateUrlButtonElement = containerElement.querySelector('#generate-url-button') as HTMLButtonElement;
-  const errorElement = containerElement.querySelector('#generate-url-error') as HTMLButtonElement;
-  const generatedUrlContainerElement = containerElement.querySelector('#generated-url-container') as HTMLElement;
-  const generatedUrlElement = containerElement.querySelector('#generated-url') as HTMLAnchorElement;
+  const generateUrlButtonElement = containerElement.querySelector(
+    "#generate-url-button",
+  ) as HTMLButtonElement;
+  const errorElement = containerElement.querySelector("#generate-url-error") as HTMLButtonElement;
+  const generatedUrlContainerElement = containerElement.querySelector(
+    "#generated-url-container",
+  ) as HTMLElement;
+  const generatedUrlElement = containerElement.querySelector("#generated-url") as HTMLAnchorElement;
   const copyGeneratedUrlButtonElement = containerElement.querySelector(
-    '#copy-generated-url-button',
+    "#copy-generated-url-button",
   ) as HTMLAnchorElement;
 
   return {

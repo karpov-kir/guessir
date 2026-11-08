@@ -1,4 +1,4 @@
-import { ChildRenderer } from './types';
+import { ChildRenderer } from "./types";
 
 type ScoreRendererOptions = {
   wordLikeCount: number;
@@ -11,8 +11,8 @@ export class ScoreRenderer implements ChildRenderer {
 
   constructor(options: ScoreRendererOptions) {
     this.wordLikeCount = options.wordLikeCount;
-    this.containerElement = document.createElement('div');
-    this.containerElement.id = 'score-container';
+    this.containerElement = document.createElement("div");
+    this.containerElement.id = "score-container";
 
     this.initElement();
   }
@@ -53,15 +53,19 @@ export class ScoreRenderer implements ChildRenderer {
     const percent = this.wordLikeCount ? Math.floor((this.score / this.wordLikeCount) * 100) : 0;
 
     percentElement.textContent = `${percent}%`;
-    progressElement.setAttribute('aria-valuenow', this.score.toString());
+    progressElement.setAttribute("aria-valuenow", this.score.toString());
     progressBarElement.style.width = `${percent}%`;
   }
 
   private getElements() {
-    const currentScoreElement = this.containerElement.querySelector('#current-score') as HTMLElement;
-    const percentElement = this.containerElement.querySelector('#score-percent') as HTMLElement;
-    const progressElement = this.containerElement.querySelector('#score-progress') as HTMLElement;
-    const progressBarElement = this.containerElement.querySelector('#score-progress-bar') as HTMLElement;
+    const currentScoreElement = this.containerElement.querySelector(
+      "#current-score",
+    ) as HTMLElement;
+    const percentElement = this.containerElement.querySelector("#score-percent") as HTMLElement;
+    const progressElement = this.containerElement.querySelector("#score-progress") as HTMLElement;
+    const progressBarElement = this.containerElement.querySelector(
+      "#score-progress-bar",
+    ) as HTMLElement;
 
     return { currentScoreElement, percentElement, progressElement, progressBarElement };
   }

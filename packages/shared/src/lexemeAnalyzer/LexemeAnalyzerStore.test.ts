@@ -1,18 +1,18 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from "vitest";
 
-import { LexemeAnalyzerStore } from './LexemeAnalyzerStore.js';
-import { LexemeAnalyzerUtils } from './lexemeAnalyzerUtils.js';
-import { NormalizedPrimitiveLexemeNominal, PrimitiveLexemeNominal } from './types.js';
+import { LexemeAnalyzerStore } from "./LexemeAnalyzerStore.js";
+import { LexemeAnalyzerUtils } from "./lexemeAnalyzerUtils.js";
+import { NormalizedPrimitiveLexemeNominal, PrimitiveLexemeNominal } from "./types.js";
 
 const lexeme = LexemeAnalyzerUtils.createLexeme(
-  'One' as PrimitiveLexemeNominal,
-  'One' as NormalizedPrimitiveLexemeNominal,
+  "One" as PrimitiveLexemeNominal,
+  "One" as NormalizedPrimitiveLexemeNominal,
   0,
   2,
 );
 
 describe(LexemeAnalyzerStore, () => {
-  it('should give the lexeme at an index, or undefined where there is none', () => {
+  it("should give the lexeme at an index, or undefined where there is none", () => {
     const lexemeAnalyzerStore = new LexemeAnalyzerStore();
 
     lexemeAnalyzerStore.addLexeme(lexeme);
@@ -21,7 +21,7 @@ describe(LexemeAnalyzerStore, () => {
     expect(lexemeAnalyzerStore.getLexeme(1)).toBeUndefined();
   });
 
-  it('should give a copy of the lexemes, which the caller cannot change the store through', () => {
+  it("should give a copy of the lexemes, which the caller cannot change the store through", () => {
     const lexemeAnalyzerStore = new LexemeAnalyzerStore();
 
     lexemeAnalyzerStore.addLexeme(lexeme);

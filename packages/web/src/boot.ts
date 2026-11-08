@@ -1,16 +1,16 @@
 /* v8 ignore start */
 
-import './styles/index.css';
-import { CreateTextDto } from '@guessir/shared/dist/CreateTextDto';
+import "./styles/index.css";
+import { CreateTextDto } from "@guessir/shared/dist/CreateTextDto";
 
-import { Game } from './game/Game';
-import { LocalGame } from './game/LocalGame';
-import { RenderController } from './RenderController';
-import { ApiClient } from './utils/ApiClient';
-import { hasTextParametersInUrl, parseTextIdFromUrl } from './utils/text';
+import { Game } from "./game/Game";
+import { LocalGame } from "./game/LocalGame";
+import { RenderController } from "./RenderController";
+import { ApiClient } from "./utils/ApiClient";
+import { hasTextParametersInUrl, parseTextIdFromUrl } from "./utils/text";
 
 const defaultText: CreateTextDto = {
-  title: 'Hello!',
+  title: "Hello!",
   description: `I am a simple tool to turn any English text into a word guessing game.`,
   text: `In order to create your own text find the form below.`,
   allowShowingFirstLetters: true,
@@ -39,15 +39,15 @@ async function loadGame(apiClient: ApiClient): Promise<Game> {
   }
 
   try {
-    console.log('Trying to load text...');
+    console.log("Trying to load text...");
 
     const remoteGame = await apiClient.loadGame(parseTextIdFromUrl());
 
-    console.log('Text has been loaded', remoteGame.skeleton);
+    console.log("Text has been loaded", remoteGame.skeleton);
 
     return remoteGame;
   } catch (error) {
-    console.error('Failed to load the text', error);
+    console.error("Failed to load the text", error);
 
     return new LocalGame({ ...defaultText, text: couldNotLoadRemoteTextText });
   }

@@ -5,15 +5,14 @@ services:
   database:
     image: postgres:17
     ports:
-      - '127.0.0.1:5432:5432'
+      - "127.0.0.1:5432:5432"
     environment:
       POSTGRES_USER: guessir
       POSTGRES_PASSWORD_FILE: /run/secrets/database-password
-      POSTGRES_DB: guessir
     secrets:
       - database-password
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -h 127.0.0.1 -U guessir']
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U guessir"]
       interval: 2s
     volumes:
       - database-data:/var/lib/postgresql/data

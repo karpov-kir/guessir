@@ -8,7 +8,5 @@ RUN npm ci
 RUN npm run build:web
 
 FROM nginx:1-alpine
-WORKDIR /usr/share/nginx/html
-RUN rm -rf ./*
-COPY --from=builder /app/packages/web/dist .
-ENTRYPOINT [ "nginx", "-g", "daemon off;" ]
+
+COPY --from=builder /app/packages/web/dist /usr/share/nginx/html

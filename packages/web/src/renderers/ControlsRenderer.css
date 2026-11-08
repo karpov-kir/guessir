@@ -114,12 +114,12 @@
   }
 }
 
-#hints input[type='checkbox']:checked {
+#hints input[type="checkbox"]:checked {
   border-color: var(--on-yellow);
   background: var(--on-yellow);
 }
 
-#hints input[type='checkbox']:checked::after {
+#hints input[type="checkbox"]:checked::after {
   background: var(--yellow);
 }
 

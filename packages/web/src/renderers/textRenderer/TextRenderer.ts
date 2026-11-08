@@ -1,8 +1,8 @@
-import { RevealedWord, SkeletonLexeme } from '@guessir/shared/dist/game/types';
+import { RevealedWord, SkeletonLexeme } from "@guessir/shared/dist/game/types";
 
-import { PubSub } from '../../pubSub/PubSub';
-import { ChildRenderer } from '../types';
-import { WordHint, WordRenderer } from './WordRenderer';
+import { PubSub } from "../../pubSub/PubSub";
+import { ChildRenderer } from "../types";
+import { WordHint, WordRenderer } from "./WordRenderer";
 
 type TextRendererOptions = {
   lexemes: SkeletonLexeme[];
@@ -26,7 +26,7 @@ export class TextRenderer implements ChildRenderer {
   private freshWordRenderers: WordRenderer[] = [];
 
   /** Publishes the lexeme index of a hidden word the user clicks. */
-  public revealRequestEvent: PubSub<number>['event'];
+  public revealRequestEvent: PubSub<number>["event"];
 
   constructor(options: TextRendererOptions) {
     this.revealRequestPubSub = options.revealRequestPubSub || new PubSub<number>();
@@ -34,8 +34,8 @@ export class TextRenderer implements ChildRenderer {
     this.lexemes = options.lexemes;
     this.title = options.title;
     this.description = options.description;
-    this.containerElement = document.createElement('article');
-    this.containerElement.id = 'text-container';
+    this.containerElement = document.createElement("article");
+    this.containerElement.id = "text-container";
 
     this.initElement();
   }
@@ -98,12 +98,12 @@ export class TextRenderer implements ChildRenderer {
   }
 
   public setHint(hint: WordHint) {
-    this.containerElement.classList.remove('show-text', 'show-first-letters');
+    this.containerElement.classList.remove("show-text", "show-first-letters");
 
     if (hint === WordHint.Text) {
-      this.containerElement.classList.add('show-text');
+      this.containerElement.classList.add("show-text");
     } else if (hint === WordHint.FirstLetters) {
-      this.containerElement.classList.add('show-first-letters');
+      this.containerElement.classList.add("show-first-letters");
     }
 
     this.wordRenderers.forEach((wordRenderer) => wordRenderer.setHint(hint));
@@ -119,13 +119,13 @@ export class TextRenderer implements ChildRenderer {
     const { titleElement, descriptionElement, lexemesElement } = getElements(this.containerElement);
 
     if (this.title) {
-      titleElement.classList.remove('hide');
+      titleElement.classList.remove("hide");
       // XSS safe
       titleElement.textContent = this.title;
     }
 
     if (this.description) {
-      descriptionElement.classList.remove('hide');
+      descriptionElement.classList.remove("hide");
       // XSS safe
       descriptionElement.textContent = this.description;
     }
@@ -142,19 +142,21 @@ export class TextRenderer implements ChildRenderer {
     let group: HTMLElement | undefined;
     let groupHasWord = false;
     const newGroup = () => {
-      const element = document.createElement('span');
+      const element = document.createElement("span");
 
-      element.classList.add('lexeme-group');
+      element.classList.add("lexeme-group");
       lexemesElement.append(element);
 
       return element;
     };
 
     for (const lexeme of this.lexemes) {
-      if (!('character' in lexeme)) {
+      if (!("character" in lexeme)) {
         const wordRenderer = new WordRenderer(lexeme);
 
-        wordRenderer.revealRequestEvent.subscribe((index) => this.revealRequestPubSub.publish(index));
+        wordRenderer.revealRequestEvent.subscribe((index) =>
+          this.revealRequestPubSub.publish(index),
+        );
         this.wordRenderers.set(lexeme.index, wordRenderer);
 
         if (!group || groupHasWord) {
@@ -177,14 +179,28 @@ export class TextRenderer implements ChildRenderer {
       } else {
         group = undefined;
         groupHasWord = false;
-        lexemesElement.append(character === '\n' ? document.createElement('br') : character);
+        lexemesElement.append(character === "\n" ? document.createElement("br") : character);
       }
     }
   }
 }
 
-const closingCharacters = new Set([',', '.', ';', ':', '!', '?', ')', ']', '}', '%', '…', '»', '”']);
-const openingCharacters = new Set(['(', '[', '{', '«', '“', '‘']);
+const closingCharacters = new Set([
+  ",",
+  ".",
+  ";",
+  ":",
+  "!",
+  "?",
+  ")",
+  "]",
+  "}",
+  "%",
+  "…",
+  "»",
+  "”",
+]);
+const openingCharacters = new Set(["(", "[", "{", "«", "“", "‘"]);
 const straightQuotes = new Set(['"', "'"]);
 
 /** Tells whether the character closes the word before it. A straight quote closes a word only right after it. */
@@ -197,9 +213,9 @@ function isOpening(character: string) {
 }
 
 export function getElements(containerElement: HTMLElement) {
-  const titleElement = containerElement.querySelector('#title') as HTMLElement;
-  const descriptionElement = containerElement.querySelector('#description') as HTMLElement;
-  const lexemesElement = containerElement.querySelector('#lexemes') as HTMLElement;
+  const titleElement = containerElement.querySelector("#title") as HTMLElement;
+  const descriptionElement = containerElement.querySelector("#description") as HTMLElement;
+  const lexemesElement = containerElement.querySelector("#lexemes") as HTMLElement;
 
   return { titleElement, descriptionElement, lexemesElement };
 }

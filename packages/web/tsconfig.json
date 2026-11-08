@@ -1,8 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "skipLibCheck": true,
-    "lib": ["DOM", "ES2022"],
     "types": ["./src/@types/env", "vite/client"],
     "noEmit": true
   }

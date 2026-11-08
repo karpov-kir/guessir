@@ -1,13 +1,7 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "module": "ES2022",
-    "target": "ES2022",
-    "moduleResolution": "Bundler",
-    "lib": ["ES2022"],
     "paths": {
       "@guessir/shared/dist/*": ["./packages/shared/src/*"]
-    },
-    "types": []
+    }
   }
 }

@@ -2,9 +2,13 @@ type OnEnterOptions = {
   toggleChecked?: boolean;
 };
 
-export const onEnter = (element: HTMLInputElement, callback: (event: Event) => void, options: OnEnterOptions = {}) => {
-  element.addEventListener('keypress', (event) => {
-    if (event.key !== 'Enter' && event.key !== 'NumpadEnter') {
+export const onEnter = (
+  element: HTMLInputElement,
+  callback: (event: Event) => void,
+  options: OnEnterOptions = {},
+) => {
+  element.addEventListener("keypress", (event) => {
+    if (event.key !== "Enter" && event.key !== "NumpadEnter") {
       return;
     }
 
@@ -21,7 +25,7 @@ export const onChangeAndEnter = (
   callback: (event: Event) => void,
   options: OnEnterOptions = {},
 ) => {
-  element.addEventListener('change', (event) => {
+  element.addEventListener("change", (event) => {
     callback(event);
   });
 

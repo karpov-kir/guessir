@@ -1,16 +1,16 @@
-import { LexemeAnalyzerStore } from './LexemeAnalyzerStore.js';
-import { LexemeAnalyzerUtils } from './lexemeAnalyzerUtils.js';
-import { LexemeNormalizer } from './LexemeNormalizer.js';
+import { LexemeAnalyzerStore } from "./LexemeAnalyzerStore.js";
+import { LexemeAnalyzerUtils } from "./lexemeAnalyzerUtils.js";
+import { LexemeNormalizer } from "./LexemeNormalizer.js";
 import {
   Lexeme,
   LexemeAnalysis,
   LexemeType,
   NormalizedPrimitiveLexemeNominal,
   PrimitiveLexemeNominal,
-} from './types.js';
+} from "./types.js";
 
 export class LexemeAnalyzer {
-  private static readonly PUNCTUATION_CHARACTERS = [',', '.', '!', '?', ';'];
+  private static readonly PUNCTUATION_CHARACTERS = [",", ".", "!", "?", ";"];
 
   /**
    * Applies the following rules:
@@ -52,11 +52,19 @@ export class LexemeAnalyzer {
       if (LexemeNormalizer.isWordCharacter(normalizedCharacter)) {
         const nextNormalizedCharacter =
           // Can be undefined if this is beyond the text
-          nextCharacter === undefined ? undefined : LexemeNormalizer.normalizeCharacter(nextCharacter);
+          nextCharacter === undefined
+            ? undefined
+            : LexemeNormalizer.normalizeCharacter(nextCharacter);
         const isWordBoundary =
-          nextNormalizedCharacter === undefined || !LexemeNormalizer.isWordCharacter(nextNormalizedCharacter);
+          nextNormalizedCharacter === undefined ||
+          !LexemeNormalizer.isWordCharacter(nextNormalizedCharacter);
 
-        LexemeAnalyzerUtils.addCharacterToBuffer(buffer, character, normalizedCharacter, isWordBoundary);
+        LexemeAnalyzerUtils.addCharacterToBuffer(
+          buffer,
+          character,
+          normalizedCharacter,
+          isWordBoundary,
+        );
 
         // If the next character is not a part of the word, then the word is finished
         if (isWordBoundary) {
@@ -96,13 +104,22 @@ export class LexemeAnalyzer {
     // Uncontraction is applied after normalization. Therefor if `uncontracted` is not equal `normalized` then
     // we need to split the new primitive uncontracted lexeme (e.g. `do not`) to separate lexemes (e.g. to `do` and `not).
     if (possiblyNewLexeme.uncontracted !== possiblyNewLexeme.normalized) {
-      newLexemes = LexemeAnalyzerUtils.splitUncontractedLexeme(possiblyNewLexeme, startIndex, endIndex);
+      newLexemes = LexemeAnalyzerUtils.splitUncontractedLexeme(
+        possiblyNewLexeme,
+        startIndex,
+        endIndex,
+      );
     }
 
     newLexemes.forEach((newLexeme) => {
-      const isLastSpace = lexemeAnalyzerStore.isLastNLexemesMatch(1, (lexeme) => lexeme.normalized === ' ');
-      const isCurrentPunctuation = LexemeAnalyzer.PUNCTUATION_CHARACTERS.includes(newLexeme.normalized);
-      const isCurrentNewLine = newLexeme.normalized === '\n';
+      const isLastSpace = lexemeAnalyzerStore.isLastNLexemesMatch(
+        1,
+        (lexeme) => lexeme.normalized === " ",
+      );
+      const isCurrentPunctuation = LexemeAnalyzer.PUNCTUATION_CHARACTERS.includes(
+        newLexeme.normalized,
+      );
+      const isCurrentNewLine = newLexeme.normalized === "\n";
 
       if (
         // Replace trailing spaces followed by a punctuation with just punctuation
@@ -110,7 +127,7 @@ export class LexemeAnalyzer {
         // Replace trailing spaces followed by a new line with just new line
         (isLastSpace && isCurrentNewLine)
       ) {
-        lexemeAnalyzerStore.deleteLastLexemesUntilMatch((lexeme) => lexeme.normalized === ' ');
+        lexemeAnalyzerStore.deleteLastLexemesUntilMatch((lexeme) => lexeme.normalized === " ");
       }
 
       if (LexemeAnalyzer.canAddLexeme(lexemeAnalyzerStore, newLexeme)) {
@@ -129,15 +146,15 @@ export class LexemeAnalyzer {
     }
     // No more than two `\n` in a row
     else if (
-      lexemeToAdd.normalized === '\n' &&
-      lexemeAnalyzerStore.isLastNLexemesMatch(2, (lexeme) => lexeme.normalized === '\n')
+      lexemeToAdd.normalized === "\n" &&
+      lexemeAnalyzerStore.isLastNLexemesMatch(2, (lexeme) => lexeme.normalized === "\n")
     ) {
       return false;
     }
     // No more than one space in a row
     else if (
-      lexemeToAdd.normalized === ' ' &&
-      lexemeAnalyzerStore.isLastNLexemesMatch(1, (lexeme) => lexeme.normalized === ' ')
+      lexemeToAdd.normalized === " " &&
+      lexemeAnalyzerStore.isLastNLexemesMatch(1, (lexeme) => lexeme.normalized === " ")
     ) {
       return false;
     }

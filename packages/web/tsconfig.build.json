@@ -1,9 +1,4 @@
 {
   // The package options come from ./tsconfig.json, the build excludes from the root
-  "extends": ["../../tsconfig.build.json", "./tsconfig.json"],
-  "references": [
-    {
-      "path": "../shared/tsconfig.build.json"
-    }
-  ]
+  "extends": ["../../tsconfig.build.json", "./tsconfig.json"]
 }

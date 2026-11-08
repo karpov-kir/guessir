@@ -1,7 +1,7 @@
-import { CreateTextDto, createTextLimits } from '@guessir/shared/dist/CreateTextDto.js';
-import { IsBoolean, IsNotEmpty, IsOptional } from 'class-validator';
+import { CreateTextDto, createTextLimits } from "@guessir/shared/dist/CreateTextDto.js";
+import { IsBoolean, IsNotEmpty, IsOptional } from "class-validator";
 
-import { HasNoNullCharacter, MaxCodePoints } from './dbTextValidators.js';
+import { HasNoNullCharacter, MaxCodePoints } from "./dbTextValidators.js";
 
 export class CreateTextDtoRequest implements CreateTextDto {
   @IsNotEmpty()

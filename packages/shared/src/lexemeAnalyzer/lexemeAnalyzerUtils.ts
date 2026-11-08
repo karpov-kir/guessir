@@ -1,5 +1,10 @@
-import { LexemeNormalizer } from './LexemeNormalizer.js';
-import { BaseLexeme, Lexeme, NormalizedPrimitiveLexemeNominal, PrimitiveLexemeNominal } from './types.js';
+import { LexemeNormalizer } from "./LexemeNormalizer.js";
+import {
+  BaseLexeme,
+  Lexeme,
+  NormalizedPrimitiveLexemeNominal,
+  PrimitiveLexemeNominal,
+} from "./types.js";
 
 interface Buffer {
   primitiveLexeme: PrimitiveLexemeNominal;
@@ -9,8 +14,8 @@ interface Buffer {
 export class LexemeAnalyzerUtils {
   public static createEmptyBuffer(): Buffer {
     return {
-      primitiveLexeme: '' as PrimitiveLexemeNominal,
-      normalizedPrimitiveLexeme: '' as NormalizedPrimitiveLexemeNominal,
+      primitiveLexeme: "" as PrimitiveLexemeNominal,
+      normalizedPrimitiveLexeme: "" as NormalizedPrimitiveLexemeNominal,
     };
   }
 
@@ -45,32 +50,43 @@ export class LexemeAnalyzerUtils {
   /**
    * Split constructions like 'I am / we will / they have' to separate lexemes e.g. to 'I' and 'am'
    */
-  public static splitUncontractedLexeme(lexemeToSplit: Lexeme, startIndex: number, endIndex: number): Lexeme[] {
-    const newNormalizedPrimitiveLexemes = lexemeToSplit.uncontracted.split(' ') as NormalizedPrimitiveLexemeNominal[];
+  public static splitUncontractedLexeme(
+    lexemeToSplit: Lexeme,
+    startIndex: number,
+    endIndex: number,
+  ): Lexeme[] {
+    const newNormalizedPrimitiveLexemes = lexemeToSplit.uncontracted.split(
+      " ",
+    ) as NormalizedPrimitiveLexemeNominal[];
     const splitLexemes: Lexeme[] = [];
 
-    newNormalizedPrimitiveLexemes.forEach((newNormalizedPrimitiveLexeme, newNormalizedPrimitiveLexemeIndex) => {
-      splitLexemes.push(
-        LexemeAnalyzerUtils.createLexeme(
-          lexemeToSplit.original,
-          LexemeNormalizer.convertNormalizedWord(lexemeToSplit.original, newNormalizedPrimitiveLexeme),
-          startIndex,
-          endIndex,
-        ),
-      );
-
-      // Add spaces between uncontracted lexemes
-      if (newNormalizedPrimitiveLexemeIndex < newNormalizedPrimitiveLexemes.length - 1) {
+    newNormalizedPrimitiveLexemes.forEach(
+      (newNormalizedPrimitiveLexeme, newNormalizedPrimitiveLexemeIndex) => {
         splitLexemes.push(
           LexemeAnalyzerUtils.createLexeme(
-            ' ' as PrimitiveLexemeNominal,
-            ' ' as NormalizedPrimitiveLexemeNominal,
+            lexemeToSplit.original,
+            LexemeNormalizer.convertNormalizedWord(
+              lexemeToSplit.original,
+              newNormalizedPrimitiveLexeme,
+            ),
             startIndex,
             endIndex,
           ),
         );
-      }
-    });
+
+        // Add spaces between uncontracted lexemes
+        if (newNormalizedPrimitiveLexemeIndex < newNormalizedPrimitiveLexemes.length - 1) {
+          splitLexemes.push(
+            LexemeAnalyzerUtils.createLexeme(
+              " " as PrimitiveLexemeNominal,
+              " " as NormalizedPrimitiveLexemeNominal,
+              startIndex,
+              endIndex,
+            ),
+          );
+        }
+      },
+    );
 
     return splitLexemes.map((splitLexeme) => ({
       ...splitLexeme,
