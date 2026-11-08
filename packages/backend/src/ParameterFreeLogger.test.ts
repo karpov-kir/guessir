@@ -6,6 +6,7 @@ import { ParameterFreeLogger } from './ParameterFreeLogger.js';
 
 const secretText = 'the whole hidden text of a game';
 const insertQuery = 'INSERT INTO texts VALUES ($1)';
+const levels = ['error', 'warn', 'log', 'debug', 'verbose', 'fatal'] as const;
 // The tests hold the logger as TypeORM's `Logger`, because TypeORM passes the query's parameters to `logQuery`,
 // `logQueryError` and `logQuerySlow`, which the class declares without them
 let parameterFreeLogger: TypeOrmLogger;
@@ -13,9 +14,9 @@ let parameterFreeLogger: TypeOrmLogger;
 describe(ParameterFreeLogger, () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
-    vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined);
-    vi.spyOn(Logger.prototype, 'log').mockImplementation(() => undefined);
+    for (const level of levels) {
+      vi.spyOn(Logger.prototype, level).mockImplementation(() => undefined);
+    }
     parameterFreeLogger = new ParameterFreeLogger();
   });
 
@@ -32,9 +33,9 @@ describe(ParameterFreeLogger, () => {
     parameterFreeLogger.logQuery(insertQuery, [secretText]);
     parameterFreeLogger.logQuerySlow(5_000, insertQuery, [secretText]);
 
-    expect(Logger.prototype.error).not.toBeCalled();
-    expect(Logger.prototype.warn).not.toBeCalled();
-    expect(Logger.prototype.log).not.toBeCalled();
+    for (const level of levels) {
+      expect(Logger.prototype[level]).not.toBeCalled();
+    }
   });
 
   it('should log only the warnings among the messages TypeORM reports on its own', () => {
@@ -42,8 +43,11 @@ describe(ParameterFreeLogger, () => {
     parameterFreeLogger.log('info', 'connected');
     parameterFreeLogger.log('log', 'connected');
 
+    expect(Logger.prototype.warn).toBeCalledTimes(1);
     expect(Logger.prototype.warn).toBeCalledWith('deprecated option');
-    expect(Logger.prototype.log).not.toBeCalled();
+    for (const level of levels.filter((level) => level !== 'warn')) {
+      expect(Logger.prototype[level]).not.toBeCalled();
+    }
   });
 
   it('should log schema builds and migrations', () => {

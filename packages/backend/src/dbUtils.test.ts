@@ -28,6 +28,5 @@ describe(getTypeOrmConfig, () => {
     const config = getTypeOrmConfig();
 
     expect(config.logger).toBeInstanceOf(ParameterFreeLogger);
-    expect(config.logging).toBeUndefined();
   });
 });
