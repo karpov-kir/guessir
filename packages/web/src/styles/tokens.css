@@ -1,0 +1,64 @@
+:root {
+  --font: 'JetBrains Mono', ui-monospace, monospace;
+  --text-2xs: 13px;
+  --text-xs: 14px;
+  --text-sm: 15px;
+  --text-md: 16px;
+  --text-lg: 17px;
+  --text-xl: 19px;
+  --text-2xl: 20px;
+  --text-3xl: 24px;
+  --text-4xl: 30px;
+  --radius-pill: 999px;
+  --radius-lg: 28px;
+  --radius-md: 16px;
+  --control-md: 44px;
+  --control-lg: 52px;
+  --control-xl: 56px;
+  --gutter: 32px;
+  --bg: light-dark(#f1eeff, #120d2b);
+  --surface: light-dark(#fff, #1d1645);
+  --ink: light-dark(#1b1340, #f1eeff);
+  --muted: light-dark(#544d7a, #b3abdd);
+  --accent: #5b3df5;
+  --accent-hover: #4a2ee0;
+  --accent-deep: #3a21b8;
+  --on-accent: #fff;
+  --yellow: #ffd23f;
+  --yellow-hover: #ffdc66;
+  --yellow-disabled: #ffe9a3;
+  --yellow-deep: #c99a00;
+  --on-yellow: #1b1340;
+  --tile: light-dark(#e6e0ff, #2e2468);
+  --tile-border: light-dark(#cfc5ff, #3f3484);
+  --chip: light-dark(#eeeaff, #2a2160);
+  --field: light-dark(#fbfaff, #160f38);
+  --link: light-dark(#4a2ee0, #c9bfff);
+  --error: light-dark(#c0262d, #ff8a8f);
+  --focus: light-dark(#5b3df5, #c9bfff);
+  --track: light-dark(rgb(255 255 255 / 28%), rgb(18 13 43 / 35%));
+  --hud-chip-border: rgb(255 255 255 / 60%);
+
+  /* Hover, one shade per kind: a fill changes shade, a field's border firms up, a text-only control recolours */
+  --surface-hover: light-dark(#e2dcff, #3a2f7a);
+  --tile-hover: var(--tile-border);
+  --field-border-hover: var(--muted);
+  --link-hover: light-dark(#3a21b8, #a898ff);
+
+  /* Without the user's own pick the page follows the system theme */
+  color-scheme: light dark;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+@media (width <= 640px) {
+  :root {
+    --gutter: 12px;
+  }
+}

@@ -1,0 +1,105 @@
+/*
+ * A word keeps one box in every state: its own glyphs, with no margin or padding, so revealing it moves no text.
+ * The tile is painted outside that box by ::before, which takes no room in the line.
+ */
+.lexeme-container {
+  --tile-bleed: 4px;
+
+  position: relative;
+  display: inline-flex;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  background: none;
+  color: var(--ink);
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: 1.3;
+  vertical-align: baseline;
+
+  /* The word group around the tile does not wrap; a word wider than the line still wraps inside its tile */
+  white-space: normal;
+}
+
+.lexeme-container::before {
+  content: '';
+  position: absolute;
+  inset: 0 calc(-1 * var(--tile-bleed));
+  z-index: -1;
+  border-radius: 9px;
+  background: var(--tile);
+  box-shadow: inset 0 -3px 0 var(--tile-border);
+}
+
+/* A pressed button moves down 1px, and a transform would make the tile its own stacking context again, painting its
+   bleed over the punctuation beside it */
+.lexeme-container:active {
+  transform: none;
+}
+
+/* The ring goes round the painted tile rather than the narrower word box */
+.lexeme-container:focus-visible {
+  outline: none;
+}
+
+.lexeme-container:focus-visible::before {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* A shown word is no longer clickable, so only the words still hidden react to the pointer */
+@media (hover: hover) {
+  .lexeme-container:not(.show):hover::before {
+    background: var(--tile-hover);
+  }
+}
+
+.lexeme {
+  visibility: hidden;
+}
+
+.lexeme-first-letter {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  color: var(--link);
+  font-weight: 800;
+}
+
+.lexeme-container.show {
+  cursor: default;
+}
+
+.show-text .lexeme-container::before,
+.lexeme-container.show::before {
+  background: none;
+  box-shadow: none;
+}
+
+.show-text .lexeme,
+.lexeme-container.show .lexeme {
+  visibility: visible;
+}
+
+/* While peeking, the words not found yet are muted and dotted, so the found ones stand out without relying on colour */
+.show-text .lexeme-container:not(.show) {
+  color: var(--muted);
+  text-decoration: underline dotted 2px;
+  text-underline-offset: 4px;
+}
+
+/* Only the words still hidden: a shown word needs no hint */
+.show-first-letters .lexeme-container:not(.show) .lexeme-first-letter {
+  visibility: visible;
+}
+
+/* Last among the word rules, so the mark of the last guess beats the shown and peek rules of equal specificity */
+.lexeme-container.fresh {
+  color: var(--on-yellow);
+  font-weight: 800;
+}
+
+.lexeme-container.fresh::before {
+  background: var(--yellow);
+}

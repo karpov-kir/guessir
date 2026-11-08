@@ -1,0 +1,60 @@
+/* The header and the main column share one width */
+#site-header,
+#guessir {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+#guessir,
+#game {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+#guessir {
+  padding: 8px var(--gutter) 64px;
+}
+
+/* The game panel (HUD): the score and the controls */
+#hud {
+  --focus: var(--yellow);
+
+  position: sticky;
+  top: 12px;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 24px;
+  padding: 22px;
+  border-radius: var(--radius-lg);
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 10px 0 var(--accent-deep);
+}
+
+@media (width <= 640px) {
+  #guessir,
+  #game {
+    gap: 16px;
+  }
+
+  #guessir {
+    padding: 0 var(--gutter);
+  }
+
+  /*
+   * Docks to the bottom edge, where the thumb reaches it. Floats above the edge, inset and rounded like the cards, so
+   * it looks the same stuck and in the page flow. Only Chrome can style a stuck element apart (scroll-state queries),
+   * so the panel keeps one look in both.
+   */
+  #hud {
+    top: auto;
+    bottom: 12px;
+    order: 2;
+    gap: 12px;
+    padding: 14px;
+    box-shadow: none;
+  }
+}

@@ -1,0 +1,160 @@
+#controls-container {
+  display: flex;
+  flex: 999 1 360px;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+#guess-container {
+  display: flex;
+  gap: 10px;
+}
+
+/* The HUD is violet in both themes, so the guess field stays white in both. Its light colour scheme makes the shared
+   field rules paint their light-theme colours, so its border shows hover, focus and a miss like a form field's */
+#guess-input {
+  flex-grow: 1;
+  min-width: 0;
+  height: var(--control-xl);
+  padding: 0 20px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--text-2xl);
+  color-scheme: light;
+}
+
+/* The HUD turns the shared focus colour yellow for its rings, which would vanish as a border on the white field */
+#guess-input:focus {
+  border-color: var(--accent);
+}
+
+#guess-input.shake-and-error {
+  border-color: var(--error);
+}
+
+#guess-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--control-xl);
+  padding: 0 26px;
+  background: var(--yellow);
+  color: var(--on-yellow);
+  font-size: 18px;
+  box-shadow: 0 4px 0 var(--yellow-deep);
+}
+
+@media (hover: hover) {
+  #guess-button:not(:disabled):hover {
+    background: var(--yellow-hover);
+  }
+}
+
+/* Half-transparent yellow over the violet panel turns muddy, so the disabled button gets its own solid shade */
+#guess-button:disabled {
+  background: var(--yellow-disabled);
+  opacity: 1;
+  box-shadow: none;
+}
+
+/* The status keeps its line while empty, so a message does not grow the panel and push the text. It sits in the
+   panel's own row gaps, which clear the 5px focus ring of the field above and the chips below, and its text starts
+   where the field's text does (20px padding and 2px border). It holds one line: a longer message is cut on screen,
+   and a screen reader still reads it whole */
+#guess-status {
+  min-height: 16px;
+  padding-left: 22px;
+  overflow: hidden;
+  color: var(--on-accent);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 16px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+#hints {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+#hints:not(:has(.chip:not(.hide))) {
+  display: none;
+}
+
+#hints-label {
+  margin-right: 4px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+#hints .chip {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--hud-chip-border);
+}
+
+#hints .chip:has(:checked) {
+  background: var(--yellow);
+  color: var(--on-yellow);
+  box-shadow: none;
+}
+
+/* On the violet panel an unchecked chip shows the panel through, so its hover takes the panel's own hover shade */
+@media (hover: hover) {
+  #hints .chip:hover:not(:has(:disabled)) {
+    background: var(--accent-hover);
+  }
+
+  #hints .chip:hover:has(:checked):not(:has(:disabled)) {
+    background: var(--yellow-hover);
+  }
+}
+
+#hints input[type='checkbox']:checked {
+  border-color: var(--on-yellow);
+  background: var(--on-yellow);
+}
+
+#hints input[type='checkbox']:checked::after {
+  background: var(--yellow);
+}
+
+@media (width <= 640px) {
+  #controls-container {
+    flex-basis: 100%;
+  }
+
+  #guess-input,
+  #guess-button {
+    height: var(--control-lg);
+  }
+
+  #guess-button {
+    padding: 0 18px;
+  }
+
+  /* The longest message fits one line on a 320px screen at this size */
+  #guess-status {
+    font-size: var(--text-2xs);
+  }
+
+  #hints-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  #hints .chip {
+    flex: 1 1 auto;
+    justify-content: center;
+    padding: 0 8px;
+    white-space: nowrap;
+    font-size: var(--text-xs);
+  }
+}

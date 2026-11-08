@@ -55,7 +55,7 @@ export function initThemeToggle({
   getStorage = () => globalThis.localStorage,
   systemTheme = globalThis.matchMedia('(prefers-color-scheme: dark)'),
 }: ThemeToggleOptions) {
-  // The button shows the moon in the light theme and the sun in the dark one; styles.css hides the other
+  // The button shows the moon in the light theme and the sun in the dark one; `src/styles/header.css` hides the other
   button.innerHTML = icon(moonIcon, 'icon-moon') + icon(sunIcon, 'icon-sun');
 
   const storedTheme = readStoredTheme(getStorage);

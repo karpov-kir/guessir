@@ -1,6 +1,6 @@
 /* v8 ignore start */
 
-import './styles.css';
+import './styles/index.css';
 
 import { CreateTextDto } from '@guessir/shared/dist/CreateTextDto';
 
