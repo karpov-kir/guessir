@@ -58,6 +58,10 @@ describe(watchDb, () => {
 });
 
 describe(waitForDb, () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("should return once the database answers", async () => {
     const db = fakeDb((ping) => (ping <= 3 ? Promise.reject(down) : Promise.resolve()));
 
@@ -67,8 +71,12 @@ describe(waitForDb, () => {
   });
 
   it("should throw the last ping error once the limit has passed", async () => {
+    // Each ping moves the clock by one interval, so a slow machine cannot change how many pings fit in the limit
+    let now = 0;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
     const errors: Error[] = [];
     const db = fakeDb((ping) => {
+      now += 5;
       errors.push(new Error(`ping ${ping} failed`));
       return Promise.reject(errors[ping - 1]);
     });
@@ -77,8 +85,8 @@ describe(waitForDb, () => {
       (error: unknown) => error,
     );
 
-    expect(db.pings).toBeGreaterThan(3);
-    expect(thrown).toBe(errors[db.pings - 1]);
+    expect(db.pings).toBe(10);
+    expect(thrown).toBe(errors[9]);
   });
 
   it("should throw by the limit on a ping that never settles", async () => {
