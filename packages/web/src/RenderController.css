@@ -46,8 +46,7 @@
 
   /*
    * Docks to the bottom edge, where the thumb reaches it. Floats above the edge, inset and rounded like the cards, so
-   * it looks the same stuck and in the page flow. Only Chrome can style a stuck element apart (scroll-state queries),
-   * so the panel keeps one look in both.
+   * it looks the same stuck and in the page flow.
    */
   #hud {
     top: auto;
