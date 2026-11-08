@@ -72,7 +72,8 @@ export async function waitForDb(
       ]);
       return;
     } catch (error) {
-      if (Date.now() >= deadline) {
+      // The timeout is the deadline itself: its timer may fire a moment before the clock reaches the deadline
+      if (error === timeout || Date.now() >= deadline) {
         throw error;
       }
 
