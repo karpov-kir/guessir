@@ -1,0 +1,38 @@
+/* Every inline icon: the files hold only shapes and a stroke width, so size and colour come from here */
+.icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--control-md);
+  padding: 0 18px;
+  border-radius: var(--radius-pill);
+  background: var(--chip);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* The chip is the checkbox's label and its whole hit area, so the chip carries the hover of the box inside */
+@media (hover: hover) {
+  .chip:hover:not(:has(:disabled)) {
+    background: var(--surface-hover);
+  }
+}
+
+/* The cards of the text and of the create form share one look */
+#text-container,
+#utils-container details {
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 2px var(--tile-border);
+}

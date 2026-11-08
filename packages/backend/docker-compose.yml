@@ -9,7 +9,6 @@ services:
     environment:
       POSTGRES_USER: guessir
       POSTGRES_PASSWORD_FILE: /run/secrets/database-password
-      POSTGRES_DB: guessir
     secrets:
       - database-password
     healthcheck:

@@ -1,13 +1,12 @@
-import { CreateTextDtoResponse } from '@guessir/shared/dist/CreateTextDtoResponse';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { mock, MockProxy } from 'vitest-mock-extended';
+import { CreateTextDtoResponse } from "@guessir/shared/dist/CreateTextDtoResponse";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { mock, MockProxy } from "vitest-mock-extended";
 
-import { ApiClient } from '../utils/ApiClient';
-import { Deferred } from '../utils/Deferred';
-import { CreateTextRenderer, getElements } from './CreateTextRenderer';
+import { ApiClient } from "../utils/ApiClient";
+import { CreateTextRenderer, getElements } from "./CreateTextRenderer";
 
 const mockedText = {
-  id: 'mocked-id',
+  id: "mocked-id",
 };
 let mockedApiClient: MockProxy<ApiClient>;
 let createTextRenderer: CreateTextRenderer;
@@ -20,13 +19,13 @@ const createText = async () => {
     allowShowingFirstLettersCheckboxElement,
     generateUrlButtonElement,
   } = getElements(createTextRenderer.getElement());
-  const deferred = new Deferred<CreateTextDtoResponse>();
+  const deferred = Promise.withResolvers<CreateTextDtoResponse>();
 
   mockedApiClient.createText.mockReturnValue(deferred.promise);
 
-  textInputElement.value = 'Text text';
-  titleInputElement.value = 'Test title';
-  descriptionInputElement.value = 'Test description';
+  textInputElement.value = "Text text";
+  titleInputElement.value = "Test title";
+  descriptionInputElement.value = "Test description";
   allowShowingFirstLettersCheckboxElement.checked = false;
 
   generateUrlButtonElement.click();
@@ -47,73 +46,76 @@ describe(CreateTextRenderer, () => {
     });
   });
 
-  it('should create a text when the form is submitted', async () => {
-    const { generatedUrlElement, generatedUrlContainerElement } = getElements(createTextRenderer.getElement());
+  it("should create a text when the form is submitted", async () => {
+    const { generatedUrlElement, generatedUrlContainerElement } = getElements(
+      createTextRenderer.getElement(),
+    );
 
-    expect(generatedUrlContainerElement.classList).toContain('hide');
+    expect(generatedUrlContainerElement.classList).toContain("hide");
 
     await createText();
 
     expect(mockedApiClient.createText).toBeCalledWith({
       allowShowingFirstLetters: false,
       allowShowingText: true,
-      description: 'Test description',
-      text: 'Text text',
-      title: 'Test title',
+      description: "Test description",
+      text: "Text text",
+      title: "Test title",
     });
-    expect(generatedUrlElement.textContent).toBe('http://localhost:3000?textId=mocked-id');
-    expect(generatedUrlElement.href).toBe('http://localhost:3000/?textId=mocked-id');
-    expect(generatedUrlContainerElement.classList).not.toContain('hide');
+    expect(generatedUrlElement.textContent).toBe("http://localhost:3000?textId=mocked-id");
+    expect(generatedUrlElement.href).toBe("http://localhost:3000/?textId=mocked-id");
+    expect(generatedUrlContainerElement.classList).not.toContain("hide");
   });
 
-  it('should reset the length counters after a text is created', async () => {
+  it("should reset the length counters after a text is created", async () => {
     const { titleInputElement } = getElements(createTextRenderer.getElement());
-    const getTitleLimitText = () => titleInputElement.parentElement?.querySelector('.limit-text')?.textContent;
+    const getTitleLimitText = () =>
+      titleInputElement.parentElement?.querySelector(".limit-text")?.textContent;
 
-    titleInputElement.value = 'ab';
-    titleInputElement.dispatchEvent(new Event('input'));
-    expect(getTitleLimitText()).toBe('2/2');
+    titleInputElement.value = "ab";
+    titleInputElement.dispatchEvent(new Event("input"));
+    expect(getTitleLimitText()).toBe("2/2");
 
     await createText();
 
-    expect(getTitleLimitText()).toBe('0/2');
+    expect(getTitleLimitText()).toBe("0/2");
   });
 
-  it('should render an error if text creation fails', async () => {
-    const deferred = new Deferred<CreateTextDtoResponse>();
-    const { errorElement, generateUrlButtonElement, textInputElement, titleInputElement } = getElements(
-      createTextRenderer.getElement(),
-    );
+  it("should render an error if text creation fails", async () => {
+    const deferred = Promise.withResolvers<CreateTextDtoResponse>();
+    const { errorElement, generateUrlButtonElement, textInputElement, titleInputElement } =
+      getElements(createTextRenderer.getElement());
 
     mockedApiClient.createText.mockReturnValue(deferred.promise);
 
     // Set required fields
-    textInputElement.value = 'Text text';
-    titleInputElement.value = 'Test title';
+    textInputElement.value = "Text text";
+    titleInputElement.value = "Test title";
 
-    expect(errorElement.classList).toContain('hide');
+    expect(errorElement.classList).toContain("hide");
 
     generateUrlButtonElement.click();
-    deferred.reject(new Error('Test error'));
+    deferred.reject(new Error("Test error"));
     await deferred.promise.catch(() => void 0);
 
-    expect(errorElement.textContent).toBe('Test error');
-    expect(errorElement.classList).not.toContain('hide');
+    expect(errorElement.textContent).toBe("Test error");
+    expect(errorElement.classList).not.toContain("hide");
   });
 
-  it('should disable form while a request is executing', async () => {
-    const deferred = new Deferred<CreateTextDtoResponse>();
+  it("should disable form while a request is executing", async () => {
+    const deferred = Promise.withResolvers<CreateTextDtoResponse>();
     const { textInputElement, titleInputElement, generateUrlButtonElement } = getElements(
       createTextRenderer.getElement(),
     );
     const containerElement = createTextRenderer.getElement();
-    const getDisabledElements = () => containerElement.querySelectorAll('input:disabled, textarea:disabled');
+    const getDisabledElements = () =>
+      containerElement.querySelectorAll("input:disabled, textarea:disabled");
 
     mockedApiClient.createText.mockReturnValue(deferred.promise);
 
     // Set required fields
-    textInputElement.value = 'Text text';
-    titleInputElement.value = 'Test title';
+    textInputElement.value = "Text text";
+    titleInputElement.value = "Test title";
 
     expect(getDisabledElements()).toHaveLength(0);
 
@@ -128,7 +130,7 @@ describe(CreateTextRenderer, () => {
     expect(getDisabledElements()).toHaveLength(0);
   });
 
-  it('should not submit an invalid form', () => {
+  it("should not submit an invalid form", () => {
     const { generateUrlButtonElement } = getElements(createTextRenderer.getElement());
 
     generateUrlButtonElement.click();
@@ -136,66 +138,80 @@ describe(CreateTextRenderer, () => {
     expect(mockedApiClient.createText).not.toBeCalled();
   });
 
-  it('should initialize inputs without validation classes', () => {
+  it("should initialize inputs without validation classes", () => {
     const { textInputElement, titleInputElement } = getElements(createTextRenderer.getElement());
 
-    expect(!titleInputElement.classList.contains('invalid'));
-    expect(!textInputElement.classList.contains('invalid'));
+    expect(titleInputElement.classList).not.toContain("invalid");
+    expect(textInputElement.classList).not.toContain("invalid");
   });
 
-  it('should validate inputs on submit', () => {
+  it("should validate inputs on submit", () => {
     const { textInputElement, titleInputElement, generateUrlButtonElement } = getElements(
       createTextRenderer.getElement(),
     );
 
     generateUrlButtonElement.click();
 
-    expect(titleInputElement.classList.contains('invalid'));
-    expect(textInputElement.classList.contains('invalid'));
+    expect(titleInputElement.classList).toContain("invalid");
+    expect(textInputElement.classList).toContain("invalid");
   });
 
-  it('should mark empty required fields invalid for screen readers too', () => {
+  it("should mark empty required fields invalid for screen readers too", () => {
     const { textInputElement, titleInputElement, generateUrlButtonElement } = getElements(
       createTextRenderer.getElement(),
     );
 
     generateUrlButtonElement.click();
 
-    expect(titleInputElement.getAttribute('aria-invalid')).toBe('true');
-    expect(textInputElement.getAttribute('aria-invalid')).toBe('true');
+    expect(titleInputElement.getAttribute("aria-invalid")).toBe("true");
+    expect(textInputElement.getAttribute("aria-invalid")).toBe("true");
 
-    titleInputElement.value = 'ab';
-    titleInputElement.dispatchEvent(new Event('input'));
+    titleInputElement.value = "ab";
+    titleInputElement.dispatchEvent(new Event("input"));
 
-    expect(titleInputElement.getAttribute('aria-invalid')).toBe('false');
-    expect(textInputElement.getAttribute('aria-invalid')).toBe('true');
+    expect(titleInputElement.getAttribute("aria-invalid")).toBe("false");
+    expect(textInputElement.getAttribute("aria-invalid")).toBe("true");
   });
 
-  it('should validate inputs on change', () => {
+  it("should validate inputs on input", () => {
     const { textInputElement, titleInputElement } = getElements(createTextRenderer.getElement());
 
-    titleInputElement.dispatchEvent(new KeyboardEvent('keypress'));
-    textInputElement.dispatchEvent(new KeyboardEvent('keypress'));
+    titleInputElement.dispatchEvent(new Event("input"));
+    textInputElement.dispatchEvent(new Event("input"));
 
-    expect(titleInputElement.classList.contains('invalid'));
-    expect(textInputElement.classList.contains('invalid'));
+    expect(titleInputElement.classList).toContain("invalid");
+    expect(textInputElement.classList).toContain("invalid");
   });
 
-  it('should limit inputs length', () => {
+  it("should limit inputs length", () => {
     const { textInputElement, titleInputElement, descriptionInputElement } = getElements(
       createTextRenderer.getElement(),
     );
     const elements = [textInputElement, titleInputElement, descriptionInputElement];
 
     elements.forEach((element) => {
-      element.value = '  asd  ';
-      element.dispatchEvent(new Event('input'));
+      element.value = "  asd  ";
+      element.dispatchEvent(new Event("input"));
 
-      expect(element.parentElement?.querySelector('.limit-text')?.textContent).toBe('2/2');
+      expect(element.parentElement?.querySelector(".limit-text")?.textContent).toBe("2/2");
     });
   });
 
-  it('should copy a generated URL on click', async () => {
+  it("should count and cut inputs in code points, as the server counts them", () => {
+    const { textInputElement, titleInputElement, descriptionInputElement } = getElements(
+      createTextRenderer.getElement(),
+    );
+
+    [textInputElement, titleInputElement, descriptionInputElement].forEach((element) => {
+      element.value = "\u{1F600}\u{1F600}\u{1F600}";
+      element.dispatchEvent(new Event("input"));
+
+      expect(element.value).toBe("\u{1F600}\u{1F600}");
+      expect(element.parentElement?.querySelector(".limit-text")?.textContent).toBe("2/2");
+    });
+  });
+
+  it("should copy a generated URL on click", async () => {
     const mockedWriteText = vi.fn();
     const { copyGeneratedUrlButtonElement } = getElements(createTextRenderer.getElement());
 
@@ -208,10 +224,10 @@ describe(CreateTextRenderer, () => {
     await createText();
     copyGeneratedUrlButtonElement.click();
 
-    expect(mockedWriteText).toBeCalledWith('http://localhost:3000?textId=mocked-id');
+    expect(mockedWriteText).toBeCalledWith("http://localhost:3000?textId=mocked-id");
   });
 
-  it('should hide the alert that a generated URL was copied on a timeout', async () => {
+  it("should hide the alert that a generated URL was copied on a timeout", async () => {
     const { copyGeneratedUrlButtonElement } = getElements(createTextRenderer.getElement());
 
     vi.useFakeTimers();
@@ -219,10 +235,10 @@ describe(CreateTextRenderer, () => {
     await createText();
     copyGeneratedUrlButtonElement.click();
 
-    expect(copyGeneratedUrlButtonElement.querySelector('div')?.textContent).toBe('(copied)');
+    expect(copyGeneratedUrlButtonElement.querySelector("div")?.textContent).toBe("(copied)");
 
     vi.runAllTimers();
 
-    expect(copyGeneratedUrlButtonElement.querySelector('div')).toBe(null);
+    expect(copyGeneratedUrlButtonElement.querySelector("div")).toBe(null);
   });
 });

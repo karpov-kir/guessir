@@ -1,4 +1,4 @@
-import { IsInt, Min } from 'class-validator';
+import { IsInt, Min } from "class-validator";
 
 /** Holds the body of a reveal request: the position of the word in the text that a move opens. */
 export class RevealDtoRequest {

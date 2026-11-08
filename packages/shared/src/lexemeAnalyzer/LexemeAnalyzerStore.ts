@@ -1,5 +1,5 @@
-import { LexemeNormalizer } from './LexemeNormalizer.js';
-import { GroupWordLikeNominal, Lexeme, LexemeAnalysis } from './types.js';
+import { LexemeNormalizer } from "./LexemeNormalizer.js";
+import { GroupWordLikeNominal, Lexeme, LexemeAnalysis } from "./types.js";
 
 export class LexemeAnalyzerStore implements LexemeAnalysis {
   #lexemes: Map<number, Lexeme> = new Map<number, Lexeme>();
@@ -45,7 +45,8 @@ export class LexemeAnalyzerStore implements LexemeAnalysis {
       this.#wordLikeCount++;
 
       LexemeNormalizer.getGroupingWords(newLexeme.normalized).forEach((groupWordLikeNominal) => {
-        const lexemesByWordLike = this.#lexemesByWordLike.get(groupWordLikeNominal) || new Map<number, Lexeme>();
+        const lexemesByWordLike =
+          this.#lexemesByWordLike.get(groupWordLikeNominal) || new Map<number, Lexeme>();
         lexemesByWordLike.set(newLexemeIndex, newLexeme);
         this.#lexemesByWordLike.set(groupWordLikeNominal, lexemesByWordLike);
       });
@@ -62,7 +63,8 @@ export class LexemeAnalyzerStore implements LexemeAnalysis {
         this.#wordLikeCount--;
 
         LexemeNormalizer.getGroupingWords(lastLexeme.normalized).forEach((groupWordLikeNominal) => {
-          const lexemesByWordLike = this.#lexemesByWordLike.get(groupWordLikeNominal) || new Map<number, Lexeme>();
+          const lexemesByWordLike =
+            this.#lexemesByWordLike.get(groupWordLikeNominal) || new Map<number, Lexeme>();
 
           lexemesByWordLike.delete(this.lastLexemeIndex);
 

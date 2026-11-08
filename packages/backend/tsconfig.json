@@ -1,11 +1,9 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "module": "NodeNext",
-    "moduleResolution": "NodeNext",
     "skipLibCheck": true,
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true
+    "experimentalDecorators": true
   }
 }

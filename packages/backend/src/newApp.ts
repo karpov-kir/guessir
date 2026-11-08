@@ -1,13 +1,17 @@
-import fastifyHelmet from '@fastify/helmet';
-import { NotAcceptableException, ValidationPipe } from '@nestjs/common';
-import { IEntryNestModule, NestFactory } from '@nestjs/core';
-import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import fastifyHelmet from "@fastify/helmet";
+import { NotAcceptableException, ValidationPipe } from "@nestjs/common";
+import { IEntryNestModule, NestFactory } from "@nestjs/core";
+import { FastifyAdapter, NestFastifyApplication } from "@nestjs/platform-fastify";
 
-import { QueryErrorFilter } from './QueryErrorFilter.js';
+import { QueryErrorFilter } from "./QueryErrorFilter.js";
 
 /** Creates the HTTP app of `module` as the server runs it: routing, headers, validation and failed-query handling. */
 export async function newApp(module: IEntryNestModule, { logger = true } = {}) {
-  const allowedOrigins = new Set(['http://localhost:5173', 'http://127.0.0.1:5173', 'https://guessir.kk-forge.com']);
+  const allowedOrigins = new Set([
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://guessir.kk-forge.com",
+  ]);
   const app = await NestFactory.create<NestFastifyApplication>(
     module,
     new FastifyAdapter({
@@ -28,7 +32,7 @@ export async function newApp(module: IEntryNestModule, { logger = true } = {}) {
       if (isAllowed) {
         callback(null, true);
       } else {
-        callback(new NotAcceptableException('Not allowed by CORS'), false);
+        callback(new NotAcceptableException("Not allowed by CORS"), false);
       }
     },
   });

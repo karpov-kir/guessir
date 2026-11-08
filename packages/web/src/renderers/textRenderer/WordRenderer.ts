@@ -1,10 +1,10 @@
-import { PubSub } from '../../pubSub/PubSub';
-import { ChildRenderer } from '../types';
+import { PubSub } from "../../pubSub/PubSub";
+import { ChildRenderer } from "../types";
 
 export enum WordHint {
-  None = 'none',
-  FirstLetters = 'first-letters',
-  Text = 'text',
+  None = "none",
+  FirstLetters = "first-letters",
+  Text = "text",
 }
 
 type WordRendererOptions = {
@@ -30,12 +30,12 @@ export class WordRenderer implements ChildRenderer {
   constructor(options: WordRendererOptions) {
     this.index = options.index;
     this.length = options.length;
-    this.containerElement = document.createElement('button');
-    this.containerElement.classList.add('lexeme-container');
-    this.lexemeElement = document.createElement('span');
-    this.lexemeElement.classList.add('lexeme');
-    this.firstLetterElement = document.createElement('span');
-    this.firstLetterElement.classList.add('lexeme-first-letter');
+    this.containerElement = document.createElement("button");
+    this.containerElement.classList.add("lexeme-container");
+    this.lexemeElement = document.createElement("span");
+    this.lexemeElement.classList.add("lexeme");
+    this.firstLetterElement = document.createElement("span");
+    this.firstLetterElement.classList.add("lexeme-first-letter");
 
     this.initElement();
   }
@@ -47,7 +47,7 @@ export class WordRenderer implements ChildRenderer {
   public show(word: string) {
     this.setWord(word);
     this.isShown = true;
-    this.containerElement.classList.add('show');
+    this.containerElement.classList.add("show");
     this.renderLabel();
   }
 
@@ -64,7 +64,7 @@ export class WordRenderer implements ChildRenderer {
 
   /** Turns on or off the highlight that marks the word as part of the last successful guess. */
   public markFresh(isFresh: boolean) {
-    this.containerElement.classList.toggle('fresh', isFresh);
+    this.containerElement.classList.toggle("fresh", isFresh);
   }
 
   public setHint(hint: WordHint) {
@@ -78,29 +78,29 @@ export class WordRenderer implements ChildRenderer {
    */
   private renderLabel() {
     if (this.isShown || this.hint === WordHint.Text) {
-      this.containerElement.removeAttribute('aria-label');
+      this.containerElement.removeAttribute("aria-label");
     } else if (this.hint === WordHint.FirstLetters && this.firstLetter) {
       this.containerElement.setAttribute(
-        'aria-label',
+        "aria-label",
         `Hidden word starting with ${this.firstLetter}, ${this.describeLength()}`,
       );
     } else {
-      this.containerElement.setAttribute('aria-label', `Hidden word, ${this.describeLength()}`);
+      this.containerElement.setAttribute("aria-label", `Hidden word, ${this.describeLength()}`);
     }
   }
 
   private describeLength() {
-    return this.length === 1 ? '1 letter' : `${this.length} letters`;
+    return this.length === 1 ? "1 letter" : `${this.length} letters`;
   }
 
   private initElement() {
     this.renderLabel();
 
     // The page font is monospace, so a placeholder of as many characters keeps the tile as wide as the hidden word
-    this.lexemeElement.textContent = '_'.repeat(this.length);
+    this.lexemeElement.textContent = "_".repeat(this.length);
     this.containerElement.append(this.lexemeElement, this.firstLetterElement);
 
-    this.containerElement.addEventListener('click', () => {
+    this.containerElement.addEventListener("click", () => {
       if (!this.isShown) {
         this.revealRequestPubSub.publish(this.index);
       }

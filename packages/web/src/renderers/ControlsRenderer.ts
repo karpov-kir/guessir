@@ -1,8 +1,8 @@
-import arrowIcon from '../icons/arrowIcon.svg?raw';
-import { PubSub } from '../pubSub/PubSub';
-import { onChangeAndEnter, onEnter } from '../utils/dom';
-import { icon } from '../utils/icon';
-import { ChildRenderer } from './types';
+import arrowIcon from "../icons/arrowIcon.svg?raw";
+import { PubSub } from "../pubSub/PubSub";
+import { onChangeAndEnter, onEnter } from "../utils/dom";
+import { icon } from "../utils/icon";
+import { ChildRenderer } from "./types";
 
 export type GuessEvent = {
   word: string;
@@ -29,9 +29,9 @@ export class ControlsRenderer implements ChildRenderer {
    */
   private readonly statusesByCheckedWord = new Map<string, string>();
 
-  public readonly guessEvent: PubSub<GuessEvent>['event'];
-  public readonly showFirstLettersEvent: PubSub<boolean>['event'];
-  public readonly showTextEvent: PubSub<boolean>['event'];
+  public readonly guessEvent: PubSub<GuessEvent>["event"];
+  public readonly showFirstLettersEvent: PubSub<boolean>["event"];
+  public readonly showTextEvent: PubSub<boolean>["event"];
 
   constructor(options: ControlsRendererOptions = {}) {
     this.guessPubSub = options.guessPubSub || new PubSub<GuessEvent>();
@@ -42,8 +42,8 @@ export class ControlsRenderer implements ChildRenderer {
     this.showFirstLettersEvent = this.showFirstLettersPubSub.event;
     this.showTextEvent = this.showTextPubSub.event;
 
-    this.containerElement = document.createElement('div');
-    this.containerElement.id = 'controls-container';
+    this.containerElement = document.createElement("div");
+    this.containerElement.id = "controls-container";
     this.initElement(options.allowShowingText, options.allowShowingFirstLetters);
   }
 
@@ -63,11 +63,11 @@ export class ControlsRenderer implements ChildRenderer {
     this.statusesByCheckedWord.delete(word);
 
     if (this.getInputtedWord() === word) {
-      guessInputElement.value = '';
+      guessInputElement.value = "";
     }
 
     if (statusElement.textContent === statusAtSend) {
-      statusElement.textContent = '';
+      statusElement.textContent = "";
     }
 
     this.renderGuessButton();
@@ -116,16 +116,16 @@ export class ControlsRenderer implements ChildRenderer {
   public shakeAndError() {
     const { guessInputElement } = this.getElements();
 
-    guessInputElement.classList.add('shake-and-error');
+    guessInputElement.classList.add("shake-and-error");
     // The shake is visual only, so a screen reader hears the miss from this live region
-    this.announce('No new words for this guess');
+    this.announce("No new words for this guess");
 
     const removeAnimationClass = () => {
-      guessInputElement.removeEventListener('animationend', removeAnimationClass);
-      guessInputElement.classList.remove('shake-and-error');
+      guessInputElement.removeEventListener("animationend", removeAnimationClass);
+      guessInputElement.classList.remove("shake-and-error");
     };
 
-    guessInputElement.addEventListener('animationend', removeAnimationClass);
+    guessInputElement.addEventListener("animationend", removeAnimationClass);
   }
 
   private initElement(allowShowingText?: boolean, allowShowingFirstLetters?: boolean) {
@@ -152,11 +152,11 @@ export class ControlsRenderer implements ChildRenderer {
     const { showTextCheckboxElement, showFirstLettersCheckboxElement } = this.getElements();
 
     if (!allowShowingText) {
-      showTextCheckboxElement.parentElement?.classList.add('hide');
+      showTextCheckboxElement.parentElement?.classList.add("hide");
     }
 
     if (!allowShowingFirstLetters) {
-      showFirstLettersCheckboxElement.parentElement?.classList.add('hide');
+      showFirstLettersCheckboxElement.parentElement?.classList.add("hide");
     }
 
     this.attachGuessHandler();
@@ -179,7 +179,7 @@ export class ControlsRenderer implements ChildRenderer {
   private attachInputHandler() {
     const { guessInputElement } = this.getElements();
 
-    guessInputElement.addEventListener('input', () => this.renderGuessButton());
+    guessInputElement.addEventListener("input", () => this.renderGuessButton());
   }
 
   /** Enables the button for a typed word that is not already being checked. */
@@ -200,7 +200,7 @@ export class ControlsRenderer implements ChildRenderer {
       }
 
       // The word stays in the input while the server checks it: an emptied input would flash its placeholder
-      this.statusesByCheckedWord.set(word, statusElement.textContent ?? '');
+      this.statusesByCheckedWord.set(word, statusElement.textContent ?? "");
       this.renderGuessButton();
       guessInputElement.focus();
       this.guessPubSub.publish({
@@ -208,7 +208,7 @@ export class ControlsRenderer implements ChildRenderer {
       });
     };
 
-    guessButtonElement.addEventListener('click', guessHandler);
+    guessButtonElement.addEventListener("click", guessHandler);
     onEnter(guessInputElement, guessHandler);
   }
 
@@ -217,7 +217,7 @@ export class ControlsRenderer implements ChildRenderer {
 
     onChangeAndEnter(showTextCheckboxElement, () => {
       if (this.isFirstLettersShown) {
-        showFirstLettersCheckboxElement.dispatchEvent(new Event('change'));
+        showFirstLettersCheckboxElement.dispatchEvent(new Event("change"));
       }
 
       this.isTextShown = !this.isTextShown;
@@ -231,7 +231,7 @@ export class ControlsRenderer implements ChildRenderer {
 
     onChangeAndEnter(showFirstLettersCheckboxElement, () => {
       if (this.isTextShown) {
-        showTextCheckboxElement.dispatchEvent(new Event('change'));
+        showTextCheckboxElement.dispatchEvent(new Event("change"));
       }
 
       this.isFirstLettersShown = !this.isFirstLettersShown;
@@ -242,13 +242,15 @@ export class ControlsRenderer implements ChildRenderer {
 }
 
 export function getElements(containerElement: HTMLElement) {
-  const showTextCheckboxElement = containerElement.querySelector('#show-text-checkbox') as HTMLInputElement;
-  const showFirstLettersCheckboxElement = containerElement.querySelector(
-    '#show-first-letters-checkbox',
+  const showTextCheckboxElement = containerElement.querySelector(
+    "#show-text-checkbox",
   ) as HTMLInputElement;
-  const guessButtonElement = containerElement.querySelector('#guess-button') as HTMLButtonElement;
-  const guessInputElement = containerElement.querySelector('#guess-input') as HTMLInputElement;
-  const statusElement = containerElement.querySelector('#guess-status') as HTMLElement;
+  const showFirstLettersCheckboxElement = containerElement.querySelector(
+    "#show-first-letters-checkbox",
+  ) as HTMLInputElement;
+  const guessButtonElement = containerElement.querySelector("#guess-button") as HTMLButtonElement;
+  const guessInputElement = containerElement.querySelector("#guess-input") as HTMLInputElement;
+  const statusElement = containerElement.querySelector("#guess-status") as HTMLElement;
 
   return {
     showTextCheckboxElement,

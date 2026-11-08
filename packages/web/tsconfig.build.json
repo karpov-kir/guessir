@@ -1,13 +1,4 @@
 {
-  "extends": "../../tsconfig.build.json",
-  "compilerOptions": {
-    "lib": ["DOM", "ES2022"],
-    "types": ["./src/@types/env", "vite/client"],
-    "noEmit": true
-  },
-  "references": [
-    {
-      "path": "../shared/tsconfig.build.json"
-    }
-  ]
+  // The package options come from ./tsconfig.json, the build excludes from the root
+  "extends": ["../../tsconfig.build.json", "./tsconfig.json"]
 }

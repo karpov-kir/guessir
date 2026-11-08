@@ -1,0 +1,56 @@
+#text-container {
+  padding: 40px 44px 44px;
+}
+
+#title {
+  margin-bottom: 8px;
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+#description {
+  margin-bottom: 28px;
+  color: var(--muted);
+  font-size: var(--text-xl);
+}
+
+#lexemes {
+  font-size: 21px;
+  line-height: 2.05;
+  overflow-wrap: anywhere;
+
+  /* Leaves a gap between two tiles, which bleed over the spaces */
+  word-spacing: 4px;
+
+  /* The tiles (z-index -1) paint under all of the text here,
+     so a tile's bleed never covers the punctuation beside it */
+  isolation: isolate;
+}
+
+/* A word and the punctuation that opens or closes it break as one, so no line starts with a comma */
+.lexeme-group {
+  white-space: nowrap;
+}
+
+@media (width <= 640px) {
+  #text-container {
+    order: 1;
+    padding: 22px 18px;
+  }
+
+  #title {
+    font-size: var(--text-4xl);
+  }
+
+  #description {
+    margin-bottom: 16px;
+    font-size: var(--text-sm);
+  }
+
+  #lexemes {
+    font-size: var(--text-xl);
+    line-height: 2;
+  }
+}

@@ -1,7 +1,15 @@
-import { Text } from '@guessir/shared/dist/Text.js';
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { createTextLimits } from "@guessir/shared/dist/CreateTextDto.js";
+import { Text } from "@guessir/shared/dist/Text.js";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
-@Entity('texts')
+@Entity("texts")
 export class TextEntity implements Text {
   @PrimaryGeneratedColumn()
   pk!: number;
@@ -13,18 +21,18 @@ export class TextEntity implements Text {
   id!: string;
 
   @Column({
-    length: 500,
+    length: createTextLimits.title,
   })
   title!: string;
 
   @Column({
-    length: 4000,
+    length: createTextLimits.description,
     nullable: true,
   })
   description?: string;
 
   @Column({
-    length: 4000,
+    length: createTextLimits.text,
   })
   text!: string;
 

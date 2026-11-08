@@ -1,16 +1,16 @@
-import moonIcon from '../icons/moonIcon.svg?raw';
-import sunIcon from '../icons/sunIcon.svg?raw';
-import { icon } from './icon';
+import moonIcon from "../icons/moonIcon.svg?raw";
+import sunIcon from "../icons/sunIcon.svg?raw";
+import { icon } from "./icon";
 
 enum Theme {
-  Light = 'light',
-  Dark = 'dark',
+  Light = "light",
+  Dark = "dark",
 }
 
 /** The part of `MediaQueryList` the toggle uses, so a test can stand in for the system theme */
 export type SystemThemeQuery = {
   matches: boolean;
-  addEventListener(type: 'change', listener: () => void): void;
+  addEventListener(type: "change", listener: () => void): void;
 };
 
 type ThemeToggleOptions = {
@@ -20,7 +20,7 @@ type ThemeToggleOptions = {
   systemTheme?: SystemThemeQuery;
 };
 
-const storageKey = 'guessir.theme';
+const storageKey = "guessir.theme";
 
 /**
  * Returns the stored theme, or undefined when none is stored or the storage is unavailable.
@@ -53,10 +53,10 @@ export function initThemeToggle({
   button,
   root = document.documentElement,
   getStorage = () => globalThis.localStorage,
-  systemTheme = globalThis.matchMedia('(prefers-color-scheme: dark)'),
+  systemTheme = globalThis.matchMedia("(prefers-color-scheme: dark)"),
 }: ThemeToggleOptions) {
-  // The button shows the moon in the light theme and the sun in the dark one; styles.css hides the other
-  button.innerHTML = icon(moonIcon, 'icon-moon') + icon(sunIcon, 'icon-sun');
+  // The button shows the moon in the light theme and the sun in the dark one; `src/styles/header.css` hides the other
+  button.innerHTML = icon(moonIcon, "icon-moon") + icon(sunIcon, "icon-sun");
 
   const storedTheme = readStoredTheme(getStorage);
 
@@ -64,13 +64,14 @@ export function initThemeToggle({
     root.dataset.theme = storedTheme;
   }
 
-  const isDark = () => (root.dataset.theme ? root.dataset.theme === Theme.Dark : systemTheme.matches);
-  const renderPressed = () => button.setAttribute('aria-pressed', String(isDark()));
+  const isDark = () =>
+    root.dataset.theme ? root.dataset.theme === Theme.Dark : systemTheme.matches;
+  const renderPressed = () => button.setAttribute("aria-pressed", String(isDark()));
 
   renderPressed();
-  systemTheme.addEventListener('change', renderPressed);
+  systemTheme.addEventListener("change", renderPressed);
 
-  button.addEventListener('click', () => {
+  button.addEventListener("click", () => {
     const theme = isDark() ? Theme.Light : Theme.Dark;
 
     root.dataset.theme = theme;
