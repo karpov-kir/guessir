@@ -39,7 +39,6 @@ export async function newApp(module: IEntryNestModule, { logger = true } = {}) {
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
-      transform: false,
       forbidNonWhitelisted: true,
     }),
   );
