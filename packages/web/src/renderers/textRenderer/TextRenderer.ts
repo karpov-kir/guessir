@@ -134,10 +134,9 @@ export class TextRenderer implements ChildRenderer {
   }
 
   /**
-   * Puts a word in one group with the punctuation that closes it and the punctuation that opens it. The group does
-   * not wrap, so no line starts with a comma or ends with an opening bracket: a tile is an atomic inline, and a browser
-   * may break right after it. Any other character, such as a standalone dash or a slash, stays outside the groups, so
-   * a line can still break there, inside a link for one.
+   * Groups each word with the punctuation that opens and closes it and keeps the group on one line, so no line
+   * starts with a comma or ends with an opening bracket. A word tile is an atomic inline, and a browser may break
+   * a line right after it. A standalone dash or slash stays outside the groups, so a line can still break there.
    */
   private renderLexemes(lexemesElement: HTMLElement) {
     let group: HTMLElement | undefined;

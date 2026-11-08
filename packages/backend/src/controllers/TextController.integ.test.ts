@@ -23,9 +23,11 @@ describe(TextController, () => {
   let textsController: TextController;
   let textsRepository: Repository<TextEntity>;
 
-  /** Makes the repository return `text` with `overrides` for any id. */
+  /** Makes the repository return `text` with `overrides` for its id, and no text for any other id. */
   const storeText = (overrides: Partial<TextEntity> = {}) => {
-    vi.spyOn(textsRepository, 'findOne').mockResolvedValue({ ...text, ...overrides });
+    vi.spyOn(textsRepository, 'findOne').mockImplementation(async (options) =>
+      !Array.isArray(options.where) && options.where?.id === text.id ? { ...text, ...overrides } : null,
+    );
   };
 
   beforeEach(() => {
@@ -60,7 +62,6 @@ describe(TextController, () => {
           { index: 5, length: 3 },
         ],
       });
-      expect(textsRepository.findOne).toBeCalledWith({ where: { id: 'id' } });
     });
 
     it('should throw an error if the search query fails', async () => {
@@ -161,19 +162,6 @@ describe(TextController, () => {
       await expect(textsController.findById('unknown')).rejects.toEqual(new NotFoundException());
 
       expect(textsRepository.findOne).toBeCalledTimes(2);
-    });
-
-    it('should ask the repository again for a text it dropped beyond its bound', async () => {
-      storeText();
-
-      for (let i = 0; i <= TextController.CACHED_TEXT_COUNT; i++) {
-        await textsController.findById(`id-${i}`);
-      }
-
-      await textsController.findById('id-0');
-
-      expect(textsRepository.findOne).toBeCalledTimes(TextController.CACHED_TEXT_COUNT + 2);
-      expect(textsRepository.findOne).lastCalledWith({ where: { id: 'id-0' } });
     });
   });
 

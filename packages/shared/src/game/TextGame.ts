@@ -33,7 +33,7 @@ export class TextGame {
     return Array.from(lexemes, ([index, lexeme]) => ({ index, word: lexeme.normalized }));
   }
 
-  /** Returns the word at `index`, or undefined when the lexeme there is not a word. */
+  /** Returns the word at `index`, or undefined when there is no lexeme at `index` or that lexeme is not a word. */
   public reveal(index: number): RevealedWord | undefined {
     const lexeme = this.lexemesByIndex.get(index);
 

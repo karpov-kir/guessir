@@ -5,6 +5,7 @@ export interface Game {
   readonly skeleton: TextSkeleton;
   /** Returns every word the guess matches, or an empty array for a miss. */
   guess(word: string): Promise<RevealedWord[]>;
+  /** Returns the word at `index`, or rejects when the lexeme there is not a word. */
   reveal(index: number): Promise<RevealedWord>;
   firstLetters(): Promise<RevealedWord[]>;
   words(): Promise<RevealedWord[]>;

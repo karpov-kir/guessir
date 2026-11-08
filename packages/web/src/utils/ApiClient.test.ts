@@ -1,17 +1,11 @@
-import { TextSkeleton } from '@guessir/shared/dist/game/types';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { mock, MockProxy } from 'vitest-mock-extended';
 
+import { newTextSkeleton } from '../../tests/utils/textSkeleton';
 import { ApiClient } from './ApiClient';
 import { HttpClient } from './HttpClient';
 
-const skeleton: TextSkeleton = {
-  title: 'Title',
-  allowShowingFirstLetters: true,
-  allowShowingText: true,
-  wordCount: 1,
-  lexemes: [{ index: 0, length: 3 }],
-};
+const skeleton = newTextSkeleton();
 let httpClient: MockProxy<HttpClient>;
 let apiClient: ApiClient;
 

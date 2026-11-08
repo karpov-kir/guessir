@@ -36,6 +36,10 @@ describe(TextGame, () => {
     expect(textGame.guess('two')).toEqual([]);
   });
 
+  it('should reveal nothing for a blank guess, even next to a bare contraction ending', () => {
+    expect(new TextGame("The boy 's here").guess(' ')).toEqual([]);
+  });
+
   it('should reveal a word by its index', () => {
     expect(textGame.reveal(3)).toEqual({ index: 3, word: "she's" });
   });
