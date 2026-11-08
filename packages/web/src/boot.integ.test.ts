@@ -1,7 +1,7 @@
-import { TextSkeleton } from '@guessir/shared/dist/game/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mock, MockProxy } from 'vitest-mock-extended';
 
+import { newTextSkeleton } from '../tests/utils/textSkeleton';
 import { boot } from './boot';
 import { Game } from './game/Game';
 import { LocalGame } from './game/LocalGame';
@@ -14,14 +14,7 @@ let mockedApiClient: MockProxy<ApiClient>;
 vi.mock('./RenderController');
 
 const textId = 'text-id';
-const skeleton: TextSkeleton = {
-  title: 'Test title',
-  description: 'Test description',
-  allowShowingFirstLetters: true,
-  allowShowingText: true,
-  wordCount: 1,
-  lexemes: [{ index: 0, length: 4 }],
-};
+const skeleton = newTextSkeleton();
 
 Object.defineProperty(window, 'location', {
   value: {

@@ -68,8 +68,7 @@ describe(ControlsRenderer, () => {
 
   it('should keep the guess and the status, focus the input and disable the button while a guess is checked', () => {
     const controlsRenderer = new ControlsRenderer();
-    const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
-    const statusElement = controlsRenderer.getElement().querySelector('[role="status"]') as HTMLElement;
+    const { guessButtonElement, guessInputElement, statusElement } = getElements(controlsRenderer.getElement());
 
     controlsRenderer.announce('No new words for this guess');
     vi.spyOn(guessInputElement, 'focus');
@@ -85,8 +84,7 @@ describe(ControlsRenderer, () => {
 
   it('should empty the input and clear the last status once a guess is found', () => {
     const controlsRenderer = new ControlsRenderer();
-    const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
-    const statusElement = controlsRenderer.getElement().querySelector('[role="status"]') as HTMLElement;
+    const { guessButtonElement, guessInputElement, statusElement } = getElements(controlsRenderer.getElement());
 
     controlsRenderer.announce('No new words for this guess');
     typeGuess(guessInputElement, 'test');
@@ -101,8 +99,7 @@ describe(ControlsRenderer, () => {
 
   it('should keep what was typed or announced while a found guess was checked', () => {
     const controlsRenderer = new ControlsRenderer();
-    const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
-    const statusElement = controlsRenderer.getElement().querySelector('[role="status"]') as HTMLElement;
+    const { guessButtonElement, guessInputElement, statusElement } = getElements(controlsRenderer.getElement());
 
     typeGuess(guessInputElement, 'test');
     guessButtonElement.click();
@@ -128,6 +125,24 @@ describe(ControlsRenderer, () => {
     guessInputElement.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter' }));
 
     expect(guessPubSub.publish).toBeCalledTimes(1);
+  });
+
+  it('should not send a guess again while it is checked, after an earlier guess is answered', () => {
+    const guessPubSub = new PubSub<GuessEvent>();
+    const controlsRenderer = new ControlsRenderer({ guessPubSub });
+    const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
+
+    vi.spyOn(guessPubSub, 'publish');
+    typeGuess(guessInputElement, 'one');
+    guessButtonElement.click();
+    typeGuess(guessInputElement, 'two');
+    guessButtonElement.click();
+
+    controlsRenderer.acceptGuess('one');
+    guessInputElement.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter' }));
+
+    expect(guessButtonElement.disabled).toBe(true);
+    expect(guessPubSub.publish).toBeCalledTimes(2);
   });
 
   it('should leave a missed guess in the input and enable the button, so the player can correct it', () => {
@@ -187,16 +202,6 @@ describe(ControlsRenderer, () => {
     guessButtonElement.click();
 
     expect(guessPubSub.publish).not.toBeCalled();
-  });
-
-  it('should show first letters on a click', () => {
-    const controlsRenderer = new ControlsRenderer({
-      allowShowingFirstLetters: true,
-      allowShowingText: true,
-    });
-    const { showFirstLettersCheckboxElement } = getElements(controlsRenderer.getElement());
-
-    showFirstLettersCheckboxElement.click();
   });
 
   it.each([
@@ -329,7 +334,7 @@ describe(ControlsRenderer, () => {
 
   it('should announce a wrong guess', () => {
     const controlsRenderer = new ControlsRenderer();
-    const statusElement = controlsRenderer.getElement().querySelector('[role="status"]') as HTMLElement;
+    const { statusElement } = getElements(controlsRenderer.getElement());
 
     expect(statusElement.textContent).toBe('');
 

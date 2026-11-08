@@ -107,7 +107,7 @@ export class RenderController {
     try {
       guessedWords = await this.game.guess(word);
     } catch (error) {
-      console.error('Failed to check the guess', error);
+      console.error('Failed to check the guess', { word }, error);
       this.controlsRenderer.returnGuess(word);
       this.controlsRenderer.announce('Could not check this guess');
       return;

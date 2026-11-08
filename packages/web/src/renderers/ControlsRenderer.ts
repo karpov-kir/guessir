@@ -23,10 +23,11 @@ export class ControlsRenderer implements ChildRenderer {
   private readonly showTextPubSub: PubSub<boolean>;
   private isTextShown = false;
   private isFirstLettersShown = false;
-  /** The word the server is checking, so a second click on it sends nothing */
-  private checkedWord?: string;
-  /** The status shown when the checked word was sent, which a hit clears unless something else was announced since */
-  private statusAtSend = '';
+  /**
+   * Maps each word the server is checking to the status shown when the word was sent. A second click on a checked word
+   * sends nothing. A hit clears the status only while it is still the one shown at send.
+   */
+  private readonly statusesByCheckedWord = new Map<string, string>();
 
   public readonly guessEvent: PubSub<GuessEvent>['event'];
   public readonly showFirstLettersEvent: PubSub<boolean>['event'];
@@ -51,19 +52,21 @@ export class ControlsRenderer implements ChildRenderer {
   }
 
   /**
-   * Empties the input for the next word after a hit, and clears the status of the last guess unless something was
-   * announced while the server checked it. A word the player typed since sending stays.
+   * Empties the input for the next word after a hit. Also clears the status, while it still reads as it did when the
+   * word was sent. A word the player typed since sending stays.
    */
   public acceptGuess(word: string) {
     const { guessInputElement, statusElement } = this.getElements();
 
-    this.checkedWord = undefined;
+    const statusAtSend = this.statusesByCheckedWord.get(word);
+
+    this.statusesByCheckedWord.delete(word);
 
     if (this.getInputtedWord() === word) {
       guessInputElement.value = '';
     }
 
-    if (statusElement.textContent === this.statusAtSend) {
+    if (statusElement.textContent === statusAtSend) {
       statusElement.textContent = '';
     }
 
@@ -77,7 +80,7 @@ export class ControlsRenderer implements ChildRenderer {
   public returnGuess(word: string) {
     const { guessInputElement } = this.getElements();
 
-    this.checkedWord = undefined;
+    this.statusesByCheckedWord.delete(word);
 
     if (!this.getInputtedWord()) {
       guessInputElement.value = word;
@@ -101,7 +104,7 @@ export class ControlsRenderer implements ChildRenderer {
     showFirstLettersCheckboxElement.checked = false;
   }
 
-  /** Unchecks the peek hint without publishing, for a hint that could not turn on. */
+  /** Unchecks the text hint without publishing, for a hint that could not turn on. */
   public uncheckText() {
     const { showTextCheckboxElement } = this.getElements();
 
@@ -184,21 +187,20 @@ export class ControlsRenderer implements ChildRenderer {
     const { guessButtonElement } = this.getElements();
     const word = this.getInputtedWord();
 
-    guessButtonElement.disabled = !word || word === this.checkedWord;
+    guessButtonElement.disabled = !word || this.statusesByCheckedWord.has(word);
   }
 
   private attachGuessHandler() {
-    const { guessButtonElement, guessInputElement } = this.getElements();
+    const { guessButtonElement, guessInputElement, statusElement } = this.getElements();
     const guessHandler = () => {
       const word = this.getInputtedWord();
 
-      if (!word || word === this.checkedWord) {
+      if (!word || this.statusesByCheckedWord.has(word)) {
         return;
       }
 
       // The word stays in the input while the server checks it: an emptied input would flash its placeholder
-      this.checkedWord = word;
-      this.statusAtSend = this.getElements().statusElement.textContent ?? '';
+      this.statusesByCheckedWord.set(word, statusElement.textContent ?? '');
       this.renderGuessButton();
       guessInputElement.focus();
       this.guessPubSub.publish({
