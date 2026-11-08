@@ -22,7 +22,11 @@ let revealRequestPubSub: PubSub<number>;
 /** Lets the game answers, which are promises, reach the renderers. */
 const settle = () => new Promise((resolve) => setTimeout(resolve));
 const getStatus = () => containerElement.querySelector('#guess-status')?.textContent;
+const getScore = () => containerElement.querySelector('#current-score')?.textContent;
 const getGuessInput = () => containerElement.querySelector('#guess-input') as HTMLInputElement;
+const isGuessInputShaken = () => getGuessInput().classList.contains('shake-and-error');
+const getCheckbox = (selector: string) => containerElement.querySelector(selector) as HTMLInputElement;
+const toggleCheckbox = (selector: string) => getCheckbox(selector).dispatchEvent(new Event('change'));
 const typeGuess = (word: string) => {
   getGuessInput().value = word;
   getGuessInput().dispatchEvent(new Event('input'));
@@ -64,9 +68,6 @@ describe(RenderController, () => {
     new RenderController({ game, textRenderer, scoreRenderer, controlsRenderer }).init(containerElement);
 
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    vi.spyOn(scoreRenderer, 'addScore');
-    vi.spyOn(controlsRenderer, 'returnGuess');
-    vi.spyOn(controlsRenderer, 'shakeAndError');
   });
 
   it('should render the skeleton of the game', () => {
@@ -88,16 +89,12 @@ describe(RenderController, () => {
   });
 
   it('should reveal a clicked word and increase the score once', async () => {
-    vi.spyOn(game, 'reveal');
-
     revealRequestPubSub.publish(0);
     revealRequestPubSub.publish(0);
     await settle();
 
-    expect(game.reveal).toBeCalledWith(0);
     expect(getWordTexts()[0]).toBe('One');
-    expect(scoreRenderer.addScore).toBeCalledTimes(1);
-    expect(scoreRenderer.addScore).toBeCalledWith(1);
+    expect(getScore()).toBe('1');
   });
 
   it('should announce a word that could not be revealed', async () => {
@@ -107,7 +104,7 @@ describe(RenderController, () => {
     await settle();
 
     expect(getStatus()).toBe('Could not open this word');
-    expect(scoreRenderer.addScore).not.toBeCalled();
+    expect(getScore()).toBe('0');
   });
 
   it('should increase the score if the user guesses a word', async () => {
@@ -115,17 +112,18 @@ describe(RenderController, () => {
     await settle();
 
     expect(getWordTexts()[0]).toBe('One');
-    expect(scoreRenderer.addScore).toBeCalledWith(1);
-    expect(controlsRenderer.returnGuess).not.toBeCalled();
+    expect(getScore()).toBe('1');
+    expect(getGuessInput().value).toBe('');
   });
 
   it('should shake the guess input and keep the score when the user does not guess the word', async () => {
     guessPubSub.publish({ word: 'unknown' });
     await settle();
 
-    expect(scoreRenderer.addScore).toBeCalledWith(0);
-    expect(controlsRenderer.shakeAndError).toBeCalled();
-    expect(controlsRenderer.returnGuess).toBeCalledWith('unknown');
+    expect(getScore()).toBe('0');
+    expect(isGuessInputShaken()).toBe(true);
+    expect(getStatus()).toBe('No new words for this guess');
+    expect(getGuessInput().value).toBe('unknown');
   });
 
   it('should announce a guess that could not be checked, without counting it as a miss', async () => {
@@ -135,9 +133,9 @@ describe(RenderController, () => {
     await settle();
 
     expect(getStatus()).toBe('Could not check this guess');
-    expect(controlsRenderer.shakeAndError).not.toBeCalled();
-    expect(controlsRenderer.returnGuess).toBeCalledWith('one');
-    expect(scoreRenderer.addScore).not.toBeCalled();
+    expect(isGuessInputShaken()).toBe(false);
+    expect(getGuessInput().value).toBe('one');
+    expect(getScore()).toBe('0');
   });
 
   it.each([
@@ -212,7 +210,7 @@ describe(RenderController, () => {
 
     expect(getTextClasses()).toContain('show-first-letters');
     expect(game.firstLetters).toBeCalledTimes(1);
-    expect(scoreRenderer.addScore).not.toBeCalled();
+    expect(getScore()).toBe('0');
   });
 
   it('should load the words once and let the user peek at them', async () => {
@@ -231,28 +229,30 @@ describe(RenderController, () => {
     await settle();
 
     expect(game.words).toBeCalledTimes(1);
-    expect(scoreRenderer.addScore).not.toBeCalled();
+    expect(getScore()).toBe('0');
   });
 
   it.each([
-    { hint: 'first letters', load: 'firstLetters', status: 'Could not load first letters' },
-    { hint: 'text', load: 'words', status: 'Could not load the text' },
-  ] as const)('should uncheck $hint and announce it when they fail to load', async ({ load, status }) => {
-    const pubSub = load === 'firstLetters' ? showFirstLettersPubSub : showTextPubSub;
-    const uncheck = load === 'firstLetters' ? 'uncheckFirstLetters' : 'uncheckText';
-
+    {
+      hint: 'first letters',
+      load: 'firstLetters',
+      checkbox: '#show-first-letters-checkbox',
+      status: 'Could not load first letters',
+    },
+    { hint: 'text', load: 'words', checkbox: '#show-text-checkbox', status: 'Could not load the text' },
+  ] as const)('should uncheck $hint and announce it when they fail to load', async ({ load, checkbox, status }) => {
     vi.spyOn(game, load).mockRejectedValueOnce(new Error('Test'));
-    vi.spyOn(controlsRenderer, uncheck);
 
-    pubSub.publish(true);
+    toggleCheckbox(checkbox);
+    expect(getCheckbox(checkbox).checked).toBe(true);
     await settle();
 
-    expect(controlsRenderer[uncheck]).toBeCalled();
+    expect(getCheckbox(checkbox).checked).toBe(false);
     expect(getStatus()).toBe(status);
     expect(getTextClasses()).not.toContain('show-first-letters');
     expect(getTextClasses()).not.toContain('show-text');
 
-    pubSub.publish(true);
+    toggleCheckbox(checkbox);
     await settle();
 
     expect(game[load]).toBeCalledTimes(2);
@@ -269,16 +269,15 @@ describe(RenderController, () => {
     expect(getTextClasses()).not.toContain('show-text');
   });
 
-  it('should leave the checkbox of a hint the user left while it failed to load', async () => {
+  it('should not announce the failure of a hint the user left while it loaded', async () => {
     vi.spyOn(game, 'firstLetters').mockRejectedValue(new Error('Test'));
-    vi.spyOn(controlsRenderer, 'uncheckFirstLetters');
 
-    showFirstLettersPubSub.publish(true);
-    showFirstLettersPubSub.publish(false);
-    showTextPubSub.publish(true);
+    toggleCheckbox('#show-first-letters-checkbox');
+    toggleCheckbox('#show-text-checkbox');
     await settle();
 
-    expect(controlsRenderer.uncheckFirstLetters).not.toBeCalled();
+    expect(getStatus()).toBe('');
+    expect(getCheckbox('#show-text-checkbox').checked).toBe(true);
     expect(getTextClasses()).toContain('show-text');
   });
 });

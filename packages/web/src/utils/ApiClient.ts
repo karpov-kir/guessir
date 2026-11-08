@@ -18,7 +18,8 @@ export class ApiClient {
 
   /** Loads the skeleton of the stored text with `id` and returns the game that plays it through the server. */
   async loadGame(id: string): Promise<RemoteGame> {
-    // The id comes from the page URL, so it is encoded to stay one path segment
+    // The id comes from the page URL, so it is encoded to stay one path segment: a slash or `?` in it would send the
+    // request to another endpoint
     const textUrl = urlJoin(this.baseUrl, 'texts', encodeURIComponent(id));
     const skeleton = (await this.httpClient.get(textUrl)) as TextSkeleton;
 

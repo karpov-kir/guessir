@@ -1,11 +1,9 @@
 import { Text } from '@guessir/shared/dist/Text.js';
-import { Exclude } from 'class-transformer';
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('texts')
 export class TextEntity implements Text {
   @PrimaryGeneratedColumn()
-  @Exclude()
   pk!: number;
 
   @Column({

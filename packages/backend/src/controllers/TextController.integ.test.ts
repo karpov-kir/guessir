@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockRepository } from '../../tests/utils/mockRepository.js';
 import { CreateTextDtoRequest } from '../dto/CreateTextDtoRequest.js';
 import { TextEntity } from '../entities/TextEntity.js';
-import { TextsController as TextController } from './TextController.js';
+import { TextsController } from './TextController.js';
 
 const text: TextEntity = {
   pk: 1,
@@ -19,18 +19,20 @@ const text: TextEntity = {
   createdAt: new Date(),
 };
 
-describe(TextController, () => {
-  let textsController: TextController;
+describe(TextsController, () => {
+  let textsController: TextsController;
   let textsRepository: Repository<TextEntity>;
 
-  /** Makes the repository return `text` with `overrides` for any id. */
+  /** Makes the repository return `text` with `overrides` for its id, and no text for any other id. */
   const storeText = (overrides: Partial<TextEntity> = {}) => {
-    vi.spyOn(textsRepository, 'findOne').mockResolvedValue({ ...text, ...overrides });
+    vi.spyOn(textsRepository, 'findOne').mockImplementation(async (options) =>
+      !Array.isArray(options.where) && options.where?.id === text.id ? { ...text, ...overrides } : null,
+    );
   };
 
   beforeEach(() => {
     textsRepository = mockRepository<TextEntity>();
-    textsController = new TextController(textsRepository);
+    textsController = new TextsController(textsRepository);
   });
 
   describe('create', () => {
@@ -60,7 +62,6 @@ describe(TextController, () => {
           { index: 5, length: 3 },
         ],
       });
-      expect(textsRepository.findOne).toBeCalledWith({ where: { id: 'id' } });
     });
 
     it('should throw an error if the search query fails', async () => {
@@ -163,17 +164,21 @@ describe(TextController, () => {
       expect(textsRepository.findOne).toBeCalledTimes(2);
     });
 
-    it('should ask the repository again for a text it dropped beyond its bound', async () => {
-      storeText();
+    it('should keep a bounded number of texts and ask the repository again for one it dropped', async () => {
+      vi.spyOn(textsRepository, 'findOne').mockImplementation(async (options) =>
+        Array.isArray(options.where) ? null : { ...text, id: String(options.where?.id) },
+      );
 
-      for (let i = 0; i <= TextController.CACHED_TEXT_COUNT; i++) {
+      // More texts than the controller caches
+      const textCount = 1000;
+
+      for (let i = 0; i < textCount; i++) {
         await textsController.findById(`id-${i}`);
       }
 
       await textsController.findById('id-0');
 
-      expect(textsRepository.findOne).toBeCalledTimes(TextController.CACHED_TEXT_COUNT + 2);
-      expect(textsRepository.findOne).lastCalledWith({ where: { id: 'id-0' } });
+      expect(textsRepository.findOne).toBeCalledTimes(textCount + 1);
     });
   });
 

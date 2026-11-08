@@ -91,8 +91,8 @@ export class LexemeNormalizer {
 
   /**
    * Returns the lower case of `character`, or `character` unchanged when its lower case is longer than one
-   * character, such as `İ`, whose lower case is `i̇`. The analysis reads the text one character at a time, so `İ`
-   * stays one character, becomes an other-character lexeme, and the text stays playable.
+   * character, such as `İ`, whose lower case is `i̇`. `isWordCharacter` throws on more than one character, so `İ`
+   * stays itself and becomes an other-character lexeme instead of failing the analysis.
    */
   private static toLowerCaseCharacter(character: string) {
     const lowerCasedCharacter = character.toLowerCase();
@@ -150,13 +150,19 @@ export class LexemeNormalizer {
     return LexemeType.Word;
   }
 
+  /** Returns the lower-cased word, preceded by its base word when it ends in `'s` or `'d`. */
   public static getGroupingWords(normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal): GroupWordLikeNominal[] {
     const length = normalizedPrimitiveLexeme.length;
     // Keep as lower-cased for easy access
     const groupWordLikeNominal = normalizedPrimitiveLexeme.toLowerCase() as GroupWordLikeNominal;
 
-    // Separate words that end with `'s, 'd`, e.g. `she's`
-    if (['s', 'd'].includes(groupWordLikeNominal[length - 1]) && groupWordLikeNominal[length - 2] === "'") {
+    // The ending `'s` or `'d` can mean is or has, would or had, so the uncontraction table cannot expand it.
+    // The check skips a bare `'s`, which has no base word.
+    if (
+      length > 2 &&
+      ['s', 'd'].includes(groupWordLikeNominal[length - 1]) &&
+      groupWordLikeNominal[length - 2] === "'"
+    ) {
       return [groupWordLikeNominal.slice(0, -2) as GroupWordLikeNominal, groupWordLikeNominal];
     }
 

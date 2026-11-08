@@ -1,18 +1,12 @@
-import { TextSkeleton } from '@guessir/shared/dist/game/types';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { mock, MockProxy } from 'vitest-mock-extended';
 
+import { newTextSkeleton } from '../../tests/utils/textSkeleton';
 import { HttpClient } from '../utils/HttpClient';
 import { RemoteGame } from './RemoteGame';
 
 const textUrl = 'https://api.test/texts/text-id';
-const skeleton: TextSkeleton = {
-  title: 'Title',
-  allowShowingFirstLetters: true,
-  allowShowingText: true,
-  wordCount: 1,
-  lexemes: [{ index: 0, length: 3 }],
-};
+const skeleton = newTextSkeleton();
 const words = [{ index: 0, word: 'One' }];
 let httpClient: MockProxy<HttpClient>;
 let remoteGame: RemoteGame;
