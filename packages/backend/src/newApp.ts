@@ -7,12 +7,7 @@ import { QueryErrorFilter } from './QueryErrorFilter.js';
 
 /** Creates the HTTP app of `module` as the server runs it: routing, headers, validation and failed-query handling. */
 export async function newApp(module: IEntryNestModule, { logger = true } = {}) {
-  const allowedOrigins = [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    'http://guessir.k-k.local',
-    'https://guessir.kk-forge.com',
-  ];
+  const allowedOrigins = new Set(['http://localhost:5173', 'http://127.0.0.1:5173', 'https://guessir.kk-forge.com']);
   const app = await NestFactory.create<NestFastifyApplication>(
     module,
     new FastifyAdapter({
@@ -28,7 +23,7 @@ export async function newApp(module: IEntryNestModule, { logger = true } = {}) {
 
   app.enableCors({
     origin: (origin, callback) => {
-      const isAllowed = !origin || allowedOrigins.includes(origin);
+      const isAllowed = !origin || allowedOrigins.has(origin);
 
       if (isAllowed) {
         callback(null, true);
