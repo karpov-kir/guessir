@@ -12,7 +12,6 @@
     "start:dev": "docker compose up -d --wait && npm run build && run-p dev:compile dev:run",
     "start:dev:debug": "docker compose up -d --wait && npm run build && node --env-file=env/.env.development --inspect-brk ./guessirBackend.js",
     "build:docker": "docker build --platform=linux/amd64 -t guessir-backend -f ./Dockerfile ../..",
-    "publish:docker": "docker tag guessir-backend dr.kk-forge.com/guessir-backend && docker push dr.kk-forge.com/guessir-backend",
     "dev:compile": "tsc -b tsconfig.build.json --watch --preserveWatchOutput",
     "dev:run": "node --watch --env-file=env/.env.development ./guessirBackend.js"
   },

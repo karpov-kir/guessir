@@ -28,8 +28,7 @@
     "test:ci": "vitest run --coverage",
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
     "test:watch": "vitest watch",
-    "build:docker": "npm run build:docker --workspaces --if-present",
-    "publish:docker": "npm run publish:docker --workspaces --if-present"
+    "build:docker": "npm run build:docker --workspaces --if-present"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",

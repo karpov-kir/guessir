@@ -5,8 +5,37 @@ on:
   # A PR opened after its last push gets its SonarQube PR analysis. A fork's PR skips the scan.
   pull_request:
     types: [opened, reopened]
+  # A manual run releases <version>-dev.<run> from its branch, for a trial on the server
+  workflow_dispatch:
+    inputs:
+      dev:
+        description: Release <version>-dev.<run> from this branch
+        type: boolean
+        default: true
 jobs:
   ci:
     uses: kk-forge-engineering/gh-actions/.github/workflows/ci.yml@v4
     permissions: { contents: read, pull-requests: read }
     secrets: { SONAR_TOKEN: "${{ secrets.SONAR_TOKEN }}" }
+  release-backend:
+    needs: ci
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || inputs.dev == true
+    uses: kk-forge-engineering/gh-actions/.github/workflows/release-image.yml@v4
+    permissions: { contents: write }
+    with:
+      dev: ${{ inputs.dev == true }}
+      version-task: backend:version
+      tag-prefix: backend-
+      images: guessir-backend . packages/backend/Dockerfile
+    secrets: { DOCKER_REGISTRY_TOKEN: "${{ secrets.DOCKER_REGISTRY_TOKEN }}" }
+  release-web:
+    needs: ci
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || inputs.dev == true
+    uses: kk-forge-engineering/gh-actions/.github/workflows/release-image.yml@v4
+    permissions: { contents: write }
+    with:
+      dev: ${{ inputs.dev == true }}
+      version-task: web:version
+      tag-prefix: web-
+      images: guessir-web . packages/web/Dockerfile
+    secrets: { DOCKER_REGISTRY_TOKEN: "${{ secrets.DOCKER_REGISTRY_TOKEN }}" }
