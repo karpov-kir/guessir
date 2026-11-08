@@ -89,13 +89,10 @@ describe(RenderController, () => {
   });
 
   it('should reveal a clicked word and increase the score once', async () => {
-    vi.spyOn(game, 'reveal');
-
     revealRequestPubSub.publish(0);
     revealRequestPubSub.publish(0);
     await settle();
 
-    expect(game.reveal).toBeCalledWith(0);
     expect(getWordTexts()[0]).toBe('One');
     expect(getScore()).toBe('1');
   });

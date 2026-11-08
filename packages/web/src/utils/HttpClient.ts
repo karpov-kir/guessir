@@ -4,7 +4,7 @@ export interface HttpClient {
   get: (url: string) => Promise<unknown>;
 }
 
-/* v8 ignore start */
+/* v8 ignore start: FetchHttpClient only wraps `fetch`, which no unit test reaches without a real server */
 
 export class FetchHttpClient implements HttpClient {
   async post(url: string, payload: unknown): Promise<unknown> {

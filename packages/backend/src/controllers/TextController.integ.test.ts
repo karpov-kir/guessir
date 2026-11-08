@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockRepository } from '../../tests/utils/mockRepository.js';
 import { CreateTextDtoRequest } from '../dto/CreateTextDtoRequest.js';
 import { TextEntity } from '../entities/TextEntity.js';
-import { TextsController as TextController } from './TextController.js';
+import { TextsController } from './TextController.js';
 
 const text: TextEntity = {
   pk: 1,
@@ -19,8 +19,8 @@ const text: TextEntity = {
   createdAt: new Date(),
 };
 
-describe(TextController, () => {
-  let textsController: TextController;
+describe(TextsController, () => {
+  let textsController: TextsController;
   let textsRepository: Repository<TextEntity>;
 
   /** Makes the repository return `text` with `overrides` for its id, and no text for any other id. */
@@ -32,7 +32,7 @@ describe(TextController, () => {
 
   beforeEach(() => {
     textsRepository = mockRepository<TextEntity>();
-    textsController = new TextController(textsRepository);
+    textsController = new TextsController(textsRepository);
   });
 
   describe('create', () => {
@@ -162,6 +162,20 @@ describe(TextController, () => {
       await expect(textsController.findById('unknown')).rejects.toEqual(new NotFoundException());
 
       expect(textsRepository.findOne).toBeCalledTimes(2);
+    });
+
+    it('should keep a bounded number of texts and ask the repository again for one it dropped', async () => {
+      vi.spyOn(textsRepository, 'findOne').mockImplementation(async (options) =>
+        Array.isArray(options.where) ? null : { ...text, id: String(options.where?.id) },
+      );
+
+      for (let i = 0; i < 1000; i++) {
+        await textsController.findById(`id-${i}`);
+      }
+
+      await textsController.findById('id-0');
+
+      expect(textsRepository.findOne).toBeCalledTimes(1001);
     });
   });
 

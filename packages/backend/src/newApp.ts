@@ -19,7 +19,7 @@ export async function newApp(module: IEntryNestModule, { logger = true } = {}) {
       // A HEAD request would run the GET handler and read a text outside the rate limit set for GET.
       exposeHeadRoutes: false,
     }),
-    { logger: logger ? undefined : false },
+    logger ? undefined : { logger: false },
   );
 
   await app.register(fastifyHelmet);

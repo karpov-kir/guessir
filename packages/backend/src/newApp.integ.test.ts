@@ -57,6 +57,16 @@ describe('the texts API over HTTP', () => {
     expect(response.json()).toEqual({ id: 'text-id' });
   });
 
+  it('should send the security headers and allow the web origin', async () => {
+    const response = await app
+      .getHttpAdapter()
+      .getInstance()
+      .inject({ method: 'GET', url: '/texts/text-id', headers: { origin: 'https://guessir.kk-forge.com' } });
+
+    expect(response.headers['x-content-type-options']).toBe('nosniff');
+    expect(response.headers['access-control-allow-origin']).toBe('https://guessir.kk-forge.com');
+  });
+
   it('should not list texts', async () => {
     expect((await request('GET', '/texts')).statusCode).toBe(404);
   });

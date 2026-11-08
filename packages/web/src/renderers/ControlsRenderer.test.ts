@@ -204,16 +204,6 @@ describe(ControlsRenderer, () => {
     expect(guessPubSub.publish).not.toBeCalled();
   });
 
-  it('should show first letters on a click', () => {
-    const controlsRenderer = new ControlsRenderer({
-      allowShowingFirstLetters: true,
-      allowShowingText: true,
-    });
-    const { showFirstLettersCheckboxElement } = getElements(controlsRenderer.getElement());
-
-    showFirstLettersCheckboxElement.click();
-  });
-
   it.each([
     { type: 'first-letters', selector: '#show-first-letters-checkbox' },
     { type: 'text', selector: '#show-text-checkbox' },

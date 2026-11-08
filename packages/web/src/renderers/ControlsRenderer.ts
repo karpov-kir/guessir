@@ -52,8 +52,8 @@ export class ControlsRenderer implements ChildRenderer {
   }
 
   /**
-   * Empties the input for the next word after a hit. Also clears the status of the last guess, unless the renderer
-   * announced a new status while the server checked the word. A word the player typed since sending stays.
+   * Empties the input for the next word after a hit. Also clears the status, while it still reads as it did when the
+   * word was sent. A word the player typed since sending stays.
    */
   public acceptGuess(word: string) {
     const { guessInputElement, statusElement } = this.getElements();
@@ -104,7 +104,7 @@ export class ControlsRenderer implements ChildRenderer {
     showFirstLettersCheckboxElement.checked = false;
   }
 
-  /** Unchecks the peek hint without publishing, for a hint that could not turn on. */
+  /** Unchecks the text hint without publishing, for a hint that could not turn on. */
   public uncheckText() {
     const { showTextCheckboxElement } = this.getElements();
 
@@ -191,7 +191,7 @@ export class ControlsRenderer implements ChildRenderer {
   }
 
   private attachGuessHandler() {
-    const { guessButtonElement, guessInputElement } = this.getElements();
+    const { guessButtonElement, guessInputElement, statusElement } = this.getElements();
     const guessHandler = () => {
       const word = this.getInputtedWord();
 
@@ -200,7 +200,7 @@ export class ControlsRenderer implements ChildRenderer {
       }
 
       // The word stays in the input while the server checks it: an emptied input would flash its placeholder
-      this.statusesByCheckedWord.set(word, this.getElements().statusElement.textContent ?? '');
+      this.statusesByCheckedWord.set(word, statusElement.textContent ?? '');
       this.renderGuessButton();
       guessInputElement.focus();
       this.guessPubSub.publish({

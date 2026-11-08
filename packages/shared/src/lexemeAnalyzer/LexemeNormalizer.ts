@@ -156,8 +156,7 @@ export class LexemeNormalizer {
     // Keep as lower-cased for easy access
     const groupWordLikeNominal = normalizedPrimitiveLexeme.toLowerCase() as GroupWordLikeNominal;
 
-    // The check also groups a word ending in `'s` or `'d`, such as `she's`, under its base word.
-    // The ending can mean is or has, would or had, so the uncontraction table cannot expand it.
+    // The ending `'s` or `'d` can mean is or has, would or had, so the uncontraction table cannot expand it.
     // The check skips a bare `'s`, which has no base word.
     if (
       length > 2 &&
