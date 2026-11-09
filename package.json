@@ -16,7 +16,7 @@
     "lint:oxlint:fix": "oxlint --type-aware --fix",
     "lint:format": "oxfmt --check",
     "lint:format:fix": "oxfmt",
-    "lint:tsc": "tsc --noEmit -p packages/backend/tsconfig.json && tsc --noEmit -p packages/shared/tsconfig.json && tsc --noEmit -p packages/web/tsconfig.json",
+    "lint:tsc": "tsc -p packages/backend/tsconfig.json && tsc -p packages/shared/tsconfig.json && tsc -p packages/web/tsconfig.json",
     "lint:stylelint": "stylelint \"packages/**/src/**/*.{css,scss}\"",
     "lint:stylelint:fix": "npm run lint:stylelint -- --fix",
     "lint": "run-p -c lint:*[!fix]",
