@@ -5,9 +5,11 @@ import { QueryFailedError, Repository } from "typeorm";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { mockRepository } from "../tests/utils/mockRepository.js";
+import { HealthController } from "./controllers/HealthController.js";
 import { TextsController } from "./controllers/TextController.js";
 import { TextEntity } from "./entities/TextEntity.js";
 import { newApp } from "./newApp.js";
+import { version } from "./version.js";
 
 const text: TextEntity = {
   pk: 1,
@@ -22,7 +24,7 @@ const text: TextEntity = {
 const textsRepository: Repository<TextEntity> = mockRepository<TextEntity>();
 
 @Module({
-  controllers: [TextsController],
+  controllers: [HealthController, TextsController],
   providers: [{ provide: getRepositoryToken(TextEntity), useValue: textsRepository }],
 })
 class TestModule {}
@@ -92,6 +94,13 @@ describe("the texts API over HTTP", () => {
     expect(response.json()).toEqual({ statusCode: 500, message: "Internal server error" });
     expect(errorLog).toBeCalled();
     expect(JSON.stringify(errorLog.mock.calls)).not.toContain("One two");
+  });
+
+  it("should answer the running version on /health", async () => {
+    const response = await request("GET", "/health");
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ version });
   });
 
   it("should not list texts", async () => {

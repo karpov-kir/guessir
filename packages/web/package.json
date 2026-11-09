@@ -9,8 +9,7 @@
     "start:vite": "vite",
     "typecheck:watch": "tsc -b ./tsconfig.build.json --watch",
     "start:preview": "vite preview",
-    "build:docker": "docker build --platform=linux/amd64 -t guessir-web -f ./Dockerfile ../..",
-    "publish:docker": "docker tag guessir-web dr.kk-forge.com/guessir-web && docker push dr.kk-forge.com/guessir-web"
+    "build:docker": "docker build --platform=linux/amd64 -t guessir-web -f ./Dockerfile ../.."
   },
   "dependencies": {
     "@guessir/shared": "^1.0.0",
