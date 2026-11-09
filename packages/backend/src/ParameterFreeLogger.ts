@@ -1,3 +1,5 @@
+import { inspect } from "node:util";
+
 import { Logger as NestLogger } from "@nestjs/common";
 import { Logger } from "typeorm";
 
@@ -30,7 +32,7 @@ export class ParameterFreeLogger implements Logger {
 
   log(level: "log" | "info" | "warn", message: unknown) {
     if (level === "warn") {
-      this.logger.warn(String(message));
+      this.logger.warn(typeof message === "string" ? message : inspect(message));
     }
   }
 }

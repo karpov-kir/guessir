@@ -4,7 +4,7 @@ import "reflect-metadata";
 import { Logger } from "@nestjs/common";
 
 import { createDbPing } from "./dbUtils.js";
-import { waitForDb, watchDb } from "./dbWatch.js";
+import { errorText, waitForDb, watchDb } from "./dbWatch.js";
 import { MainModule } from "./MainModule.js";
 import { newApp } from "./newApp.js";
 
@@ -22,7 +22,7 @@ export async function boot(host = "0.0.0.0", port = 3020) {
   const pingDb = createDbPing();
   await waitForDb(pingDb, { limitMs: startupWaitMs, intervalMs: pingEveryMs }).catch(
     (error: unknown) => {
-      logger.error(`DB did not answer for ${startupWaitMs}ms: ${String(error)}`);
+      logger.error(`DB did not answer for ${startupWaitMs}ms: ${errorText(error)}`);
       process.exit(1);
     },
   );
@@ -32,7 +32,7 @@ export async function boot(host = "0.0.0.0", port = 3020) {
   await app.listen(port, host);
 
   void watchDb(pingDb, { limitMs: lostAfterMs, intervalMs: pingEveryMs }).then((error) => {
-    logger.error(`DB has been unreachable for ${lostAfterMs}ms: ${String(error)}`);
+    logger.error(`DB has been unreachable for ${lostAfterMs}ms: ${errorText(error)}`);
     process.exit(1);
   });
 }

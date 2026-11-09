@@ -50,6 +50,12 @@ describe(ParameterFreeLogger, () => {
     }
   });
 
+  it("should inspect a warning that is not a string", () => {
+    parameterFreeLogger.log("warn", { reason: "pool error" });
+
+    expect(Logger.prototype.warn).toBeCalledWith("{ reason: 'pool error' }");
+  });
+
   it("should log schema builds and migrations", () => {
     parameterFreeLogger.logSchemaBuild("schema built");
     parameterFreeLogger.logMigration("migration applied");
