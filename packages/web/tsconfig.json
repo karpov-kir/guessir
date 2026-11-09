@@ -1,7 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["./src/@types/env", "vite/client"],
-    "noEmit": true
+    "types": ["./src/@types/env", "vite/client"]
   }
 }

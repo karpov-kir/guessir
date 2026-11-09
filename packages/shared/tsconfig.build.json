@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.build.json",
   "compilerOptions": {
     "module": "NodeNext",
+    "noEmit": false,
     "rootDir": "./src",
     "outDir": "./dist",
     "composite": true
