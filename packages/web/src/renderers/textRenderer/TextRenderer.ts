@@ -22,7 +22,7 @@ export class TextRenderer implements ChildRenderer {
     number,
     WordRenderer
   >();
-  /** Words of the last successful guess, highlighted so the user sees where they landed */
+  /** Holds the words of the last successful guess, which the renderer highlights for the player. */
   private freshWordRenderers: WordRenderer[] = [];
 
   /** Publishes the lexeme index of a hidden word the user clicks. */

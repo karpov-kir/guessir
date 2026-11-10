@@ -47,9 +47,9 @@ export class LexemeAnalyzerUtils {
   }
 
   /**
-   * Splits an uncontracted lexeme such as `I am` into one lexeme per word and puts a space lexeme
-   * between the words. Each part keeps the original text, the given indexes and the whole
-   * uncontracted form.
+   * Splits an uncontracted lexeme such as `I am` into one lexeme per word, with a space lexeme
+   * between the words. Each word keeps the original text, and every part keeps the given indexes
+   * and the whole uncontracted form.
    */
   public static splitUncontractedLexeme(
     lexemeToSplit: Lexeme,

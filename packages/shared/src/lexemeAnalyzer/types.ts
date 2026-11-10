@@ -2,7 +2,7 @@ export enum LexemeType {
   Word = "w",
   SpecialCharacter = "sc",
   Letter = "l",
-  /** Means a dash or apostrophe inside a word, as in `re-configured` or `don't`. */
+  /** Means a dash or apostrophe that stands alone, such as the dash in `one - two`. */
   WordHelping = "wh",
 }
 

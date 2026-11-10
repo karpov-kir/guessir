@@ -1,6 +1,4 @@
-/*
- * v8 ignore start
- */
+/* v8 ignore start */
 
 import "./styles/index.css";
 import { CreateTextDto } from "@guessir/shared/dist/CreateTextDto";
@@ -55,6 +53,4 @@ async function loadGame(apiClient: ApiClient): Promise<Game> {
   }
 }
 
-/*
- * v8 ignore stop
- */
+/* v8 ignore stop */

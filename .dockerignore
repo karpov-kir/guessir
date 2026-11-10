@@ -1,5 +1,5 @@
-# Both images build from the repository root, so this file covers them; a .dockerignore beside a
-# Dockerfile is not read
+# Both images build from the repository root, so this file covers them. Docker does not read a
+# .dockerignore beside a Dockerfile
 **/node_modules
 **/dist
 **/*.tsbuildinfo

@@ -1,6 +1,4 @@
-/*
- * v8 ignore start
- */
+/* v8 ignore start */
 
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -109,6 +107,4 @@ export async function applyDbMigrations() {
   await migrator.up();
 }
 
-/*
- * v8 ignore stop
- */
+/* v8 ignore stop */

@@ -18,7 +18,7 @@
   vertical-align: baseline;
 
   /*
-   * The word group around the tile does not wrap; a word wider than the line still wraps inside its
+   * The word group around the tile does not wrap. A word wider than the line still wraps inside its
    * tile
    */
   white-space: normal;
@@ -103,8 +103,8 @@
 }
 
 /*
- * Last among the word rules, so the mark of the last guess beats the shown and peek rules of equal
- * specificity
+ * This rule comes last among the word rules, so the mark of the last guess beats the shown and peek
+ * rules of equal specificity.
  */
 .lexeme-container.fresh {
   color: var(--on-yellow);

@@ -1,7 +1,7 @@
 import { RevealedWord, TextSkeleton } from "@guessir/shared/dist/game/types";
 
 /**
- * A text to guess. The game gives only the skeleton up front, and each word comes back from a
+ * Means a text to guess. The game gives only the skeleton up front, and each word comes back from a
  * method call.
  */
 export interface Game {

@@ -213,7 +213,7 @@ describe(ControlsRenderer, () => {
 
     vi.spyOn(guessPubSub, "publish");
 
-    // Spaces only also check that the renderer trims the word before the check.
+    // The input holds only spaces, so the test also checks that the renderer trims the word.
     guessInputElement.value = "  ";
     guessButtonElement.click();
 

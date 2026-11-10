@@ -61,8 +61,8 @@ export class LexemeNormalizer {
     ["they've", "they have"],
     ["they'll", "they will"],
 
-    // The table leaves out `'d` and `'s` contractions, such as I'd and he's. Each has two
-    // expansions, so `getGroupingWords` handles them instead.
+    // The table leaves out `'d` and `'s` contractions, such as I'd and he's. Each has more than one
+    // expansion, so `getGroupingWords` handles them instead.
   ]);
 
   /**

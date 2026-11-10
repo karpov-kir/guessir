@@ -20,7 +20,8 @@ export async function newApp(module: IEntryNestModule, { logger = true } = {}) {
     new FastifyAdapter({
       logger,
       // This option stops Fastify from adding a HEAD route for each GET route. A HEAD request would
-      // run the GET handler and read a text outside the rate limit set for GET.
+      // run the GET handler and read a text outside the rate limit that the proxy in front of the
+      // API sets for GET.
       exposeHeadRoutes: false,
     }),
     logger ? undefined : { logger: false },

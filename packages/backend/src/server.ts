@@ -1,6 +1,4 @@
-/*
- * v8 ignore start
- */
+/* v8 ignore start */
 
 import "reflect-metadata";
 import { Logger } from "@nestjs/common";
@@ -10,10 +8,10 @@ import { errorText, waitForDb, watchDb } from "./dbWatch.js";
 import { MainModule } from "./MainModule.js";
 import { newApp } from "./newApp.js";
 
-// The server waits for the database at start. A postgres:17 patch deploy restarts the database, and
-// a task that exits at once pauses the Swarm rolling update. After `lostAfterMs` without the
-// database, the server exits, so Swarm starts a new container with fresh connections and name
-// lookups.
+// The server waits for the database at start. A deploy of a Postgres patch release restarts the
+// database, and a task that exits at once pauses the Swarm rolling update. After `lostAfterMs`
+// without the database, the server exits, so Swarm starts a new container with fresh connections
+// and name lookups.
 const startupWaitMs = 60_000;
 const lostAfterMs = 30_000;
 const pingEveryMs = 1_000;
@@ -43,6 +41,4 @@ export async function boot(host = "0.0.0.0", port = 3020) {
   });
 }
 
-/*
- * v8 ignore stop
- */
+/* v8 ignore stop */

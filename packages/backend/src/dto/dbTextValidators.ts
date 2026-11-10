@@ -11,8 +11,8 @@ export function MaxCodePoints(
 ): PropertyDecorator {
   return ValidateBy(
     {
-      // This check takes the name of class-validator's `MaxLength`. A client then gets a too-long
-      // value under the `maxLength` key on every DTO.
+      // This check takes the name of class-validator's `MaxLength`. A client then finds a too-long
+      // value reported under the `maxLength` key on every DTO.
       name: "maxLength",
       constraints: [max],
       validator: {
