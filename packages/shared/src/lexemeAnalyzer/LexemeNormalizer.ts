@@ -36,7 +36,7 @@ export class LexemeNormalizer {
     ["haven't", "have not"],
     ["hadn't", "had not"],
 
-    ["shouldn't", "should"],
+    ["shouldn't", "should not"],
     ["wouldn't", "would not"],
     ["couldn't", "could not"],
     ["mustn't", "must not"],
@@ -45,9 +45,9 @@ export class LexemeNormalizer {
 
     ["won't", "will not"],
 
-    ["I'm", "I am"],
-    ["I've", "I have"],
-    ["I'll", "I will"],
+    ["i'm", "I am"],
+    ["i've", "I have"],
+    ["i'll", "I will"],
 
     ["she'll", "she will"],
 
