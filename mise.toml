@@ -19,11 +19,11 @@ run = "npm ci"
 
 [tasks.check]
 description = "The gate before a commit: every linter, the build and every test"
-depends = ["lint", "build", "test"]
+depends = ["lint", "build", "test", "web:test-image"]
 
 [tasks."check:ci"]
 description = "check with coverage and the SonarQube reports, as CI runs it"
-depends = ["lint", "build", "test:ci"]
+depends = ["lint", "build", "test:ci", "web:test-image"]
 
 [tasks.lint]
 run = "npm run lint"
@@ -36,3 +36,7 @@ run = "npm test"
 
 [tasks."test:ci"]
 run = "npm run test:ci"
+
+[tasks."web:test-image"]
+description = "Build the web image and check that no line of its logs holds a client's address"
+run = "packages/web/tests/image-logs.sh"
