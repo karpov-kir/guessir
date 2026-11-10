@@ -75,3 +75,51 @@ describe("a text with a character whose lower case is two characters", () => {
     ]);
   });
 });
+
+describe("a text with contractions", () => {
+  it.each([
+    ["don't", "do not"],
+    ["doesn't", "does not"],
+    ["didn't", "did not"],
+    ["haven't", "have not"],
+    ["hadn't", "had not"],
+    ["shouldn't", "should not"],
+    ["wouldn't", "would not"],
+    ["couldn't", "could not"],
+    ["mustn't", "must not"],
+    ["can't", "cannot"],
+    ["needn't", "need not"],
+    ["won't", "will not"],
+    ["I'm", "I am"],
+    ["I've", "I have"],
+    ["I'll", "I will"],
+    ["she'll", "she will"],
+    ["he'll", "he will"],
+    ["we're", "we are"],
+    ["we've", "we have"],
+    ["we'll", "we will"],
+    ["they're", "they are"],
+    ["they've", "they have"],
+    ["they'll", "they will"],
+  ])("should spell %s as %s", (contraction, words) => {
+    expect(new TextGame(`So ${contraction} go`).words().map(({ word }) => word)).toEqual([
+      "So",
+      ...words.split(" "),
+      "go",
+    ]);
+  });
+});
+
+describe("a text that starts with a contraction", () => {
+  it.each([
+    ["Needn't", ["Need", "not"]],
+    ["Won't", ["Will", "not"]],
+    ["We'll", ["We", "will"]],
+    ["They're", ["They", "are"]],
+  ])("should capitalise only the first word of %s", (contraction, words) => {
+    expect(new TextGame(`${contraction} go`).words().map(({ word }) => word)).toEqual([
+      ...words,
+      "go",
+    ]);
+  });
+});
