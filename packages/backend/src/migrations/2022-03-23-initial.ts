@@ -17,6 +17,4 @@ export const up: MigrationFn = async ({ context: { query } }) => {
   await query(`CREATE UNIQUE INDEX id_idx ON texts (id)`);
 };
 
-export const down = async () => {
-  // No down migration
-};
+export const down = async () => {};

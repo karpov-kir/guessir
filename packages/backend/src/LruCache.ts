@@ -1,11 +1,15 @@
-/** Keeps at most `maxSize` values and drops the least recently used one to make room for a new one. */
+/**
+ * Keeps at most `maxSize` values. Drops the least recently used value to make room for a new one.
+ */
 export class LruCache<Key, Value extends object> {
-  // A `Map` iterates in insertion order, so the first key is the least recently used one
   private readonly values = new Map<Key, Value>();
 
   constructor(private readonly maxSize: number) {}
 
-  /** Returns the value for `key` and marks it as the most recently used one, or undefined when there is none. */
+  /**
+   * Returns the value for `key` and marks it as the most recently used one. Returns undefined when
+   * the cache has no value for `key`.
+   */
   public get(key: Key): Value | undefined {
     const value = this.values.get(key);
 

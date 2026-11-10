@@ -2,7 +2,7 @@ export enum LexemeType {
   Word = "w",
   SpecialCharacter = "sc",
   Letter = "l",
-  // E.g. dash in `re-configured` or apostrophe in `don't`
+  /** Means a dash or apostrophe inside a word, as in `re-configured` or `don't`. */
   WordHelping = "wh",
 }
 
@@ -21,7 +21,7 @@ export interface LexemeAnalysis {
     Lexeme
   >;
   lexemesByWordLike: Map<
-    // Word
+    // Lower-cased word. A word in `'s` or `'d` also sits under its base word
     string,
     Map<
       // Lexeme index
@@ -45,9 +45,11 @@ export type PrimitiveLexemeNominal = string & {
   __type: "primitive";
 };
 
-// To workaround words like `Item's/I'd/She'd/He'd/He's/She's`. We cannot uncontract them, as they can be
-// uncontracted in multiple ways (e.g. she's - she is / she has or it can be a possessive ’s), so we can simply
-// let the user just use e.g. `she` and count it as `she's` and as `she`.
+/**
+ * Means a lower-cased word that groups lexemes. A word in `'s` or `'d` also groups under its base
+ * word, so a guess of `she` opens `she's` and `she`. The analyzer cannot uncontract these words:
+ * `she's` can mean `she is`, `she has` or a possessive.
+ */
 export type GroupWordLikeNominal = string & {
   __type: "groupWordLike";
 };

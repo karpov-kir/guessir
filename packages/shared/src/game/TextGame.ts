@@ -3,7 +3,9 @@ import { LexemeNormalizer } from "../lexemeAnalyzer/LexemeNormalizer.js";
 import { LexemeAnalysis } from "../lexemeAnalyzer/types.js";
 import { RevealedWord, SkeletonLexeme } from "./types.js";
 
-/** Answers the moves of a word guessing game over one text, giving out only the words a move opens. */
+/**
+ * Answers the moves of a word guessing game over one text, giving out only the words a move opens.
+ */
 export class TextGame {
   public readonly wordCount: number;
   private readonly lexemesByIndex: LexemeAnalysis["lexemes"];
@@ -17,7 +19,10 @@ export class TextGame {
     this.lexemesByWordLike = lexemeAnalysis.lexemesByWordLike;
   }
 
-  /** Returns the text skeleton: each non-word lexeme with its character, and each word with only its length. */
+  /**
+   * Returns the text skeleton: each non-word lexeme with its character, and each word with only its
+   * length.
+   */
   public lexemes(): SkeletonLexeme[] {
     return Array.from(this.lexemesByIndex, ([index, lexeme]) =>
       LexemeNormalizer.isLexemeOtherCharacter(lexeme)
@@ -26,14 +31,20 @@ export class TextGame {
     );
   }
 
-  /** Returns every word that matches the guess, ignoring case and surrounding spaces, or an empty array for a miss. */
+  /**
+   * Returns every word that matches the guess, ignoring case and surrounding spaces, or an empty
+   * array for a miss.
+   */
   public guess(word: string): RevealedWord[] {
     const lexemes = this.lexemesByWordLike.get(word.trim().toLowerCase()) ?? [];
 
     return Array.from(lexemes, ([index, lexeme]) => ({ index, word: lexeme.normalized }));
   }
 
-  /** Returns the word at `index`, or undefined when there is no lexeme at `index` or that lexeme is not a word. */
+  /**
+   * Returns the word at `index`, or undefined when there is no lexeme at `index` or that lexeme is
+   * not a word.
+   */
   public reveal(index: number): RevealedWord | undefined {
     const lexeme = this.lexemesByIndex.get(index);
 

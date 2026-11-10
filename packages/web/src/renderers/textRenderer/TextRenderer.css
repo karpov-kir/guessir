@@ -24,12 +24,16 @@
   /* Leaves a gap between two tiles, which bleed over the spaces */
   word-spacing: 4px;
 
-  /* The tiles (z-index -1) paint under all of the text here,
-     so a tile's bleed never covers the punctuation beside it */
+  /*
+   * The tiles (z-index -1) paint under all of the text here, so a tile's bleed never covers the
+   * punctuation beside it
+   */
   isolation: isolate;
 }
 
-/* A word and the punctuation that opens or closes it break as one, so no line starts with a comma */
+/*
+ * A word and the punctuation that opens or closes it break as one, so no line starts with a comma
+ */
 .lexeme-group {
   white-space: nowrap;
 }

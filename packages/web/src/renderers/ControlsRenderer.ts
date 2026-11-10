@@ -24,8 +24,9 @@ export class ControlsRenderer implements ChildRenderer {
   private isTextShown = false;
   private isFirstLettersShown = false;
   /**
-   * Maps each word the server is checking to the status shown when the word was sent. A second click on a checked word
-   * sends nothing. A hit clears the status only while it is still the one shown at send.
+   * Maps each word the server is checking to the status shown when the word was sent. A second
+   * click on a checked word sends nothing. A hit clears the status only while it is still the one
+   * shown at send.
    */
   private readonly statusesByCheckedWord = new Map<string, string>();
 
@@ -52,8 +53,8 @@ export class ControlsRenderer implements ChildRenderer {
   }
 
   /**
-   * Empties the input for the next word after a hit. Also clears the status, while it still reads as it did when the
-   * word was sent. A word the player typed since sending stays.
+   * Empties the input for the next word after a hit. Also clears the status, while it still reads
+   * as it did when the word was sent. A word the player typed since sending stays.
    */
   public acceptGuess(word: string) {
     const { guessInputElement, statusElement } = this.getElements();
@@ -74,8 +75,8 @@ export class ControlsRenderer implements ChildRenderer {
   }
 
   /**
-   * Leaves a missed or unchecked guess in the input, so the player can correct it, and puts it back if the player
-   * emptied the input meanwhile. A word typed since sending stays.
+   * Leaves a missed or unchecked guess in the input, so the player can correct it, and puts it back
+   * if the player emptied the input meanwhile. A word typed since sending stays.
    */
   public returnGuess(word: string) {
     const { guessInputElement } = this.getElements();
@@ -169,7 +170,10 @@ export class ControlsRenderer implements ChildRenderer {
     return getElements(this.containerElement);
   }
 
-  /** Returns the typed word without surrounding spaces, in its typed case: the game ignores case when it matches. */
+  /**
+   * Returns the typed word without surrounding spaces, in its typed case: the game ignores case
+   * when it matches.
+   */
   private getInputtedWord() {
     const { guessInputElement } = this.getElements();
 
@@ -199,7 +203,8 @@ export class ControlsRenderer implements ChildRenderer {
         return;
       }
 
-      // The word stays in the input while the server checks it: an emptied input would flash its placeholder
+      // The word stays in the input while the server checks it: an emptied input would flash its
+      // placeholder
       this.statusesByCheckedWord.set(word, statusElement.textContent ?? "");
       this.renderGuessButton();
       guessInputElement.focus();

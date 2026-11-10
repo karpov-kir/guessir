@@ -23,7 +23,9 @@ describe(TextsController, () => {
   let textsController: TextsController;
   let textsRepository: Repository<TextEntity>;
 
-  /** Makes the repository return `text` with `overrides` for its id, and no text for any other id. */
+  /**
+   * Makes the repository return `text` with `overrides` for its id, and no text for any other id.
+   */
   const storeText = (overrides: Partial<TextEntity> = {}) => {
     vi.spyOn(textsRepository, "findOne").mockImplementation(async (options) =>
       !Array.isArray(options.where) && options.where?.id === text.id
@@ -173,7 +175,8 @@ describe(TextsController, () => {
         !Array.isArray(where) && typeof where?.id === "string" ? { ...text, id: where.id } : null,
       );
 
-      // More texts than the controller caches
+      // The test loads more texts than the controller keeps in its cache. The controller then drops
+      // `id-0` and asks the repository for it again.
       const textCount = 1000;
 
       for (let i = 0; i < textCount; i++) {

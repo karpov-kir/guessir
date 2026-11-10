@@ -15,8 +15,8 @@ interface CreateTextRendererOptions {
 }
 
 /**
- * Returns the markup of a labelled form field. The limit counter sits in the control's direct parent,
- * where `limitInputsLength` looks for it.
+ * Returns the markup of a labelled form field. The limit counter sits in the control's direct
+ * parent, where `limitInputsLength` looks for it.
  */
 function renderField({
   id,
@@ -142,8 +142,8 @@ export class CreateTextRenderer implements ChildRenderer {
   private limitInputsLength() {
     const { titleInputElement, descriptionInputElement, textInputElement } = this.getElements();
 
-    // The function counts and cuts in code points, not UTF-16 units. The server and its Postgres columns count code
-    // points, so a value that the form keeps is one that the server accepts.
+    // The function counts and cuts in code points, not UTF-16 units. The server and its Postgres
+    // columns count code points. So the server accepts every value that the form keeps.
     const limitLength = (element: HTMLInputElement, maxLength: number) => {
       let codePoints = [...element.value.trim()];
 
@@ -165,8 +165,9 @@ export class CreateTextRenderer implements ChildRenderer {
   }
 
   /**
-   * Returns whether the title and the text are both filled in. When the caller gives `limitToElement`,
-   * the check marks only that field, so a user who is typing sees no error on other fields yet.
+   * Returns whether the title and the text are both filled in. When the caller gives
+   * `limitToElement`, the check marks only that field. A user who is typing then sees no error on
+   * other fields yet.
    */
   private validateForm(limitToElement?: HTMLElement) {
     const { titleInputElement, textInputElement } = this.getElements();

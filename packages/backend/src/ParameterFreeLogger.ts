@@ -4,8 +4,8 @@ import { Logger as NestLogger } from "@nestjs/common";
 import { Logger } from "typeorm";
 
 /**
- * Logs TypeORM's failed queries, warnings, schema builds and migrations, and never a query's parameters.
- * The parameters carry the stored texts, which are the answers to the games.
+ * Logs TypeORM's failed queries, warnings, schema builds and migrations. The logger never writes a
+ * query's parameters. The parameters carry the stored texts, which are the answers to the games.
  */
 export class ParameterFreeLogger implements Logger {
   private readonly logger = new NestLogger("typeorm");
@@ -19,7 +19,7 @@ export class ParameterFreeLogger implements Logger {
   }
 
   logQuerySlow() {
-    // A slow query is not logged either: its parameters carry the stored texts
+    // A slow query is not logged: its parameters carry the stored texts
   }
 
   logSchemaBuild(message: string) {

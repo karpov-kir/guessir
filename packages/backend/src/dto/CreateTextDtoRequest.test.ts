@@ -54,7 +54,10 @@ describe(CreateTextDtoRequest, () => {
 describe(`${CreateTextDtoRequest.name} as the database stores it`, () => {
   const validText = { title: "Title", description: "Description", text: "Text" };
 
-  /** Returns the constraints that fail on `field` once it holds `value`. */
+  /**
+   * Returns the failed constraints of `field` when it holds `value`, or undefined when none fail.
+   * The other fields hold valid values.
+   */
   const failedConstraints = async (field: string, value: string) => {
     const errors = await validate(
       plainToInstance(CreateTextDtoRequest, { ...validText, [field]: value }),
@@ -70,7 +73,9 @@ describe(`${CreateTextDtoRequest.name} as the database stores it`, () => {
   ])(
     "should count $field in code points, as Postgres counts varchar($maxLength)",
     async ({ field, maxLength }) => {
-      // A variation selector is a code point of its own in Postgres, while `validator` skips it when it counts
+      // The string is one code point over `maxLength` once selectors count. Postgres counts each
+      // variation selector, and `validator` skips it. The check must count them too, so Postgres
+      // never gets a too-long value.
       const withSelectors = "a️".repeat(maxLength / 2) + "︎";
       const emoji = "\u{1F600}".repeat(maxLength);
 

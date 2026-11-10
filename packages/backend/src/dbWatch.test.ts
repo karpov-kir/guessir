@@ -23,10 +23,12 @@ describe(watchDb, () => {
   });
 
   it("should resolve with the last error once the database has failed every ping for the limit", async () => {
-    // The watch reads its time from a clock that each ping moves by one interval, so a slow machine cannot end it early
+    // The test moves `Date.now` by one interval on each ping. Thus a slow machine cannot end the
+    // watch early.
     let now = 0;
     vi.spyOn(Date, "now").mockImplementation(() => now);
-    // Pings 2-4 fail (a short restart), 5-9 answer, and from 10 on the database is gone
+    // Pings 2-4 fail as a short restart, and pings 5-9 answer. From ping 10 on, the database is
+    // gone.
     const db = fakeDb((ping) => {
       now += 5;
       return (ping >= 2 && ping <= 4) || ping >= 10 ? Promise.reject(down) : Promise.resolve();
@@ -35,7 +37,8 @@ describe(watchDb, () => {
     const error = await watchDb(db.ping, { limitMs: 20, intervalMs: 5 });
 
     expect(error).toBe(down);
-    // The short outage did not end the watch, and the limit counts from ping 9, the last one that answered
+    // The short outage does not end the watch. The limit counts from ping 9, the last ping that
+    // answered.
     expect(db.pings).toBe(13);
   });
 
@@ -71,7 +74,8 @@ describe(waitForDb, () => {
   });
 
   it("should throw the last ping error once the limit has passed", async () => {
-    // Each ping moves the clock by one interval, so a slow machine cannot change how many pings fit in the limit
+    // The test moves `Date.now` by one interval on each ping. Thus a slow machine cannot change how
+    // many pings fit in the limit.
     let now = 0;
     vi.spyOn(Date, "now").mockImplementation(() => now);
     const errors: Error[] = [];

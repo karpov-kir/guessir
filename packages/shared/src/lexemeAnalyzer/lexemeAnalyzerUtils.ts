@@ -25,7 +25,6 @@ export class LexemeAnalyzerUtils {
     normalizedCharacter: NormalizedPrimitiveLexemeNominal,
     isWordBoundary: boolean,
   ) {
-    // Cumulate this primitive lexeme till the end of the word
     buffer.primitiveLexeme = (buffer.primitiveLexeme + character) as PrimitiveLexemeNominal;
     buffer.normalizedPrimitiveLexeme = (buffer.normalizedPrimitiveLexeme +
       normalizedCharacter) as NormalizedPrimitiveLexemeNominal;
@@ -48,7 +47,9 @@ export class LexemeAnalyzerUtils {
   }
 
   /**
-   * Split constructions like 'I am / we will / they have' to separate lexemes e.g. to 'I' and 'am'
+   * Splits an uncontracted lexeme such as `I am` into one lexeme per word and puts a space lexeme
+   * between the words. Each part keeps the original text, the given indexes and the whole
+   * uncontracted form.
    */
   public static splitUncontractedLexeme(
     lexemeToSplit: Lexeme,
@@ -74,7 +75,6 @@ export class LexemeAnalyzerUtils {
           ),
         );
 
-        // Add spaces between uncontracted lexemes
         if (newNormalizedPrimitiveLexemeIndex < newNormalizedPrimitiveLexemes.length - 1) {
           splitLexemes.push(
             LexemeAnalyzerUtils.createLexeme(
@@ -90,9 +90,8 @@ export class LexemeAnalyzerUtils {
 
     return splitLexemes.map((splitLexeme) => ({
       ...splitLexeme,
-      // Because lexemes are split into separate ones (e.g. 'I am' to 'I' and 'am') we need to know the whole uncontracted (original)
-      // lexeme in each new lexeme. Otherwise, each new lexeme would have the same `Lexeme.normalized` and `Lexeme.uncontracted`
-      // fields. This overrides e.g. `am` in a new lexeme to `I am`.
+      // Each part gets the whole uncontracted form, such as `I am` for `am`. `createLexeme` gives
+      // each part only its own word, the same value as its `normalized` field.
       uncontracted: lexemeToSplit.uncontracted,
     }));
   }

@@ -15,7 +15,8 @@ FROM base AS deps
 COPY package.json package-lock.json .npmrc ./
 COPY packages/shared/package.json packages/shared/
 COPY packages/backend/package.json packages/backend/
-# npm links a bin into node_modules/.bin only when its file exists, and `npx guessirBackend` needs that link
+# npm links a bin into node_modules/.bin only when its file exists, and `npx guessirBackend` needs
+# that link
 COPY packages/backend/guessirBackend.js packages/backend/
 
 RUN npm ci --omit=dev -w @guessir/backend

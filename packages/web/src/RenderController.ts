@@ -69,9 +69,9 @@ export class RenderController {
       (isFirstLettersShown) => void this.handleShowFirstLetters(isFirstLettersShown),
     );
 
-    // The score and the controls stay together and stick to the screen edge, so a long text never scrolls them away.
-    // They share a wrapper with the text alone, so they stop sticking at the text end and leave the create-text form
-    // below them uncovered.
+    // The HUD holds the score and the controls and sticks to the screen edge, so a long text never
+    // scrolls them away. The HUD shares a wrapper with the text alone, so it stops sticking at the
+    // text end and leaves the create-text form below it uncovered.
     const gameElement = document.createElement("div");
     const hudElement = document.createElement("section");
 
@@ -148,8 +148,9 @@ export class RenderController {
   }
 
   /**
-   * Turns a hint off at once, or on once its letters load. The user can switch hints while the letters load, so only
-   * the hint turned on last is shown, and a failed load unchecks its hint only while it is still the one turned on.
+   * Turns a hint off at once, or on once its letters load. The user can switch hints while the
+   * letters load, so only the hint turned on last is shown. A failed load unchecks its hint only
+   * while that hint is still on.
    */
   private async switchHint(options: {
     hint: WordHint;

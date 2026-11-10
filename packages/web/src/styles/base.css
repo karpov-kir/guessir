@@ -1,5 +1,8 @@
-/* Font: JetBrains Mono (SIL OFL 1.1, public/fonts/OFL.txt), served from this site. One variable file per script carries
-   every weight in use; a browser fetches a file only for characters in its unicode-range */
+/*
+ * Font: JetBrains Mono (SIL OFL 1.1, public/fonts/OFL.txt), served from this site. One variable
+ * file per script carries every weight in use; a browser fetches a file only for characters in its
+ * unicode-range
+ */
 
 @font-face {
   font-family: "JetBrains Mono";
@@ -123,7 +126,10 @@ textarea {
   resize: vertical;
 }
 
-/* Leaves a focused or invalid field alone, so its focus or error border keeps showing under the pointer */
+/*
+ * Leaves a focused or invalid field alone, so its focus or error border keeps showing under the
+ * pointer
+ */
 @media (hover: hover) {
   input[type="text"]:hover:not(:disabled, :focus, .invalid),
   textarea:hover:not(:disabled, :focus, .invalid) {

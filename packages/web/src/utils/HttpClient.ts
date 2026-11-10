@@ -1,4 +1,7 @@
-/** Sends JSON requests and returns the parsed JSON body, or rejects when the response status is not 2xx. */
+/**
+ * Sends HTTP requests and returns the parsed JSON body. Rejects when the response status is not
+ * 2xx.
+ */
 export interface HttpClient {
   post: (url: string, payload: unknown) => Promise<unknown>;
   get: (url: string) => Promise<unknown>;

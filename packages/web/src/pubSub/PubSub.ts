@@ -1,6 +1,7 @@
 export class PubSub<T> {
   private readonly subscribers = new Set<(data: T) => void>();
 
+  /** Exposes only `subscribe` and `unsubscribe`, so a holder cannot publish. */
   public readonly event = {
     subscribe: (subscriber: (data: T) => void) => this.subscribe(subscriber),
     unsubscribe: (subscriber: (data: T) => void) => this.unsubscribe(subscriber),

@@ -1,4 +1,6 @@
-/* v8 ignore start */
+/*
+ * v8 ignore start
+ */
 
 import { Logger, Module, OnApplicationBootstrap } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
@@ -22,4 +24,6 @@ export class MainModule implements OnApplicationBootstrap {
   }
 }
 
-/* v8 ignore stop */
+/*
+ * v8 ignore stop
+ */

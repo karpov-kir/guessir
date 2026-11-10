@@ -1,4 +1,6 @@
-/* v8 ignore start */
+/*
+ * v8 ignore start
+ */
 
 import "./styles/index.css";
 import { CreateTextDto } from "@guessir/shared/dist/CreateTextDto";
@@ -30,8 +32,8 @@ export async function boot(containerElement: HTMLElement, apiClient = new ApiCli
 }
 
 /**
- * Returns the remote game of the text in the URL, or a local game with the default text when the URL has no text,
- * or a local game with an error text when the load fails.
+ * Returns the remote game of the text in the URL. Returns a local game with the default text when
+ * the URL has no text, or with an error text when the load fails.
  */
 async function loadGame(apiClient: ApiClient): Promise<Game> {
   if (!hasTextParametersInUrl()) {
@@ -53,4 +55,6 @@ async function loadGame(apiClient: ApiClient): Promise<Game> {
   }
 }
 
-/* v8 ignore stop */
+/*
+ * v8 ignore stop
+ */

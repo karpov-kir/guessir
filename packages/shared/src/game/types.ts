@@ -1,4 +1,8 @@
-/** A word-like lexeme gives only its length, so the text stays on the server until the player opens a word. */
+/**
+ * Means one lexeme of the text skeleton: a word with only its length, or another lexeme with its
+ * character. The server sends no word text here, so a player cannot read the hidden words in the
+ * browser.
+ */
 export type SkeletonLexeme =
   | { index: number; length: number }
   | { index: number; character: string };
