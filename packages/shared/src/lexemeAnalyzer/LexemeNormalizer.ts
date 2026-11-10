@@ -85,7 +85,7 @@ export class LexemeNormalizer {
   }
 
   public static convertNormalizedWord(
-    originalPrimitiveLexeme: PrimitiveLexemeNominal,
+    originalPrimitiveLexeme: PrimitiveLexemeNominal | NormalizedPrimitiveLexemeNominal,
     normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal,
   ): NormalizedPrimitiveLexemeNominal {
     const converted =

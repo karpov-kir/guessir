@@ -109,3 +109,17 @@ describe("a text with contractions", () => {
     ]);
   });
 });
+
+describe("a text that starts with a contraction", () => {
+  it.each([
+    ["Needn't", ["Need", "not"]],
+    ["Won't", ["Will", "not"]],
+    ["We'll", ["We", "will"]],
+    ["They're", ["They", "are"]],
+  ])("should capitalise only the first word of %s", (contraction, words) => {
+    expect(new TextGame(`${contraction} go`).words().map(({ word }) => word)).toEqual([
+      ...words,
+      "go",
+    ]);
+  });
+});

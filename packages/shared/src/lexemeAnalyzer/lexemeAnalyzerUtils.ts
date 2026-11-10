@@ -66,8 +66,11 @@ export class LexemeAnalyzerUtils {
         splitLexemes.push(
           LexemeAnalyzerUtils.createLexeme(
             lexemeToSplit.original,
+            // Only the first word takes the case of the contraction, so "Needn't" reads "Need not"
             LexemeNormalizer.convertNormalizedWord(
-              lexemeToSplit.original,
+              newNormalizedPrimitiveLexemeIndex === 0
+                ? lexemeToSplit.original
+                : newNormalizedPrimitiveLexeme,
               newNormalizedPrimitiveLexeme,
             ),
             startIndex,
