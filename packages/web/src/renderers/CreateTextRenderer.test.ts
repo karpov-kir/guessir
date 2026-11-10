@@ -30,7 +30,11 @@ const createText = async () => {
 
   generateUrlButtonElement.click();
   deferred.resolve(mockedText);
-  await deferred.promise;
+  await vi.waitFor(() =>
+    expect(
+      getElements(createTextRenderer.getElement()).generatedUrlContainerElement.classList,
+    ).not.toContain("hide"),
+  );
 };
 
 describe(CreateTextRenderer, () => {
@@ -96,9 +100,8 @@ describe(CreateTextRenderer, () => {
 
     generateUrlButtonElement.click();
     deferred.reject(new Error("Test error"));
-    await deferred.promise.catch(() => void 0);
 
-    expect(errorElement.textContent).toBe("Test error");
+    await vi.waitFor(() => expect(errorElement.textContent).toBe("Test error"));
     expect(errorElement.classList).not.toContain("hide");
   });
 
@@ -124,11 +127,8 @@ describe(CreateTextRenderer, () => {
     expect(getDisabledElements()).toHaveLength(5);
 
     deferred.resolve(mockedText);
-    // The test waits for a `finally` handler, so the assertion runs after the renderer's own
-    // `finally` handler, which enables the form again.
-    await deferred.promise.finally(() => void 0);
 
-    expect(getDisabledElements()).toHaveLength(0);
+    await vi.waitFor(() => expect(getDisabledElements()).toHaveLength(0));
   });
 
   it("should not submit an invalid form", () => {
