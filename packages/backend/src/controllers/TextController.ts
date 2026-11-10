@@ -27,14 +27,14 @@ type PlayedText = { text: TextEntity; textGame: TextGame };
 const cachedTextCount = 200;
 
 /**
- * Serves each text as a game: the browser gets the text skeleton and asks for each word that a move opens.
- * The text stays on the server, so a player cannot read the hidden words in the browser.
+ * Serves each text as a game. The browser gets the text skeleton and asks for each word that a move
+ * opens. The text stays on the server, so a player cannot read the hidden words in the browser.
  */
 @Controller("texts")
 export class TextsController {
   /**
-   * Keeps the analysed game of recently played texts, so a move does not reload and re-analyse its text.
-   * A text never changes after it is created, so a cached game never goes stale.
+   * Keeps the analysed game of recently played texts, so a move does not reload and re-analyse its
+   * text. A text never changes after it is created, so a cached game never goes stale.
    */
   private readonly playedTexts = new LruCache<string, PlayedText>(cachedTextCount);
 

@@ -1,4 +1,7 @@
-/* Important, so hiding beats a component's own display set by id, such as the flex of #generated-url-container */
+/*
+ * `!important` lets `.hide` beat a display that an id rule sets, such as the flex of
+ * `#generated-url-container`.
+ */
 .hide {
   display: none !important;
 }

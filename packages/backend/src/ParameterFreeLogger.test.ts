@@ -7,8 +7,9 @@ import { ParameterFreeLogger } from "./ParameterFreeLogger.js";
 const secretText = "the whole hidden text of a game";
 const insertQuery = "INSERT INTO texts VALUES ($1)";
 const levels = ["error", "warn", "log", "debug", "verbose", "fatal"] as const;
-// The tests hold the logger as TypeORM's `Logger`, because TypeORM passes the query's parameters to `logQuery`,
-// `logQueryError` and `logQuerySlow`, which the class declares without them
+// The tests type the logger as TypeORM's `Logger`, so they can pass query parameters as TypeORM
+// does. `ParameterFreeLogger` declares `logQuery`, `logQueryError` and `logQuerySlow` without the
+// parameters.
 let parameterFreeLogger: TypeOrmLogger;
 
 describe(ParameterFreeLogger, () => {

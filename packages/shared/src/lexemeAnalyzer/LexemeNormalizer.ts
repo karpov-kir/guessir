@@ -61,10 +61,14 @@ export class LexemeNormalizer {
     ["they've", "they have"],
     ["they'll", "they will"],
 
-    // I'd, She'd, He'd, He's, She's covered in `getGroupingWords`, read more there.
+    // The table leaves out `'d` and `'s` contractions, such as I'd and he's. Each has more than one
+    // expansion, so `getGroupingWords` handles them instead.
   ]);
 
-  // Convert word to the title case if the original word is started from a capital letter
+  /**
+   * Returns `newNormalizedLexeme` with its first letter in upper case when `originalLexeme` starts
+   * with that letter in upper case.
+   */
   public static syncCase(
     originalLexeme: PrimitiveLexemeNominal | NormalizedPrimitiveLexemeNominal,
     newNormalizedLexeme: NormalizedPrimitiveLexemeNominal,
@@ -101,9 +105,10 @@ export class LexemeNormalizer {
   }
 
   /**
-   * Returns the lower case of `character`, or `character` unchanged when its lower case is longer than one
-   * character, such as `İ`, whose lower case is `i̇`. `isWordCharacter` throws on more than one character, so `İ`
-   * stays itself and becomes an other-character lexeme instead of failing the analysis.
+   * Returns the lower case of `character`, or `character` unchanged when its lower case is longer
+   * than one character, such as `İ`, whose lower case is `i̇`. `isWordCharacter` throws on more
+   * than one character, so `İ` stays itself and becomes an other-character lexeme, and the analysis
+   * goes on.
    */
   private static toLowerCaseCharacter(character: string) {
     const lowerCasedCharacter = character.toLowerCase();
@@ -170,11 +175,11 @@ export class LexemeNormalizer {
     normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal,
   ): GroupWordLikeNominal[] {
     const length = normalizedPrimitiveLexeme.length;
-    // Keep as lower-cased for easy access
     const groupWordLikeNominal = normalizedPrimitiveLexeme.toLowerCase() as GroupWordLikeNominal;
 
-    // The ending `'s` or `'d` can mean is or has, would or had, so the uncontraction table cannot expand it.
-    // The check skips a bare `'s`, which has no base word.
+    // This check adds the base word of a word that ends in `'s` or `'d`. The ending can mean is or
+    // has, would or had, so the uncontraction table cannot expand it. The check skips a bare `'s`,
+    // which has no base word.
     if (
       length > 2 &&
       ["s", "d"].includes(groupWordLikeNominal[length - 1]) &&

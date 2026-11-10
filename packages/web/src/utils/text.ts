@@ -11,6 +11,10 @@ export function hasTextParametersInUrl() {
   return !!urlParams.get("textId");
 }
 
+/**
+ * Returns the `textId` query parameter of the current URL. Throws when the parameter is missing or
+ * empty.
+ */
 export function parseTextIdFromUrl(): string {
   const urlParams = new URLSearchParams(window.location.search);
   const textId = urlParams.get("textId");

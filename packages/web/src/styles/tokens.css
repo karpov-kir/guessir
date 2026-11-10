@@ -39,7 +39,10 @@
   --track: light-dark(rgb(255 255 255 / 28%), rgb(18 13 43 / 35%));
   --hud-chip-border: rgb(255 255 255 / 60%);
 
-  /* Hover, one shade per kind: a fill changes shade, a field's border firms up, a text-only control recolours */
+  /*
+   * Hover, one shade per kind: a fill changes shade, a field's border firms up, a text-only control
+   * recolours
+   */
   --surface-hover: light-dark(#e2dcff, #3a2f7a);
   --tile-hover: var(--tile-border);
   --field-border-hover: var(--muted);

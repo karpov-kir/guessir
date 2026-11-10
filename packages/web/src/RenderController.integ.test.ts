@@ -157,7 +157,8 @@ describe(RenderController, () => {
       mockGuess();
 
       submitGuess(word);
-      // An emptied input would show its placeholder for as long as the server takes to answer
+      // The test checks the input before the server answers. An emptied input would show its
+      // placeholder for as long as the server takes to answer.
       expect(getGuessInput().value).toBe(word);
       await settle();
 

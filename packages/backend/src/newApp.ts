@@ -5,7 +5,10 @@ import { FastifyAdapter, NestFastifyApplication } from "@nestjs/platform-fastify
 
 import { QueryErrorFilter } from "./QueryErrorFilter.js";
 
-/** Creates the HTTP app of `module` as the server runs it: routing, headers, validation and failed-query handling. */
+/**
+ * Creates the HTTP app of `module` with the server's headers, CORS, validation and query error
+ * handling, and returns it without listening.
+ */
 export async function newApp(module: IEntryNestModule, { logger = true } = {}) {
   const allowedOrigins = new Set([
     "http://localhost:5173",
@@ -16,8 +19,9 @@ export async function newApp(module: IEntryNestModule, { logger = true } = {}) {
     module,
     new FastifyAdapter({
       logger,
-      // This option stops Fastify from adding a HEAD route for each GET route.
-      // A HEAD request would run the GET handler and read a text outside the rate limit set for GET.
+      // This option stops Fastify from adding a HEAD route for each GET route. A HEAD request would
+      // run the GET handler and read a text outside the rate limit that the proxy in front of the
+      // API sets for GET.
       exposeHeadRoutes: false,
     }),
     logger ? undefined : { logger: false },

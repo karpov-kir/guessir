@@ -1,4 +1,7 @@
-/* The one entry stylesheet: imports every part in cascade order. A later part wins a tie of equal specificity */
+/*
+ * The one entry stylesheet: imports every part in cascade order. A later part wins a tie of equal
+ * specificity
+ */
 
 @import url("./tokens.css");
 @import url("./base.css");

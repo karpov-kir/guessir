@@ -31,7 +31,7 @@ const entities = [TextEntity];
 export const getTypeOrmConfig = (): DataSourceOptions => ({
   type: "postgres",
   ...getDbSettings(),
-  // Handled manually using Umzug
+  // Umzug migrations in `applyDbMigrations` own the schema, so TypeORM must not.
   synchronize: false,
   logger: new ParameterFreeLogger(),
   entities,
@@ -39,8 +39,12 @@ export const getTypeOrmConfig = (): DataSourceOptions => ({
   migrations: [],
 });
 
-// Pings over a pool of its own: in the request pool a ping waits behind requests, and a flood of them would make a
-// healthy server exit. The timeouts end a dial to a database host that is gone and a query on a dropped connection.
+/**
+ * Returns a ping that runs over a pool of its own with one connection. The server exits when pings
+ * fail. In the request pool, a flood of requests would hold pings back and make a healthy server
+ * exit. The timeouts end a dial to a database host that is gone and a query on a dropped
+ * connection.
+ */
 export const createDbPing = () => {
   const dataSource = new DataSource({
     type: "postgres",

@@ -213,7 +213,7 @@ describe(ControlsRenderer, () => {
 
     vi.spyOn(guessPubSub, "publish");
 
-    // Set to a string with spaces only to make sure that they are trimmed
+    // The input holds only spaces, so the test also checks that the renderer trims the word.
     guessInputElement.value = "  ";
     guessButtonElement.click();
 
@@ -283,22 +283,18 @@ describe(ControlsRenderer, () => {
     const checkboxA = controlsRenderer.getElement().querySelector(selectorA) as HTMLInputElement;
     const checkboxB = controlsRenderer.getElement().querySelector(selectorB) as HTMLInputElement;
 
-    // Enable one of the checkboxes
     checkboxB.dispatchEvent(new Event("change"));
 
     const pubSubA = typeA === "first letters" ? showFirstLettersPubSub : showTextPubSub;
     const pubSubB = typeA === "first letters" ? showTextPubSub : showFirstLettersPubSub;
 
-    // Start spying only after checkboxes are set to default values to not seed mocks with redundant calls
+    // The test spies only now, so the setup change above is not counted.
     vi.spyOn(pubSubA, "publish");
     vi.spyOn(pubSubB, "publish");
 
-    // Enable the other checkbox
     checkboxA.dispatchEvent(new Event("change"));
 
-    // Firstly, the changed (clicked) one should be enabled
     expect(pubSubA.publish).nthCalledWith(1, true);
-    // Secondly, the other should be disabled
     expect(pubSubB.publish).nthCalledWith(1, false);
   });
 

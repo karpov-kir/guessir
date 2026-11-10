@@ -3,16 +3,16 @@ import type { FastifyReply } from "fastify";
 import { QueryFailedError } from "typeorm";
 
 /**
- * Answers a failed query with the 500 that Nest's default handler gives, and logs it without its parameters.
- * The default handler logs the whole `QueryFailedError`, and its `parameters` and `driverError.detail` carry the
- * stored texts, which are the answers to the games.
+ * Answers a failed query with the 500 of Nest's default handler, and logs the query without its
+ * parameters. The default handler logs the whole error, and its `parameters` and
+ * `driverError.detail` carry the stored texts. These texts are the answers to the games.
  */
 @Catch(QueryFailedError)
 export class QueryErrorFilter implements ExceptionFilter<QueryFailedError> {
   private static readonly logger = new Logger("ExceptionsHandler");
 
   catch(error: QueryFailedError, host: ArgumentsHost) {
-    // pg reports the SQLSTATE as a string; other drivers may give no code
+    // pg gives the SQLSTATE in `code` as a string
     const code =
       "code" in error.driverError && typeof error.driverError.code === "string"
         ? error.driverError.code

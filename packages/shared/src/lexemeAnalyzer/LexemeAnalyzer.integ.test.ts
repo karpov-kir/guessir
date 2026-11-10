@@ -4,7 +4,8 @@ import { LexemeAnalyzer } from "./LexemeAnalyzer.js";
 
 describe(LexemeAnalyzer, () => {
   it("should build lexemes", () => {
-    // Application level test. This text covers all cases described in `buildLexeme`.
+    // The input text holds an example of each case the analyzer handles when it builds a lexeme, so
+    // a change to any of those cases fails this test.
     const lexemeAnalysis = LexemeAnalyzer.analyze(`
     
       ^One;   two#       

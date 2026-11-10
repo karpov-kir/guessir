@@ -1,6 +1,6 @@
 /*
- * A word keeps one box in every state: its own glyphs, with no margin or padding, so revealing it moves no text.
- * The tile is painted outside that box by ::before, which takes no room in the line.
+ * A word keeps one box in every state: its own glyphs, with no margin or padding, so revealing it
+ * moves no text. The tile is painted outside that box by ::before, which takes no room in the line.
  */
 .lexeme-container {
   --tile-bleed: 4px;
@@ -17,7 +17,10 @@
   line-height: 1.3;
   vertical-align: baseline;
 
-  /* The word group around the tile does not wrap; a word wider than the line still wraps inside its tile */
+  /*
+   * The word group around the tile does not wrap. A word wider than the line still wraps inside its
+   * tile
+   */
   white-space: normal;
 }
 
@@ -31,8 +34,10 @@
   box-shadow: inset 0 -3px 0 var(--tile-border);
 }
 
-/* A pressed button moves down 1px, and a transform would make the tile its own stacking context again, painting its
-   bleed over the punctuation beside it */
+/*
+ * A pressed button moves down 1px, and a transform would make the tile its own stacking context
+ * again, painting its bleed over the punctuation beside it
+ */
 .lexeme-container:active {
   transform: none;
 }
@@ -82,7 +87,10 @@
   visibility: visible;
 }
 
-/* While peeking, the words not found yet are muted and dotted, so the found ones stand out without relying on colour */
+/*
+ * While peeking, the words not found yet are muted and dotted, so the found ones stand out without
+ * relying on colour
+ */
 .show-text .lexeme-container:not(.show) {
   color: var(--muted);
   text-decoration: underline dotted 2px;
@@ -94,7 +102,10 @@
   visibility: visible;
 }
 
-/* Last among the word rules, so the mark of the last guess beats the shown and peek rules of equal specificity */
+/*
+ * This rule comes last among the word rules, so the mark of the last guess beats the shown and peek
+ * rules of equal specificity.
+ */
 .lexeme-container.fresh {
   color: var(--on-yellow);
   font-weight: 800;

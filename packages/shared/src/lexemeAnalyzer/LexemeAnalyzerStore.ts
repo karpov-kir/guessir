@@ -7,7 +7,9 @@ export class LexemeAnalyzerStore implements LexemeAnalysis {
     return new Map(this.#lexemes);
   }
 
-  /** Returns the lexeme at `index` without copying the lexemes, or undefined where there is none. */
+  /**
+   * Returns the lexeme at `index` without copying the lexemes, or undefined where there is none.
+   */
   public getLexeme(index: number) {
     return this.#lexemes.get(index);
   }
@@ -53,6 +55,10 @@ export class LexemeAnalyzerStore implements LexemeAnalysis {
     }
   }
 
+  /**
+   * Deletes lexemes from the end while `filter` returns true for each, and stops at the first it
+   * rejects.
+   */
   public deleteLastLexemesUntilMatch(filter: (lexeme: Lexeme) => boolean) {
     let lastLexeme = this.#lexemes.get(this.lastLexemeIndex);
 

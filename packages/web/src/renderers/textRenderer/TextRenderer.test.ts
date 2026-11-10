@@ -130,7 +130,8 @@ describe(TextRenderer, () => {
     textRenderer.showGuessedWords(textGame.guess("she's"));
     expect(getFreshTexts()).toEqual(["she's"]);
 
-    // Repeating a guess opens nothing new, so it counts as a miss and leaves the highlight where it was
+    // The renderer treats a repeated guess as a miss and keeps the highlight. The repeated guess
+    // shows no word that was still hidden.
     textRenderer.showGuessedWords(textGame.guess("one"));
     expect(getFreshTexts()).toEqual(["she's"]);
   });

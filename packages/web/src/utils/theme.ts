@@ -7,7 +7,10 @@ enum Theme {
   Dark = "dark",
 }
 
-/** The part of `MediaQueryList` the toggle uses, so a test can stand in for the system theme */
+/**
+ * Describes the part of `MediaQueryList` the toggle reads, so a test can stand in for the system
+ * theme.
+ */
 export type SystemThemeQuery = {
   matches: boolean;
   addEventListener(type: "change", listener: () => void): void;
@@ -23,9 +26,9 @@ type ThemeToggleOptions = {
 const storageKey = "guessir.theme";
 
 /**
- * Returns the stored theme, or undefined when none is stored or the storage is unavailable.
- * Storage can throw in a private window or with blocked site data, even on reaching `globalThis.localStorage`,
- * so the toggle keeps working without it.
+ * Returns the stored theme, or undefined when none is stored or storage fails. Storage can throw in
+ * a private window or with blocked site data, even on reading `globalThis.localStorage`, so the
+ * toggle keeps working without it.
  */
 function readStoredTheme(getStorage: () => Storage): Theme | undefined {
   try {
@@ -46,8 +49,8 @@ function storeTheme(getStorage: () => Storage, theme: Theme) {
 }
 
 /**
- * Wires the dark theme toggle. Without a stored choice the page follows the system theme through CSS,
- * so `data-theme` on the root is set only once the user picks a theme.
+ * Wires the dark theme toggle. Without a stored choice, CSS makes the page follow the system theme,
+ * so the toggle sets `data-theme` on the root only once the user picks a theme.
  */
 export function initThemeToggle({
   button,
@@ -55,7 +58,8 @@ export function initThemeToggle({
   getStorage = () => globalThis.localStorage,
   systemTheme = globalThis.matchMedia("(prefers-color-scheme: dark)"),
 }: ThemeToggleOptions) {
-  // The button shows the moon in the light theme and the sun in the dark one; `src/styles/header.css` hides the other
+  // The button holds both icons: `src/styles/header.css` shows the moon in the light theme and the
+  // sun in the dark one.
   button.innerHTML = icon(moonIcon, "icon-moon") + icon(sunIcon, "icon-sun");
 
   const storedTheme = readStoredTheme(getStorage);

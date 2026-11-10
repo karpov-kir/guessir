@@ -18,7 +18,11 @@ const readPassword = (passwordFile: string): string => {
   }
 };
 
-// The password only ever comes as a file: a Docker secret on the server, env/database-password.development locally
+/**
+ * Returns the database connection settings from the environment, and throws when a required
+ * variable is unset or the password file cannot be read. The password always comes from a file: a
+ * Docker secret on the server and `env/database-password.development` locally.
+ */
 export const getDbSettings = () => ({
   host: requireEnv("DATABASE_HOST"),
   port: process.env.DATABASE_PORT ? Number.parseInt(process.env.DATABASE_PORT) : 5432,

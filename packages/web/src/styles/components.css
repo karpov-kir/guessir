@@ -1,4 +1,7 @@
-/* Every inline icon: the files hold only shapes and a stroke width, so size and colour come from here */
+/*
+ * The icon files hold only shapes and a stroke width, so this rule sets the size and colour of
+ * every inline icon.
+ */
 .icon {
   flex: none;
   width: 20px;
@@ -22,7 +25,10 @@
   cursor: pointer;
 }
 
-/* The chip is the checkbox's label and its whole hit area, so the chip carries the hover of the box inside */
+/*
+ * The chip is the checkbox's label and its whole hit area, so the chip carries the hover of the box
+ * inside
+ */
 @media (hover: hover) {
   .chip:hover:not(:has(:disabled)) {
     background: var(--surface-hover);

@@ -88,7 +88,7 @@ describe(CreateTextRenderer, () => {
 
     mockedApiClient.createText.mockReturnValue(deferred.promise);
 
-    // Set required fields
+    // The renderer submits the form only when the title and the text are set.
     textInputElement.value = "Text text";
     titleInputElement.value = "Test title";
 
@@ -113,7 +113,7 @@ describe(CreateTextRenderer, () => {
 
     mockedApiClient.createText.mockReturnValue(deferred.promise);
 
-    // Set required fields
+    // The renderer submits the form only when the title and the text are set.
     textInputElement.value = "Text text";
     titleInputElement.value = "Test title";
 
@@ -124,7 +124,8 @@ describe(CreateTextRenderer, () => {
     expect(getDisabledElements()).toHaveLength(5);
 
     deferred.resolve(mockedText);
-    // Wait for `finally` as the form is unblocked in the finally block
+    // The test waits for a `finally` handler, so the assertion runs after the renderer's own
+    // `finally` handler, which enables the form again.
     await deferred.promise.finally(() => void 0);
 
     expect(getDisabledElements()).toHaveLength(0);

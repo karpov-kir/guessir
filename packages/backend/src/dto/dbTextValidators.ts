@@ -1,8 +1,9 @@
 import { buildMessage, ValidateBy, ValidationOptions } from "class-validator";
 
 /**
- * Checks that a string has at most `max` code points, the way Postgres counts the length of a varchar.
- * `MaxLength` of class-validator does not count U+FE0E and U+FE0F, so a text it accepts can overflow the column.
+ * Checks that a value is a string of at most `max` code points, the length Postgres gives a
+ * varchar. `MaxLength` of class-validator skips U+FE0E and U+FE0F, so a text that it accepts can
+ * overflow the column.
  */
 export function MaxCodePoints(
   max: number,
@@ -10,7 +11,8 @@ export function MaxCodePoints(
 ): PropertyDecorator {
   return ValidateBy(
     {
-      // The name of class-validator's `MaxLength`, so a too-long value fails under the same key on every DTO
+      // This check takes the name of class-validator's `MaxLength`. A client then finds a too-long
+      // value reported under the `maxLength` key on every DTO.
       name: "maxLength",
       constraints: [max],
       validator: {
@@ -26,7 +28,10 @@ export function MaxCodePoints(
   );
 }
 
-/** Checks that a string holds no U+0000. Postgres rejects that character in a text column. */
+/**
+ * Checks that a string holds no U+0000, and passes a value that is not a string. Postgres rejects
+ * U+0000 in a text column.
+ */
 export function HasNoNullCharacter(validationOptions?: ValidationOptions): PropertyDecorator {
   return ValidateBy(
     {

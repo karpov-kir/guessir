@@ -22,7 +22,6 @@ Object.defineProperty(window, "location", {
   },
 });
 
-/** Returns the game that `boot` handed to the last `RenderController`. */
 const getRenderedGame = (): Game => {
   const options = vi.mocked(RenderController).mock.lastCall?.[0];
 

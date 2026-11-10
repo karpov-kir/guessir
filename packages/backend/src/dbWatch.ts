@@ -11,9 +11,9 @@ interface WatchOptions {
 }
 
 /**
- * Pings the database every interval, one ping at a time, and resolves once no ping has answered for the limit.
- * Resolves with the last ping error, or with a timeout error when the pings hung without failing. It never rejects.
- * A ping on a connection the network dropped can hang for minutes, so a ping that has not returned counts as no answer.
+ * Pings every `intervalMs`, one ping at a time, and resolves with the last ping error or a timeout
+ * error once no ping has answered for `limitMs`. It never rejects. A ping on a dropped connection
+ * can hang for minutes, so a ping that has not returned counts as no answer.
  */
 export async function watchDb(
   ping: () => Promise<unknown>,
@@ -24,7 +24,8 @@ export async function watchDb(
   let pending: Promise<void> | undefined;
 
   for (;;) {
-    // The ping goes out before the wait, so a stalled event loop cannot end the watch before a single ping
+    // The function sends the ping before the wait. A stalled event loop then cannot end the watch
+    // before any ping has gone out.
     pending ??= ping()
       .then(
         () => {
@@ -52,8 +53,9 @@ export async function watchDb(
 }
 
 /**
- * Pings the database every interval until it answers. Throws the last ping error once the limit has passed. A ping
- * that hangs past the limit throws too, so a dropped connection cannot hold the start forever.
+ * Pings every `intervalMs` until the database answers. Throws the last ping error once `limitMs`
+ * has passed, or a timeout error when a ping hangs past it, so a dropped connection cannot hold the
+ * start forever.
  */
 export async function waitForDb(
   ping: () => Promise<unknown>,
@@ -72,7 +74,8 @@ export async function waitForDb(
       ]);
       return;
     } catch (error) {
-      // The timeout is the deadline itself: its timer may fire a moment before the clock reaches the deadline
+      // The check treats the timeout error as the deadline. Its timer can fire a moment before
+      // `Date.now()` reaches the deadline.
       if (error === timeout || Date.now() >= deadline) {
         throw error;
       }
@@ -85,8 +88,8 @@ export async function waitForDb(
 }
 
 /**
- * Returns an error the way it reads in a log line. A thrown value that is not
- * an Error is inspected, so it never reads "[object Object]".
+ * Returns an error the way it reads in a log line. A thrown value that is not an Error is
+ * inspected, so it never reads "[object Object]".
  */
 export function errorText(error: unknown): string {
   return error instanceof Error ? String(error) : inspect(error);

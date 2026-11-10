@@ -1,4 +1,8 @@
 type OnEnterOptions = {
+  /**
+   * Flips `checked` before the callback runs, for a checkbox. A browser toggles a checkbox only on
+   * Space, so Enter alone leaves the state unchanged.
+   */
   toggleChecked?: boolean;
 };
 

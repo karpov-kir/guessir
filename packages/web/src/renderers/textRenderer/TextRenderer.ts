@@ -22,7 +22,7 @@ export class TextRenderer implements ChildRenderer {
     number,
     WordRenderer
   >();
-  /** Words of the last successful guess, highlighted so the user sees where they landed */
+  /** Holds the words of the last successful guess, which the renderer highlights for the player. */
   private freshWordRenderers: WordRenderer[] = [];
 
   /** Publishes the lexeme index of a hidden word the user clicks. */
@@ -45,8 +45,8 @@ export class TextRenderer implements ChildRenderer {
   }
 
   /**
-   * Shows the guessed words and returns how many of them were hidden before.
-   * Moves the fresh highlight to these words only when at least one word was newly shown.
+   * Shows the guessed words and returns how many of them were hidden before. Moves the fresh
+   * highlight to these words only when at least one word was newly shown.
    */
   public showGuessedWords(words: RevealedWord[]): number {
     const guessedWordRenderers: WordRenderer[] = [];
@@ -66,7 +66,6 @@ export class TextRenderer implements ChildRenderer {
       guessedWordRenderers.push(wordRenderer);
     }
 
-    // A guess that opens nothing new is a miss, so the highlight stays on the last guess that opened words
     if (shownCount) {
       this.freshWordRenderers.forEach((wordRenderer) => wordRenderer.markFresh(false));
       guessedWordRenderers.forEach((wordRenderer) => wordRenderer.markFresh(true));
@@ -120,13 +119,11 @@ export class TextRenderer implements ChildRenderer {
 
     if (this.title) {
       titleElement.classList.remove("hide");
-      // XSS safe
       titleElement.textContent = this.title;
     }
 
     if (this.description) {
       descriptionElement.classList.remove("hide");
-      // XSS safe
       descriptionElement.textContent = this.description;
     }
 
@@ -134,9 +131,10 @@ export class TextRenderer implements ChildRenderer {
   }
 
   /**
-   * Groups each word with the punctuation that opens and closes it and keeps the group on one line, so no line
-   * starts with a comma or ends with an opening bracket. A word tile is an atomic inline, and a browser may break
-   * a line right after it. A standalone dash or slash stays outside the groups, so a line can still break there.
+   * Groups each word with the punctuation that opens and closes it and keeps the group on one line,
+   * so no line starts with a comma or ends with an opening bracket. A word tile is an atomic
+   * inline, and a browser may break a line right after it. A standalone dash or slash stays outside
+   * the groups, so a line can still break there.
    */
   private renderLexemes(lexemesElement: HTMLElement) {
     let group: HTMLElement | undefined;
@@ -203,7 +201,10 @@ const closingCharacters = new Set([
 const openingCharacters = new Set(["(", "[", "{", "«", "“", "‘"]);
 const straightQuotes = new Set(['"', "'"]);
 
-/** Tells whether the character closes the word before it. A straight quote closes a word only right after it. */
+/**
+ * Tells whether the character closes the word before it. A straight quote closes a word only right
+ * after it.
+ */
 function isClosing(character: string, followsWord: boolean) {
   return closingCharacters.has(character) || (followsWord && straightQuotes.has(character));
 }

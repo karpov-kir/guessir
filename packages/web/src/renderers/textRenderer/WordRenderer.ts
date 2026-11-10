@@ -73,8 +73,9 @@ export class WordRenderer implements ChildRenderer {
   }
 
   /**
-   * Names the word for screen readers by what the current hint shows, and drops the name once the word is visible.
-   * The hidden placeholder is invisible, so a screen reader would otherwise announce an empty button.
+   * Names the hidden word for screen readers by what the current hint shows. The placeholder is
+   * invisible, so a screen reader would announce an empty button. Drops the name once the word or
+   * the text hint shows the word.
    */
   private renderLabel() {
     if (this.isShown || this.hint === WordHint.Text) {
@@ -96,7 +97,8 @@ export class WordRenderer implements ChildRenderer {
   private initElement() {
     this.renderLabel();
 
-    // The page font is monospace, so a placeholder of as many characters keeps the tile as wide as the hidden word
+    // The placeholder keeps the tile as wide as the hidden word. The page font is monospace, so
+    // each character takes the same width.
     this.lexemeElement.textContent = "_".repeat(this.length);
     this.containerElement.append(this.lexemeElement, this.firstLetterElement);
 

@@ -1,6 +1,7 @@
 /**
- * Returns an inline icon's SVG with the attributes every icon shares. The icon files hold only their shapes and
- * stroke width; `.icon` in `src/styles/components.css` gives them their size and draws them in the text colour.
+ * Returns the inline SVG with the attributes every icon shares, plus `className`. The icon files
+ * hold only shapes and stroke width. The `.icon` class in `src/styles/components.css` sets the size
+ * and the text colour.
  */
 export function icon(svg: string, className?: string) {
   const classes = className ? `icon ${className}` : "icon";
