@@ -69,7 +69,7 @@ export function initThemeToggle({
   }
 
   const isDark = () =>
-    root.dataset.theme ? root.dataset.theme === Theme.Dark : systemTheme.matches;
+    root.dataset.theme ? root.dataset.theme === String(Theme.Dark) : systemTheme.matches;
   const renderPressed = () => button.setAttribute("aria-pressed", String(isDark()));
 
   renderPressed();
