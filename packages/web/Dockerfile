@@ -5,7 +5,7 @@ WORKDIR /app
 COPY . .
 
 RUN npm ci
-RUN npm run build:web
+RUN npm run build -w @guessir/web
 
 FROM nginx:1-alpine
 

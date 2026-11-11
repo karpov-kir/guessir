@@ -1,5 +1,4 @@
 {
-  // The package options come from ./tsconfig.json, the build excludes from the root
   "extends": ["../../tsconfig.build.json", "./tsconfig.json"],
   "compilerOptions": {
     "noEmit": false,

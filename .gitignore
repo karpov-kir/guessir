@@ -1,4 +1,3 @@
-.idea
 .vscode
 tsconfig.build.tsbuildinfo
 dist
@@ -7,6 +6,4 @@ coverage
 # Vitest writes its run artifacts here
 .vitest
 
-*.orig
 *.DS_Store
-npm-debug.log*
