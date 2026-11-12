@@ -29,6 +29,7 @@
     "build:docker": "npm run build:docker --workspaces --if-present"
   },
   "devDependencies": {
+    "@kk-forge/stylelint-config": "^1.0.0",
     "@types/node": "^26.6.6",
     "@vitest/coverage-v8": "^5.0.5",
     "del-cli": "^8.0.1",
@@ -37,8 +38,7 @@
     "oxfmt": "^0.75.0",
     "oxlint": "^1.90.0",
     "oxlint-tsgolint": "^7.0.2005",
-    "stylelint": "^17.16.0",
-    "stylelint-config-standard": "^40.0.0",
+    "stylelint": "^18.0.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.5",
     "vitest": "^5.0.5",
