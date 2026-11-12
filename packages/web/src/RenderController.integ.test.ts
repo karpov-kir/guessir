@@ -6,6 +6,10 @@ import { RenderController } from "./RenderController";
 import { ControlsRenderer, GuessEvent } from "./renderers/ControlsRenderer";
 import { ScoreRenderer } from "./renderers/ScoreRenderer";
 import { TextRenderer } from "./renderers/textRenderer/TextRenderer";
+import { Logger, LogLevel } from "./utils/Logger";
+
+// Silences the logger: these tests make the game fail to answer on purpose.
+Logger.root.setLevel(LogLevel.Silent);
 
 let game: LocalGame;
 let containerElement: HTMLElement;
@@ -72,8 +76,6 @@ describe(RenderController, () => {
     new RenderController({ game, textRenderer, scoreRenderer, controlsRenderer }).init(
       containerElement,
     );
-
-    vi.spyOn(console, "error").mockImplementation(() => undefined);
   });
 
   it("should render the skeleton of the game", () => {
