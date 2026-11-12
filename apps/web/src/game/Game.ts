@@ -1,4 +1,4 @@
-import { RevealedWord, TextSkeleton } from "@guessir/shared/dist/game/types";
+import { RevealedWord, TextSkeleton } from "@guessir/game";
 
 /**
  * Means a text to guess. The game gives only the skeleton up front, and each word comes back from a

@@ -1,6 +1,4 @@
-import { CreateTextDto } from "@guessir/shared/dist/CreateTextDto";
-import { CreateTextDtoResponse } from "@guessir/shared/dist/CreateTextDtoResponse";
-import { TextSkeleton } from "@guessir/shared/dist/game/types";
+import { CreateTextDto, CreateTextDtoResponse, TextSkeleton } from "@guessir/game";
 import urlJoin from "url-join";
 
 import { RemoteGame } from "../game/RemoteGame";

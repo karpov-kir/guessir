@@ -1,4 +1,4 @@
-import { CreateTextDtoResponse } from "@guessir/shared/dist/CreateTextDtoResponse";
+import { CreateTextDtoResponse } from "@guessir/game";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mock, MockProxy } from "vitest-mock-extended";
 

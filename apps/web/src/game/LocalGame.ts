@@ -1,6 +1,4 @@
-import { CreateTextDto } from "@guessir/shared/dist/CreateTextDto";
-import { TextGame } from "@guessir/shared/dist/game/TextGame";
-import { RevealedWord, TextSkeleton } from "@guessir/shared/dist/game/types";
+import { CreateTextDto, RevealedWord, TextGame, TextSkeleton } from "@guessir/game";
 
 import { Game } from "./Game";
 

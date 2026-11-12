@@ -1,4 +1,4 @@
-import { createTextLimits } from "@guessir/shared/dist/CreateTextDto";
+import { createTextLimits } from "@guessir/game";
 
 import copyIcon from "../icons/copyIcon.svg?raw";
 import { ApiClient } from "../utils/ApiClient";

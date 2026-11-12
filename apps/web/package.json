@@ -12,7 +12,7 @@
     "build:docker": "docker build --platform=linux/amd64 -t guessir-web -f ./Dockerfile ../.."
   },
   "dependencies": {
-    "@guessir/shared": "^1.0.0",
+    "@guessir/game": "^1.0.0",
     "url-join": "^6.0.0"
   }
 }

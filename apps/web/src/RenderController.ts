@@ -1,4 +1,4 @@
-import { RevealedWord } from "@guessir/shared/dist/game/types";
+import { RevealedWord } from "@guessir/game";
 
 import { Game } from "./game/Game";
 import { ControlsRenderer, GuessEvent } from "./renderers/ControlsRenderer";

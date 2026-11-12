@@ -1,7 +1,7 @@
 /* v8 ignore start */
 
 import "./styles/index.css";
-import { CreateTextDto } from "@guessir/shared/dist/CreateTextDto";
+import { CreateTextDto } from "@guessir/game";
 
 import { Game } from "./game/Game";
 import { LocalGame } from "./game/LocalGame";

@@ -1,4 +1,4 @@
-import { TextSkeleton } from "@guessir/shared/dist/game/types";
+import { TextSkeleton } from "@guessir/game";
 
 export function newTextSkeleton(): TextSkeleton {
   return {

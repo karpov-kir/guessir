@@ -1,5 +1,4 @@
-import { createTextLimits } from "@guessir/shared/dist/CreateTextDto.js";
-import { Text } from "@guessir/shared/dist/Text.js";
+import { createTextLimits } from "@guessir/game";
 import {
   Column,
   CreateDateColumn,
@@ -8,6 +7,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+
+import { Text } from "./Text.js";
 
 @Entity("texts")
 export class TextEntity implements Text {

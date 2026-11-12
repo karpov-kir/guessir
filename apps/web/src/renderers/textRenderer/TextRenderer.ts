@@ -1,4 +1,4 @@
-import { RevealedWord, SkeletonLexeme } from "@guessir/shared/dist/game/types";
+import { RevealedWord, SkeletonLexeme } from "@guessir/game";
 
 import { PubSub } from "../../pubSub/PubSub";
 import { ChildRenderer } from "../types";

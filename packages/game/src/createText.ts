@@ -11,3 +11,7 @@ export interface CreateTextDto {
  * length in code points, not in UTF-16 units.
  */
 export const createTextLimits = { title: 500, description: 4000, text: 4000 } as const;
+
+export interface CreateTextDtoResponse {
+  id: string;
+}
