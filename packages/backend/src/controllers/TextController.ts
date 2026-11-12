@@ -105,9 +105,14 @@ export class TextsController {
 
   @Post()
   async create(@Body() newTextDto: CreateTextDtoRequest): Promise<CreateTextDtoResponse> {
+    const { title, description, text, allowShowingFirstLetters, allowShowingText } = newTextDto;
     const newText = await this.textsRepository.save({
-      ...newTextDto,
       id: nanoid(20),
+      title,
+      description,
+      text,
+      allowShowingFirstLetters,
+      allowShowingText,
     });
 
     return { id: newText.id };

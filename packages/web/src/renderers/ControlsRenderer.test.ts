@@ -67,12 +67,12 @@ describe(ControlsRenderer, () => {
       const controlsRenderer = new ControlsRenderer({ guessPubSub });
       const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
 
-      vi.spyOn(guessPubSub, "publish");
+      const publish = vi.spyOn(guessPubSub, "publish");
 
       typeGuess(guessInputElement, " TeST# ");
       submit(trigger === "a click" ? guessButtonElement : guessInputElement);
 
-      expect(guessPubSub.publish).toBeCalledWith({ word: "TeST#" });
+      expect(publish).toBeCalledWith({ word: "TeST#" });
     },
   );
 
@@ -83,13 +83,13 @@ describe(ControlsRenderer, () => {
     );
 
     controlsRenderer.announce("No new words for this guess");
-    vi.spyOn(guessInputElement, "focus");
+    const focus = vi.spyOn(guessInputElement, "focus");
     typeGuess(guessInputElement, "test");
 
     guessButtonElement.click();
 
     expect(guessInputElement.value).toBe("test");
-    expect(guessInputElement.focus).toBeCalled();
+    expect(focus).toBeCalled();
     expect(guessButtonElement.disabled).toBe(true);
     expect(statusElement.textContent).toBe("No new words for this guess");
   });
@@ -134,13 +134,13 @@ describe(ControlsRenderer, () => {
     const controlsRenderer = new ControlsRenderer({ guessPubSub });
     const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
 
-    vi.spyOn(guessPubSub, "publish");
+    const publish = vi.spyOn(guessPubSub, "publish");
     typeGuess(guessInputElement, "test");
 
     guessButtonElement.click();
     guessInputElement.dispatchEvent(new KeyboardEvent("keypress", { key: "Enter" }));
 
-    expect(guessPubSub.publish).toBeCalledTimes(1);
+    expect(publish).toBeCalledTimes(1);
   });
 
   it("should not send a guess again while it is checked, after an earlier guess is answered", () => {
@@ -148,7 +148,7 @@ describe(ControlsRenderer, () => {
     const controlsRenderer = new ControlsRenderer({ guessPubSub });
     const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
 
-    vi.spyOn(guessPubSub, "publish");
+    const publish = vi.spyOn(guessPubSub, "publish");
     typeGuess(guessInputElement, "one");
     guessButtonElement.click();
     typeGuess(guessInputElement, "two");
@@ -158,7 +158,7 @@ describe(ControlsRenderer, () => {
     guessInputElement.dispatchEvent(new KeyboardEvent("keypress", { key: "Enter" }));
 
     expect(guessButtonElement.disabled).toBe(true);
-    expect(guessPubSub.publish).toBeCalledTimes(2);
+    expect(publish).toBeCalledTimes(2);
   });
 
   it("should leave a missed guess in the input and enable the button, so the player can correct it", () => {
@@ -211,13 +211,13 @@ describe(ControlsRenderer, () => {
     });
     const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
 
-    vi.spyOn(guessPubSub, "publish");
+    const publish = vi.spyOn(guessPubSub, "publish");
 
     // The input holds only spaces, so the test also checks that the renderer trims the word.
     guessInputElement.value = "  ";
     guessButtonElement.click();
 
-    expect(guessPubSub.publish).not.toBeCalled();
+    expect(publish).not.toBeCalled();
   });
 
   it.each([
@@ -236,8 +236,8 @@ describe(ControlsRenderer, () => {
       .getElement()
       .querySelector(selector) as HTMLInputElement;
 
-    vi.spyOn(showFirstLettersPubSub, "publish");
-    vi.spyOn(showTextPubSub, "publish");
+    const publishFirstLetters = vi.spyOn(showFirstLettersPubSub, "publish");
+    const publishText = vi.spyOn(showTextPubSub, "publish");
 
     checkboxElement.dispatchEvent(new Event("change"));
     checkboxElement.dispatchEvent(new Event("change"));
@@ -252,12 +252,12 @@ describe(ControlsRenderer, () => {
       }),
     );
 
-    const pubSub = type === "first-letters" ? showFirstLettersPubSub : showTextPubSub;
+    const publish = type === "first-letters" ? publishFirstLetters : publishText;
 
-    expect(pubSub.publish).nthCalledWith(1, true);
-    expect(pubSub.publish).nthCalledWith(2, false);
-    expect(pubSub.publish).nthCalledWith(3, true);
-    expect(pubSub.publish).nthCalledWith(4, false);
+    expect(publish).nthCalledWith(1, true);
+    expect(publish).nthCalledWith(2, false);
+    expect(publish).nthCalledWith(3, true);
+    expect(publish).nthCalledWith(4, false);
   });
 
   it.each([
@@ -289,13 +289,13 @@ describe(ControlsRenderer, () => {
     const pubSubB = typeA === "first letters" ? showTextPubSub : showFirstLettersPubSub;
 
     // The test spies only now, so the setup change above is not counted.
-    vi.spyOn(pubSubA, "publish");
-    vi.spyOn(pubSubB, "publish");
+    const publishA = vi.spyOn(pubSubA, "publish");
+    const publishB = vi.spyOn(pubSubB, "publish");
 
     checkboxA.dispatchEvent(new Event("change"));
 
-    expect(pubSubA.publish).nthCalledWith(1, true);
-    expect(pubSubB.publish).nthCalledWith(1, false);
+    expect(publishA).nthCalledWith(1, true);
+    expect(publishB).nthCalledWith(1, false);
   });
 
   it("should render the guess button disabled initially", () => {
@@ -397,14 +397,14 @@ describe(ControlsRenderer, () => {
         .querySelector(selector) as HTMLInputElement;
 
       checkboxElement.dispatchEvent(new Event("change"));
-      vi.spyOn(showFirstLettersPubSub, "publish");
-      vi.spyOn(showTextPubSub, "publish");
+      const publishFirstLetters = vi.spyOn(showFirstLettersPubSub, "publish");
+      const publishText = vi.spyOn(showTextPubSub, "publish");
 
       controlsRenderer[uncheck]();
 
       expect(checkboxElement.checked).toBe(false);
-      expect(showFirstLettersPubSub.publish).not.toBeCalled();
-      expect(showTextPubSub.publish).not.toBeCalled();
+      expect(publishFirstLetters).not.toBeCalled();
+      expect(publishText).not.toBeCalled();
 
       checkboxElement.dispatchEvent(new Event("change"));
 

@@ -8,6 +8,9 @@ import { LocalGame } from "./game/LocalGame";
 import { RenderController } from "./RenderController";
 import { ApiClient } from "./utils/ApiClient";
 import { hasTextParametersInUrl, parseTextIdFromUrl } from "./utils/text";
+import { Logger } from "./utils/Logger";
+
+const logger = Logger.root.scope("boot");
 
 const defaultText: CreateTextDto = {
   title: "Hello!",
@@ -39,15 +42,15 @@ async function loadGame(apiClient: ApiClient): Promise<Game> {
   }
 
   try {
-    console.log("Trying to load text...");
+    logger.debug("Trying to load text...");
 
     const remoteGame = await apiClient.loadGame(parseTextIdFromUrl());
 
-    console.log("Text has been loaded", remoteGame.skeleton);
+    logger.debug("Text has been loaded", remoteGame.skeleton);
 
     return remoteGame;
   } catch (error) {
-    console.error("Failed to load the text", error);
+    logger.error("Failed to load the text", error);
 
     return new LocalGame({ ...defaultText, text: couldNotLoadRemoteTextText });
   }
