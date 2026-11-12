@@ -13,11 +13,11 @@ FROM base AS deps
 
 # The backend's production dependencies need only the root, shared and backend manifests
 COPY package.json package-lock.json .npmrc ./
-COPY packages/shared/package.json packages/shared/
-COPY packages/backend/package.json packages/backend/
+COPY packages/game/package.json packages/game/
+COPY apps/backend/package.json apps/backend/
 # npm links a bin into node_modules/.bin only when its file exists, and `npx guessirBackend` needs
 # that link
-COPY packages/backend/guessirBackend.js packages/backend/
+COPY apps/backend/guessirBackend.js apps/backend/
 
 RUN npm ci --omit=dev -w @guessir/backend
 
@@ -25,8 +25,8 @@ FROM base AS runner
 
 # Only what the backend runs: no sources, no dev dependencies, no env files
 COPY --from=deps /app .
-COPY --from=build /app/packages/shared/dist packages/shared/dist
-COPY --from=build /app/packages/backend/dist packages/backend/dist
+COPY --from=build /app/packages/game/dist packages/game/dist
+COPY --from=build /app/apps/backend/dist apps/backend/dist
 
 USER node
 

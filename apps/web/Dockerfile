@@ -9,4 +9,4 @@ RUN npm run build -w @guessir/web
 
 FROM nginx:1-alpine
 
-COPY --from=builder /app/packages/web/dist /usr/share/nginx/html
+COPY --from=builder /app/apps/web/dist /usr/share/nginx/html

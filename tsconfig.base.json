@@ -2,7 +2,7 @@
   "compilerOptions": {
     "noEmit": true,
     "paths": {
-      "@guessir/shared/dist/*": ["./packages/shared/src/*"]
+      "@guessir/shared/dist/*": ["./packages/game/src/*"]
     }
   }
 }
