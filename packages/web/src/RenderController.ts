@@ -6,6 +6,9 @@ import { CreateTextRenderer } from "./renderers/CreateTextRenderer";
 import { ScoreRenderer } from "./renderers/ScoreRenderer";
 import { TextRenderer } from "./renderers/textRenderer/TextRenderer";
 import { WordHint } from "./renderers/textRenderer/WordRenderer";
+import { Logger } from "./utils/Logger";
+
+const logger = Logger.root.scope("RenderController");
 
 export type RenderControllerOptions = {
   game: Game;
@@ -93,7 +96,7 @@ export class RenderController {
     try {
       revealedWord = await this.game.reveal(index);
     } catch (error) {
-      console.error("Failed to reveal the word", { index }, error);
+      logger.error("Failed to reveal the word", { index }, error);
       this.controlsRenderer.announce("Could not open this word");
       return;
     }
@@ -109,7 +112,7 @@ export class RenderController {
     try {
       guessedWords = await this.game.guess(word);
     } catch (error) {
-      console.error("Failed to check the guess", { word }, error);
+      logger.error("Failed to check the guess", { word }, error);
       this.controlsRenderer.returnGuess(word);
       this.controlsRenderer.announce("Could not check this guess");
       return;
@@ -170,7 +173,7 @@ export class RenderController {
     try {
       await options.load();
     } catch (error) {
-      console.error("Failed to load the hint", { hint: options.hint }, error);
+      logger.error("Failed to load the hint", { hint: options.hint }, error);
 
       if (this.wantedHint === options.hint) {
         this.wantedHint = WordHint.None;

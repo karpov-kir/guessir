@@ -6,6 +6,9 @@ import { onChangeAndEnter } from "../utils/dom";
 import { icon } from "../utils/icon";
 import { generateTextUrl } from "../utils/text";
 import { ChildRenderer } from "./types";
+import { Logger } from "../utils/Logger";
+
+const logger = Logger.root.scope("CreateTextRenderer");
 
 interface CreateTextRendererOptions {
   maxTitleLength?: number;
@@ -306,7 +309,7 @@ export class CreateTextRenderer implements ChildRenderer {
           generatedUrlElement.href = this.generatedUrl;
         })
         .catch((error: Error) => {
-          console.error(error);
+          logger.error("Failed to create the text", error);
           errorElement.classList.remove("hide");
           errorElement.textContent = error.message;
         })
