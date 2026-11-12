@@ -1,4 +1,5 @@
 {
+  "extends": ["./node_modules/@kk-forge/oxlint-config/typescript.json"],
   "rules": {
     "typescript/no-misused-spread": "off"
   },
