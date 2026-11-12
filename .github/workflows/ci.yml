@@ -26,7 +26,7 @@ jobs:
       dev: ${{ inputs.dev == true }}
       version-task: backend:version
       tag-prefix: backend-
-      images: guessir-backend . packages/backend/Dockerfile
+      images: guessir-backend . apps/backend/Dockerfile
     secrets: { DOCKER_REGISTRY_TOKEN: "${{ secrets.DOCKER_REGISTRY_TOKEN }}" }
   release-web:
     needs: ci
@@ -37,5 +37,5 @@ jobs:
       dev: ${{ inputs.dev == true }}
       version-task: web:version
       tag-prefix: web-
-      images: guessir-web . packages/web/Dockerfile
+      images: guessir-web . apps/web/Dockerfile
     secrets: { DOCKER_REGISTRY_TOKEN: "${{ secrets.DOCKER_REGISTRY_TOKEN }}" }

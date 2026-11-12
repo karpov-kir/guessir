@@ -6,4 +6,4 @@
 coverage
 .git
 # The development database password; production reads its own from a secret
-packages/backend/env
+apps/backend/env

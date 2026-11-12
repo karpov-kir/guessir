@@ -2,9 +2,8 @@
   "name": "@guessir/monorepo",
   "private": true,
   "workspaces": [
-    "packages/shared",
-    "packages/backend",
-    "packages/web"
+    "packages/*",
+    "apps/*"
   ],
   "type": "module",
   "scripts": {
@@ -14,8 +13,8 @@
     "lint:oxlint:fix": "oxlint --fix",
     "lint:format": "oxfmt --check",
     "lint:format:fix": "oxfmt",
-    "lint:tsc": "tsc -p packages/backend/tsconfig.json && tsc -p packages/shared/tsconfig.json && tsc -p packages/web/tsconfig.json",
-    "lint:stylelint": "stylelint \"packages/**/src/**/*.css\"",
+    "lint:tsc": "tsc -p apps/backend/tsconfig.json && tsc -p packages/game/tsconfig.json && tsc -p apps/web/tsconfig.json",
+    "lint:stylelint": "stylelint \"{apps,packages}/*/src/**/*.css\"",
     "lint:stylelint:fix": "npm run lint:stylelint -- --fix",
     "lint": "run-p -c lint:*[!fix]",
     "lint:fix": "run-s -c lint:oxlint:fix lint:stylelint:fix lint:format:fix",

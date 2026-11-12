@@ -3,12 +3,12 @@ node = "26"
 
 [tasks."backend:version"]
 description = "Print the backend's version from its package.json, which a release tags"
-dir = "packages/backend"
+dir = "apps/backend"
 run = "node -p \"require('./package.json').version\""
 
 [tasks."web:version"]
 description = "Print the web's version from its package.json, which a release tags"
-dir = "packages/web"
+dir = "apps/web"
 run = "node -p \"require('./package.json').version\""
 
 [tasks.setup]
