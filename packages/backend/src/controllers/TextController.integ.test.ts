@@ -25,14 +25,16 @@ describe(TextsController, () => {
 
   /**
    * Makes the repository return `text` with `overrides` for its id, and no text for any other id.
+   * Returns the spy on the repository's `findOne`.
    */
-  const storeText = (overrides: Partial<TextEntity> = {}) => {
-    vi.spyOn(textsRepository, "findOne").mockImplementation(async (options) =>
-      !Array.isArray(options.where) && options.where?.id === text.id
-        ? { ...text, ...overrides }
-        : null,
-    );
-  };
+  const storeText = (overrides: Partial<TextEntity> = {}) =>
+    vi
+      .spyOn(textsRepository, "findOne")
+      .mockImplementation(async (options) =>
+        !Array.isArray(options.where) && options.where?.id === text.id
+          ? { ...text, ...overrides }
+          : null,
+      );
 
   beforeEach(() => {
     textsRepository = mockRepository<TextEntity>();
@@ -152,28 +154,30 @@ describe(TextsController, () => {
 
   describe("cache", () => {
     it("should ask the repository once for repeated requests on one text", async () => {
-      storeText();
+      const findOne = storeText();
 
       await textsController.findById("id");
       await textsController.guess("id", { word: "one" });
       await textsController.words("id");
 
-      expect(textsRepository.findOne).toBeCalledTimes(1);
+      expect(findOne).toBeCalledTimes(1);
     });
 
     it("should ask the repository again for an unknown text", async () => {
-      vi.spyOn(textsRepository, "findOne").mockResolvedValue(null);
+      const findOne = vi.spyOn(textsRepository, "findOne").mockResolvedValue(null);
 
       await expect(textsController.findById("unknown")).rejects.toEqual(new NotFoundException());
       await expect(textsController.findById("unknown")).rejects.toEqual(new NotFoundException());
 
-      expect(textsRepository.findOne).toBeCalledTimes(2);
+      expect(findOne).toBeCalledTimes(2);
     });
 
     it("should keep a bounded number of texts and ask the repository again for one it dropped", async () => {
-      vi.spyOn(textsRepository, "findOne").mockImplementation(async ({ where }) =>
-        !Array.isArray(where) && typeof where?.id === "string" ? { ...text, id: where.id } : null,
-      );
+      const findOne = vi
+        .spyOn(textsRepository, "findOne")
+        .mockImplementation(async ({ where }) =>
+          !Array.isArray(where) && typeof where?.id === "string" ? { ...text, id: where.id } : null,
+        );
 
       // The test loads more texts than the controller keeps in its cache. The controller then drops
       // `id-0` and asks the repository for it again.
@@ -185,7 +189,7 @@ describe(TextsController, () => {
 
       await textsController.findById("id-0");
 
-      expect(textsRepository.findOne).toBeCalledTimes(textCount + 1);
+      expect(findOne).toBeCalledTimes(textCount + 1);
     });
   });
 

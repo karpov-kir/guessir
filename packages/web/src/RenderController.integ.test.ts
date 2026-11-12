@@ -204,7 +204,7 @@ describe(RenderController, () => {
   });
 
   it("should load the first letters once and show them", async () => {
-    vi.spyOn(game, "firstLetters");
+    const firstLetters = vi.spyOn(game, "firstLetters");
 
     showFirstLettersPubSub.publish(true);
     await settle();
@@ -219,12 +219,12 @@ describe(RenderController, () => {
     await settle();
 
     expect(getTextClasses()).toContain("show-first-letters");
-    expect(game.firstLetters).toBeCalledTimes(1);
+    expect(firstLetters).toBeCalledTimes(1);
     expect(getScore()).toBe("0");
   });
 
   it("should load the words once and let the user peek at them", async () => {
-    vi.spyOn(game, "words");
+    const words = vi.spyOn(game, "words");
 
     showTextPubSub.publish(true);
     await settle();
@@ -238,7 +238,7 @@ describe(RenderController, () => {
     showTextPubSub.publish(true);
     await settle();
 
-    expect(game.words).toBeCalledTimes(1);
+    expect(words).toBeCalledTimes(1);
     expect(getScore()).toBe("0");
   });
 

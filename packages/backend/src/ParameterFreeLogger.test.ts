@@ -1,6 +1,6 @@
 import { Logger } from "@nestjs/common";
 import { Logger as TypeOrmLogger } from "typeorm";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, MockInstance, vi } from "vitest";
 
 import { ParameterFreeLogger } from "./ParameterFreeLogger.js";
 
@@ -11,21 +11,31 @@ const levels = ["error", "warn", "log", "debug", "verbose", "fatal"] as const;
 // does. `ParameterFreeLogger` declares `logQuery`, `logQueryError` and `logQuerySlow` without the
 // parameters.
 let parameterFreeLogger: TypeOrmLogger;
+let logSpies: Record<(typeof levels)[number], MockInstance>;
 
 describe(ParameterFreeLogger, () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    for (const level of levels) {
+
+    const spyOnLevel = (level: (typeof levels)[number]) =>
       vi.spyOn(Logger.prototype, level).mockImplementation(() => undefined);
-    }
+
+    logSpies = {
+      error: spyOnLevel("error"),
+      warn: spyOnLevel("warn"),
+      log: spyOnLevel("log"),
+      debug: spyOnLevel("debug"),
+      verbose: spyOnLevel("verbose"),
+      fatal: spyOnLevel("fatal"),
+    };
     parameterFreeLogger = new ParameterFreeLogger();
   });
 
   it("should log a failed query with its error but without its parameters", () => {
     parameterFreeLogger.logQueryError(new Error("connection lost"), insertQuery, [secretText]);
 
-    expect(Logger.prototype.error).toBeCalledTimes(1);
-    expect(Logger.prototype.error).toBeCalledWith(
+    expect(logSpies.error).toBeCalledTimes(1);
+    expect(logSpies.error).toBeCalledWith(
       "Query failed: Error: connection lost; INSERT INTO texts VALUES ($1)",
     );
   });
@@ -35,7 +45,7 @@ describe(ParameterFreeLogger, () => {
     parameterFreeLogger.logQuerySlow(5_000, insertQuery, [secretText]);
 
     for (const level of levels) {
-      expect(Logger.prototype[level]).not.toBeCalled();
+      expect(logSpies[level]).not.toBeCalled();
     }
   });
 
@@ -44,24 +54,24 @@ describe(ParameterFreeLogger, () => {
     parameterFreeLogger.log("info", "connected");
     parameterFreeLogger.log("log", "connected");
 
-    expect(Logger.prototype.warn).toBeCalledTimes(1);
-    expect(Logger.prototype.warn).toBeCalledWith("deprecated option");
+    expect(logSpies.warn).toBeCalledTimes(1);
+    expect(logSpies.warn).toBeCalledWith("deprecated option");
     for (const level of levels.filter((level) => level !== "warn")) {
-      expect(Logger.prototype[level]).not.toBeCalled();
+      expect(logSpies[level]).not.toBeCalled();
     }
   });
 
   it("should inspect a warning that is not a string", () => {
     parameterFreeLogger.log("warn", { reason: "pool error" });
 
-    expect(Logger.prototype.warn).toBeCalledWith("{ reason: 'pool error' }");
+    expect(logSpies.warn).toBeCalledWith("{ reason: 'pool error' }");
   });
 
   it("should log schema builds and migrations", () => {
     parameterFreeLogger.logSchemaBuild("schema built");
     parameterFreeLogger.logMigration("migration applied");
 
-    expect(Logger.prototype.log).toBeCalledWith("schema built");
-    expect(Logger.prototype.log).toBeCalledWith("migration applied");
+    expect(logSpies.log).toBeCalledWith("schema built");
+    expect(logSpies.log).toBeCalledWith("migration applied");
   });
 });
