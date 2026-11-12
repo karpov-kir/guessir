@@ -29,7 +29,7 @@
     "build:docker": "npm run build:docker --workspaces --if-present"
   },
   "devDependencies": {
-    "@kk-forge/oxlint-config": "^2.0.0",
+    "@kk-forge/oxlint-config": "^3.0.0",
     "@types/node": "^26.6.6",
     "@vitest/coverage-v8": "^5.0.5",
     "del-cli": "^8.0.1",
