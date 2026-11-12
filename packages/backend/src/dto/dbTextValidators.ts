@@ -16,7 +16,7 @@ export function MaxCodePoints(
       name: "maxLength",
       constraints: [max],
       validator: {
-        validate: (value) => typeof value === "string" && [...value].length <= max,
+        validate: (value) => typeof value === "string" && Array.from(value).length <= max,
         defaultMessage: buildMessage(
           (eachPrefix) =>
             `${eachPrefix}$property must be shorter than or equal to $constraint1 characters`,

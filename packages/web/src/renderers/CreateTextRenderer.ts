@@ -6,6 +6,9 @@ import { onChangeAndEnter } from "../utils/dom";
 import { icon } from "../utils/icon";
 import { generateTextUrl } from "../utils/text";
 import { ChildRenderer } from "./types";
+import { Logger } from "../utils/Logger";
+
+const logger = Logger.root.scope("CreateTextRenderer");
 
 interface CreateTextRendererOptions {
   maxTitleLength?: number;
@@ -145,7 +148,7 @@ export class CreateTextRenderer implements ChildRenderer {
     // The function counts and cuts in code points, not UTF-16 units. The server and its Postgres
     // columns count code points. So the server accepts every value that the form keeps.
     const limitLength = (element: HTMLInputElement, maxLength: number) => {
-      let codePoints = [...element.value.trim()];
+      let codePoints = Array.from(element.value.trim());
 
       if (codePoints.length > maxLength) {
         codePoints = codePoints.slice(0, maxLength);
@@ -306,7 +309,7 @@ export class CreateTextRenderer implements ChildRenderer {
           generatedUrlElement.href = this.generatedUrl;
         })
         .catch((error: Error) => {
-          console.error(error);
+          logger.error("Failed to create the text", error);
           errorElement.classList.remove("hide");
           errorElement.textContent = error.message;
         })

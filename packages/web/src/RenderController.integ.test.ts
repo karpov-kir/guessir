@@ -6,6 +6,10 @@ import { RenderController } from "./RenderController";
 import { ControlsRenderer, GuessEvent } from "./renderers/ControlsRenderer";
 import { ScoreRenderer } from "./renderers/ScoreRenderer";
 import { TextRenderer } from "./renderers/textRenderer/TextRenderer";
+import { Logger, LogLevel } from "./utils/Logger";
+
+// Silences the logger: these tests make the game fail to answer on purpose.
+Logger.root.setLevel(LogLevel.Silent);
 
 let game: LocalGame;
 let containerElement: HTMLElement;
@@ -72,8 +76,6 @@ describe(RenderController, () => {
     new RenderController({ game, textRenderer, scoreRenderer, controlsRenderer }).init(
       containerElement,
     );
-
-    vi.spyOn(console, "error").mockImplementation(() => undefined);
   });
 
   it("should render the skeleton of the game", () => {
@@ -204,7 +206,7 @@ describe(RenderController, () => {
   });
 
   it("should load the first letters once and show them", async () => {
-    vi.spyOn(game, "firstLetters");
+    const firstLetters = vi.spyOn(game, "firstLetters");
 
     showFirstLettersPubSub.publish(true);
     await settle();
@@ -219,12 +221,12 @@ describe(RenderController, () => {
     await settle();
 
     expect(getTextClasses()).toContain("show-first-letters");
-    expect(game.firstLetters).toBeCalledTimes(1);
+    expect(firstLetters).toBeCalledTimes(1);
     expect(getScore()).toBe("0");
   });
 
   it("should load the words once and let the user peek at them", async () => {
-    vi.spyOn(game, "words");
+    const words = vi.spyOn(game, "words");
 
     showTextPubSub.publish(true);
     await settle();
@@ -238,7 +240,7 @@ describe(RenderController, () => {
     showTextPubSub.publish(true);
     await settle();
 
-    expect(game.words).toBeCalledTimes(1);
+    expect(words).toBeCalledTimes(1);
     expect(getScore()).toBe("0");
   });
 

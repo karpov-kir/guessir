@@ -3,7 +3,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mock, MockProxy } from "vitest-mock-extended";
 
 import { ApiClient } from "../utils/ApiClient";
+import { Logger, LogLevel } from "../utils/Logger";
 import { CreateTextRenderer, getElements } from "./CreateTextRenderer";
+
+// Silences the logger: these tests make creating a text fail on purpose.
+Logger.root.setLevel(LogLevel.Silent);
 
 const mockedText = {
   id: "mocked-id",

@@ -4,7 +4,7 @@ import { Controller, Get, Logger, Module } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { FastifyAdapter, NestFastifyApplication } from "@nestjs/platform-fastify";
 import { QueryFailedError } from "typeorm";
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, MockInstance, vi } from "vitest";
 
 import { QueryErrorFilter } from "./QueryErrorFilter.js";
 
@@ -38,6 +38,7 @@ class FailingModule {}
 
 describe(QueryErrorFilter, () => {
   let app: NestFastifyApplication;
+  let logError: MockInstance<Logger["error"]>;
 
   beforeAll(async () => {
     app = await NestFactory.create<NestFastifyApplication>(FailingModule, new FastifyAdapter(), {
@@ -54,7 +55,7 @@ describe(QueryErrorFilter, () => {
 
   beforeEach(() => {
     vi.restoreAllMocks();
-    vi.spyOn(Logger.prototype, "error").mockImplementation(() => undefined);
+    logError = vi.spyOn(Logger.prototype, "error").mockImplementation(() => undefined);
   });
 
   it("should answer a failed query with Nest's own 500 and log it without the text", async () => {
@@ -62,11 +63,9 @@ describe(QueryErrorFilter, () => {
 
     expect(response.statusCode).toBe(500);
     expect(response.json()).toEqual({ statusCode: 500, message: "Internal server error" });
-    expect(Logger.prototype.error).toBeCalledTimes(1);
-    expect(
-      inspect(vi.mocked(Logger.prototype.error).mock.calls, { depth: Infinity }),
-    ).not.toContain(secretText);
-    expect(Logger.prototype.error).toBeCalledWith(
+    expect(logError).toBeCalledTimes(1);
+    expect(inspect(logError.mock.calls, { depth: Infinity })).not.toContain(secretText);
+    expect(logError).toBeCalledWith(
       `Query failed: QueryFailedError: value too long for type character varying(4000); ${insertQuery}; code 22001`,
     );
   });
@@ -76,6 +75,6 @@ describe(QueryErrorFilter, () => {
 
     expect(response.statusCode).toBe(500);
     expect(response.json()).toEqual({ statusCode: 500, message: "Internal server error" });
-    expect(Logger.prototype.error).toBeCalledWith(otherError);
+    expect(logError).toBeCalledWith(otherError);
   });
 });

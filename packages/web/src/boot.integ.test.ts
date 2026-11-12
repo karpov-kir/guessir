@@ -9,6 +9,10 @@ import { RemoteGame } from "./game/RemoteGame";
 import { RenderController } from "./RenderController";
 import { ApiClient } from "./utils/ApiClient";
 import { HttpClient } from "./utils/HttpClient";
+import { Logger, LogLevel } from "./utils/Logger";
+
+// Silences the logger: these tests make loading fail on purpose.
+Logger.root.setLevel(LogLevel.Silent);
 
 let mockedApiClient: MockProxy<ApiClient>;
 vi.mock("./RenderController");
