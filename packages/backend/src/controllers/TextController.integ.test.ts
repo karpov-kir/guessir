@@ -7,7 +7,7 @@ import { CreateTextDtoRequest } from "../dto/CreateTextDtoRequest.js";
 import { TextEntity } from "../entities/TextEntity.js";
 import { TextsController } from "./TextController.js";
 
-const text: TextEntity = {
+const text = {
   pk: 1,
   id: "id",
   title: "Title",
@@ -17,7 +17,7 @@ const text: TextEntity = {
   allowShowingText: true,
   updatedAt: new Date(),
   createdAt: new Date(),
-};
+} satisfies TextEntity;
 
 describe(TextsController, () => {
   let textsController: TextsController;

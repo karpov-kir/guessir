@@ -21,15 +21,15 @@ const createStorage = (): Storage => {
   };
 };
 
-const createBrokenStorage = (): Storage => ({
-  ...createStorage(),
-  getItem: () => {
-    throw new Error("Storage is blocked");
-  },
-  setItem: () => {
-    throw new Error("Storage is blocked");
-  },
-});
+const createBrokenStorage = (): Storage =>
+  Object.assign(createStorage(), {
+    getItem: () => {
+      throw new Error("Storage is blocked");
+    },
+    setItem: () => {
+      throw new Error("Storage is blocked");
+    },
+  });
 
 const createSystemTheme = (matches: boolean) => {
   const listeners: Array<() => void> = [];
