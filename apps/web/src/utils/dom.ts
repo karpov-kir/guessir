@@ -53,7 +53,7 @@ export function requireElement<T extends Element>({
   const element = root.querySelector(selector);
 
   if (!(element instanceof type)) {
-    throw new Error(`Expected an instance of ${type.name} at "${selector}"`);
+    throw new TypeError(`Expected an instance of ${type.name} at "${selector}"`);
   }
 
   return element;
