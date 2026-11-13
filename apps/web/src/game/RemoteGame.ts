@@ -1,4 +1,4 @@
-import { RevealedWord, RevealedWords, TextSkeleton } from "@guessir/game";
+import { RevealedWord, revealedWordSchema, revealedWordsSchema, TextSkeleton } from "@guessir/game";
 import urlJoin from "url-join";
 
 import { HttpClient } from "../utils/HttpClient";
@@ -17,25 +17,29 @@ export class RemoteGame implements Game {
   }
 
   async guess(word: string): Promise<RevealedWord[]> {
-    return this.readWords(this.httpClient.post(urlJoin(this.textPath, "guesses"), { word }));
+    const { words } = await this.httpClient.post(
+      urlJoin(this.textPath, "guesses"),
+      { word },
+      revealedWordsSchema,
+    );
+
+    return words;
   }
 
   async reveal(index: number): Promise<RevealedWord> {
-    return (await this.httpClient.post(urlJoin(this.textPath, "reveals"), {
-      index,
-    })) as RevealedWord;
+    return this.httpClient.post(urlJoin(this.textPath, "reveals"), { index }, revealedWordSchema);
   }
 
   async firstLetters(): Promise<RevealedWord[]> {
-    return this.readWords(this.httpClient.get(urlJoin(this.textPath, "first-letters")));
+    return this.readWords("first-letters");
   }
 
   async words(): Promise<RevealedWord[]> {
-    return this.readWords(this.httpClient.get(urlJoin(this.textPath, "words")));
+    return this.readWords("words");
   }
 
-  private async readWords(response: Promise<unknown>): Promise<RevealedWord[]> {
-    const { words } = (await response) as RevealedWords;
+  private async readWords(route: string): Promise<RevealedWord[]> {
+    const { words } = await this.httpClient.get(urlJoin(this.textPath, route), revealedWordsSchema);
 
     return words;
   }

@@ -1,4 +1,4 @@
-import { CreateTextDtoResponse } from "@guessir/game";
+import { CreateTextDtoResponse, createTextDtoResponseSchema } from "@guessir/game";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mock, MockProxy } from "vitest-mock-extended";
 
@@ -67,13 +67,17 @@ describe(CreateTextRenderer, () => {
 
     await createText();
 
-    expect(httpClient.post).toBeCalledWith("texts", {
-      allowShowingFirstLetters: false,
-      allowShowingText: true,
-      description: "Test description",
-      text: "Text text",
-      title: "Test title",
-    });
+    expect(httpClient.post).toBeCalledWith(
+      "texts",
+      {
+        allowShowingFirstLetters: false,
+        allowShowingText: true,
+        description: "Test description",
+        text: "Text text",
+        title: "Test title",
+      },
+      createTextDtoResponseSchema,
+    );
     expect(generatedUrlElement.textContent).toBe("http://localhost:3000?textId=mocked-id");
     expect(generatedUrlElement.href).toBe("http://localhost:3000/?textId=mocked-id");
     expect(generatedUrlContainerElement.classList).not.toContain("hide");

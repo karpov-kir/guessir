@@ -1,4 +1,4 @@
-import { CreateTextDto, CreateTextDtoResponse } from "@guessir/game";
+import { CreateTextDto, CreateTextDtoResponse, createTextDtoResponseSchema } from "@guessir/game";
 
 import { HttpClient } from "../utils/HttpClient";
 
@@ -7,5 +7,5 @@ export async function createText(
   httpClient: HttpClient,
   payload: CreateTextDto,
 ): Promise<CreateTextDtoResponse> {
-  return (await httpClient.post("texts", payload)) as CreateTextDtoResponse;
+  return httpClient.post("texts", payload, createTextDtoResponseSchema);
 }
