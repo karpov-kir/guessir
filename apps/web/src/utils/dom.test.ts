@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { onChangeAndEnter } from "./dom";
+import { onChangeAndEnter, requireElement } from "./dom";
 
 let inputElement: HTMLInputElement;
 let callback: () => void;
@@ -52,5 +52,29 @@ describe(onChangeAndEnter, () => {
     inputElement.dispatchEvent(enterPressEvent);
 
     expect(inputElement.checked).toBeTruthy();
+  });
+});
+
+describe(requireElement, () => {
+  const root = document.createElement("div");
+
+  root.innerHTML = '<textarea id="text"></textarea>';
+
+  it("should return the element of the given type", () => {
+    expect(requireElement({ root, selector: "#text", type: HTMLTextAreaElement })).toBe(
+      root.querySelector("#text"),
+    );
+  });
+
+  it("should throw when the element is of another type", () => {
+    expect(() => requireElement({ root, selector: "#text", type: HTMLInputElement })).toThrow(
+      'Expected an instance of HTMLInputElement at "#text"',
+    );
+  });
+
+  it("should throw when there is no element", () => {
+    expect(() => requireElement({ root, selector: "#missing", type: HTMLElement })).toThrow(
+      'Expected an instance of HTMLElement at "#missing"',
+    );
   });
 });

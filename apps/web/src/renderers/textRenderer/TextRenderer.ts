@@ -1,6 +1,7 @@
 import { RevealedWord, SkeletonLexeme } from "@guessir/game";
 
 import { PubSub } from "../../pubSub/PubSub";
+import { requireElement } from "../../utils/dom";
 import { ChildRenderer } from "../types";
 import { WordHint, WordRenderer } from "./WordRenderer";
 
@@ -214,9 +215,21 @@ function isOpening(character: string) {
 }
 
 export function getElements(containerElement: HTMLElement) {
-  const titleElement = containerElement.querySelector("#title") as HTMLElement;
-  const descriptionElement = containerElement.querySelector("#description") as HTMLElement;
-  const lexemesElement = containerElement.querySelector("#lexemes") as HTMLElement;
+  const titleElement = requireElement({
+    root: containerElement,
+    selector: "#title",
+    type: HTMLElement,
+  });
+  const descriptionElement = requireElement({
+    root: containerElement,
+    selector: "#description",
+    type: HTMLElement,
+  });
+  const lexemesElement = requireElement({
+    root: containerElement,
+    selector: "#lexemes",
+    type: HTMLElement,
+  });
 
   return { titleElement, descriptionElement, lexemesElement };
 }
