@@ -6,7 +6,7 @@ import { DataSource, DataSourceOptions } from "typeorm";
 import { MigrationFn as UmzugMigrationFn, Umzug } from "umzug";
 
 import { getDbSettings } from "./dbEnv.js";
-import { TextEntity } from "./entities/TextEntity.js";
+import { TextRow } from "./TextRow.js";
 import { ParameterFreeLogger } from "./ParameterFreeLogger.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -24,7 +24,7 @@ interface MigrationLog {
 
 const migrationTable = "migrations";
 
-const entities = [TextEntity];
+const entities = [TextRow];
 
 export type DbSettings = ReturnType<typeof getDbSettings>;
 
@@ -67,7 +67,7 @@ export async function openPostgres(settings: DbSettings = getDbSettings()): Prom
   return new DataSource(getTypeOrmConfig(settings)).initialize();
 }
 
-const logger = new Logger("dbUtils");
+const logger = new Logger("postgres");
 
 /** Applies the migrations the database has not run yet, through `dataSource`. */
 export async function applyDbMigrations(dataSource: DataSource) {

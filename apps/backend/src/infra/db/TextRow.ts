@@ -9,7 +9,7 @@ import {
 } from "typeorm";
 
 @Entity("texts")
-export class TextEntity {
+export class TextRow {
   @PrimaryGeneratedColumn()
   pk!: number;
 

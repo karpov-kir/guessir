@@ -4,8 +4,8 @@
 
 import { Logger } from "@nestjs/common";
 
-import { createDbPing } from "../../dbUtils.js";
-import { errorText, waitForDb, watchDb } from "../../dbWatch.js";
+import { createDbPing } from "../../infra/db/exports.js";
+import { errorText, waitForDb, watchDb } from "./dbWatch.js";
 import { compose } from "./compositionRoot.js";
 
 // The server waits for the database at start. A deploy of a Postgres patch release restarts the

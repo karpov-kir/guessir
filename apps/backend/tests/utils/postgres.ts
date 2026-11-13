@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process";
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 
-import { DbSettings } from "../../src/dbUtils.js";
+import { DbSettings } from "../../src/infra/db/exports.js";
 
 // The same Postgres major as the server's stack
 const image = "postgres:17";

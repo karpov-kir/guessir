@@ -4,14 +4,14 @@ import { join } from "node:path";
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getTypeOrmConfig } from "./dbUtils.js";
+import { getTypeOrmConfig } from "./postgres.js";
 import { ParameterFreeLogger } from "./ParameterFreeLogger.js";
 
 describe(getTypeOrmConfig, () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = mkdtempSync(join(tmpdir(), "dbUtils-"));
+    tempDir = mkdtempSync(join(tmpdir(), "postgres-"));
     const passwordFile = join(tempDir, "password");
     writeFileSync(passwordFile, "file-password\n");
     vi.stubEnv("DATABASE_HOST", "guessir_database");

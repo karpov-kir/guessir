@@ -3,7 +3,7 @@ import { NotAcceptableException, ValidationPipe } from "@nestjs/common";
 import { IEntryNestModule, NestFactory } from "@nestjs/core";
 import { FastifyAdapter, NestFastifyApplication } from "@nestjs/platform-fastify";
 
-import { TextErrorFilter } from "./entrypoints/server/http/TextErrorFilter.js";
+import { TextErrorFilter } from "./TextErrorFilter.js";
 import { QueryErrorFilter } from "./QueryErrorFilter.js";
 
 /**

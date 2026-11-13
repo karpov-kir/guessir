@@ -4,7 +4,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest
 
 import { fakeTextRows } from "../../../tests/utils/fakeTextRows.js";
 import { Text } from "../../features/texts/exports.js";
-import { version } from "../../version.js";
+import { version } from "./version.js";
 import { compose, ServerHandle } from "./compositionRoot.js";
 
 const text: Text = {

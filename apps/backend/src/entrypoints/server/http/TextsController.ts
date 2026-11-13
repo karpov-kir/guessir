@@ -1,10 +1,10 @@
 import { CreateTextDtoResponse, RevealedWord, RevealedWords, TextSkeleton } from "@guessir/game";
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from "@nestjs/common";
 
-import { CreateTextDtoRequest } from "../dto/CreateTextDtoRequest.js";
-import { GuessDtoRequest } from "../dto/GuessDtoRequest.js";
-import { RevealDtoRequest } from "../dto/RevealDtoRequest.js";
-import { Texts } from "../features/texts/exports.js";
+import { CreateTextDtoRequest } from "./dto/CreateTextDtoRequest.js";
+import { GuessDtoRequest } from "./dto/GuessDtoRequest.js";
+import { RevealDtoRequest } from "./dto/RevealDtoRequest.js";
+import { Texts } from "../../../features/texts/exports.js";
 
 /**
  * Serves the texts over HTTP. The game rules live in the texts feature; this controller maps routes
