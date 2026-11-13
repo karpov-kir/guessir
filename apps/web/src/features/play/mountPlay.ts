@@ -1,7 +1,12 @@
+import "./play.css";
+import "./ScoreRenderer.css";
+import "./ControlsRenderer.css";
+import "./text/TextRenderer.css";
+import "./text/WordRenderer.css";
 import { Game } from "../../entities/game/exports";
-import { RenderController } from "./RenderController";
+import { PlayController } from "./PlayController";
 
-/** Renders the game into `container` and answers the player's moves. */
-export function mountPlay(container: HTMLElement, game: Game) {
-  new RenderController({ game }).init(container);
+/** Returns the `#game` element, which renders the game and answers the player's moves. */
+export function mountPlay(game: Game): HTMLElement {
+  return new PlayController({ game }).getElement();
 }

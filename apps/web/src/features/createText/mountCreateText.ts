@@ -9,7 +9,7 @@ export function mountCreateText(options: {
   clipboard: Pick<Clipboard, "writeText">;
 }): HTMLElement {
   return new CreateTextRenderer({
-    httpClient: options.api,
+    api: options.api,
     origin: options.origin,
     clipboard: options.clipboard,
   }).getElement();

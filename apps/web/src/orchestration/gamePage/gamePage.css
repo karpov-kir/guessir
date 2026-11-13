@@ -1,12 +1,7 @@
-/* The header and the main column share one width */
-#site-header,
-#guessir {
-  max-width: 1040px;
-  margin: 0 auto;
-}
-
 #guessir {
   display: flex;
+  max-width: var(--page-width);
+  margin: 0 auto;
   flex-direction: column;
   gap: 20px;
   padding: 8px var(--gutter) 64px;

@@ -6,7 +6,7 @@ import { CreateTextApi, createText } from "./createTextApi";
 
 describe(createText, () => {
   it("should post the text and return its id", async () => {
-    const httpClient = mock<CreateTextApi>();
+    const api = mock<CreateTextApi>();
     const payload = {
       title: "Title",
       text: "One",
@@ -14,9 +14,9 @@ describe(createText, () => {
       allowShowingText: true,
     };
 
-    httpClient.post.mockResolvedValue({ id: "text-id" });
+    api.post.mockResolvedValue({ id: "text-id" });
 
-    await expect(createText(httpClient, payload)).resolves.toEqual({ id: "text-id" });
-    expect(httpClient.post).toHaveBeenCalledWith("texts", payload, createTextDtoResponseSchema);
+    await expect(createText(api, payload)).resolves.toEqual({ id: "text-id" });
+    expect(api.post).toHaveBeenCalledWith("texts", payload, createTextDtoResponseSchema);
   });
 });

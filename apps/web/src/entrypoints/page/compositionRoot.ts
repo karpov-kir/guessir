@@ -1,5 +1,6 @@
 import { initThemeToggle, type SystemThemeQuery } from "../../features/theme/exports";
 import { FetchHttpClient } from "../../infra/fetchHttp";
+import { config } from "../../shared/config";
 import { type GamePageDependencies, mountGamePage } from "../../orchestration/gamePage/exports";
 
 export type PageOverrides = Partial<
@@ -21,7 +22,7 @@ export function compose(overrides: PageOverrides = {}) {
         systemTheme: overrides.systemTheme ?? globalThis.matchMedia("(prefers-color-scheme: dark)"),
       });
       await mountGamePage(body, {
-        api: overrides.api ?? new FetchHttpClient(import.meta.env.GUESSIR_API_BASE_URL),
+        api: overrides.api ?? new FetchHttpClient(config.apiBaseUrl),
         location: overrides.location ?? globalThis.location,
         clipboard: overrides.clipboard ?? globalThis.navigator.clipboard,
       });

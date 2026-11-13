@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LocalGame } from "../../entities/game/exports";
-import { RenderController } from "./RenderController";
+import { PlayController } from "./PlayController";
 import { Logger, LogLevel } from "../../shared/Logger";
 import { requireElement } from "../../shared/dom";
 
@@ -9,19 +9,19 @@ import { requireElement } from "../../shared/dom";
 Logger.root.setLevel(LogLevel.Silent);
 
 let game: LocalGame;
-let containerElement: HTMLElement;
+let gameElement: HTMLElement;
 
 /** Lets the game answers, which are promises, reach the renderers. */
 const settle = () => new Promise((resolve) => setTimeout(resolve));
 const getElement = (selector: string) =>
-  requireElement({ root: containerElement, selector, type: HTMLElement });
-const getStatus = () => containerElement.querySelector("#guess-status")?.textContent;
-const getScore = () => containerElement.querySelector("#current-score")?.textContent;
+  requireElement({ root: gameElement, selector, type: HTMLElement });
+const getStatus = () => gameElement.querySelector("#guess-status")?.textContent;
+const getScore = () => gameElement.querySelector("#current-score")?.textContent;
 const getGuessInput = () =>
-  requireElement({ root: containerElement, selector: "#guess-input", type: HTMLInputElement });
+  requireElement({ root: gameElement, selector: "#guess-input", type: HTMLInputElement });
 const isGuessInputShaken = () => getGuessInput().classList.contains("shake-and-error");
 const getCheckbox = (selector: string) =>
-  requireElement({ root: containerElement, selector, type: HTMLInputElement });
+  requireElement({ root: gameElement, selector, type: HTMLInputElement });
 const toggleCheckbox = (selector: string) =>
   getCheckbox(selector).dispatchEvent(new Event("change"));
 const typeGuess = (word: string) => {
@@ -31,20 +31,20 @@ const typeGuess = (word: string) => {
 const submitGuess = (word: string) => {
   typeGuess(word);
   requireElement({
-    root: containerElement,
+    root: gameElement,
     selector: "#guess-button",
     type: HTMLButtonElement,
   }).click();
 };
 const clickWord = (wordIndex: number) =>
-  containerElement.querySelectorAll<HTMLButtonElement>(".lexeme-container")[wordIndex].click();
+  gameElement.querySelectorAll<HTMLButtonElement>(".lexeme-container")[wordIndex].click();
 const getTextClasses = () => getElement("#text-container").classList;
 const getWordTexts = () =>
   Array.from(getElement("#text-container").querySelectorAll(".lexeme")).map(
     (element) => element.textContent,
   );
 
-describe(RenderController, () => {
+describe(PlayController, () => {
   beforeEach(() => {
     game = new LocalGame({
       title: "Title",
@@ -53,18 +53,14 @@ describe(RenderController, () => {
       allowShowingText: true,
     });
 
-    containerElement = document.createElement("div");
-    new RenderController({ game }).init(containerElement);
+    gameElement = new PlayController({ game }).getElement();
   });
 
-  it("should render the skeleton of the game", () => {
-    const renderedContainerElement = document.createElement("div");
-
-    new RenderController({ game }).init(renderedContainerElement);
-
-    expect(renderedContainerElement.querySelector("#title")?.textContent).toBe("Title");
-    expect(renderedContainerElement.querySelectorAll(".lexeme-container")).toHaveLength(2);
-    expect(renderedContainerElement.querySelector("#total-score")?.textContent).toBe("2");
+  it("should render the skeleton of the game into the game element", () => {
+    expect(gameElement.id).toBe("game");
+    expect(gameElement.querySelector("#title")?.textContent).toBe("Title");
+    expect(gameElement.querySelectorAll(".lexeme-container")).toHaveLength(2);
+    expect(gameElement.querySelector("#total-score")?.textContent).toBe("2");
   });
 
   it("should put the score and the controls together above the text", () => {

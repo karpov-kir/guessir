@@ -1,5 +1,7 @@
 #site-header {
   display: flex;
+  max-width: var(--page-width);
+  margin: 0 auto;
   align-items: center;
   gap: 16px;
   padding: 20px var(--gutter);

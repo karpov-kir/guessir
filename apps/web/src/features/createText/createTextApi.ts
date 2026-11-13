@@ -12,8 +12,8 @@ export type CreateTextApi = {
 
 /** Stores a new text on the server and returns its id. */
 export async function createText(
-  httpClient: CreateTextApi,
+  api: CreateTextApi,
   payload: CreateTextDto,
 ): Promise<CreateTextDtoResponse> {
-  return httpClient.post("texts", payload, createTextDtoResponseSchema);
+  return api.post("texts", payload, createTextDtoResponseSchema);
 }

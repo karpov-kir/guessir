@@ -1,9 +1,10 @@
-import { mountCreateText } from "../../features/createText/exports";
-import { GameApi, loadGame } from "../../features/gameLoading/exports";
+import "./gamePage.css";
 import { mountPlay } from "../../features/play/exports";
+import { CreateTextApi, mountCreateText } from "../../features/createText/exports";
+import { GameApi, loadGame } from "../../features/gameLoading/exports";
 
 export type GamePageDependencies = {
-  api: GameApi;
+  api: GameApi & CreateTextApi;
   location: Pick<Location, "origin" | "search">;
   clipboard: Pick<Clipboard, "writeText">;
 };
@@ -21,6 +22,6 @@ export async function mountGamePage(
 
   mainElement.id = "guessir";
   container.appendChild(mainElement);
-  mountPlay(mainElement, game);
+  mainElement.appendChild(mountPlay(game));
   mainElement.appendChild(mountCreateText({ api, origin: location.origin, clipboard }));
 }

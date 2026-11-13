@@ -7,25 +7,26 @@ import { TextRenderer } from "./text/TextRenderer";
 import { WordHint } from "./text/WordRenderer";
 import { Logger } from "../../shared/Logger";
 
-const logger = Logger.root.scope("RenderController");
+const logger = Logger.root.scope("PlayController");
 
-export type RenderControllerOptions = {
+export type PlayControllerOptions = {
   game: Game;
 };
 
-export class RenderController {
+export class PlayController {
   private readonly game: Game;
 
   private readonly textRenderer: TextRenderer;
   private readonly controlsRenderer: ControlsRenderer;
   private readonly scoreRenderer: ScoreRenderer;
+  private readonly gameElement: HTMLElement;
 
   /** The hint the user turned on last, which turns on once its letters load. */
   private wantedHint = WordHint.None;
   private firstLettersLoad?: Promise<void>;
   private wordsLoad?: Promise<void>;
 
-  constructor(options: RenderControllerOptions) {
+  constructor(options: PlayControllerOptions) {
     const { skeleton } = options.game;
 
     this.game = options.game;
@@ -46,10 +47,15 @@ export class RenderController {
     this.scoreRenderer = new ScoreRenderer({
       wordLikeCount: skeleton.wordCount,
     });
+    this.gameElement = this.renderGame();
   }
 
-  /** Renders the game into the container element and starts answering the player's moves. */
-  public init(containerElement: HTMLElement) {
+  /** Returns the `#game` element, which shows the game and answers the player's moves. */
+  public getElement(): HTMLElement {
+    return this.gameElement;
+  }
+
+  private renderGame() {
     // The HUD holds the score and the controls and sticks to the screen edge, so a long text never
     // scrolls them away. The HUD shares a wrapper with the text alone, so it stops sticking at the
     // text end and leaves the create-text form below it uncovered.
@@ -64,7 +70,8 @@ export class RenderController {
 
     gameElement.appendChild(hudElement);
     gameElement.appendChild(this.textRenderer.getElement());
-    containerElement.appendChild(gameElement);
+
+    return gameElement;
   }
 
   private async handleRevealRequest(index: number) {

@@ -1,5 +1,6 @@
 import { createTextLimits } from "@guessir/game";
 
+import "./CreateTextRenderer.css";
 import copyIcon from "./copyIcon.svg?raw";
 import { onChangeAndEnter, requireElement } from "../../shared/dom";
 import { icon } from "../../shared/icon";
@@ -10,7 +11,7 @@ import { Logger } from "../../shared/Logger";
 const logger = Logger.root.scope("CreateTextRenderer");
 
 interface CreateTextRendererOptions {
-  httpClient: CreateTextApi;
+  api: CreateTextApi;
   /** The page origin the link to a created text starts with. */
   origin: string;
   clipboard: Pick<Clipboard, "writeText">;
@@ -52,7 +53,7 @@ export class CreateTextRenderer {
   private readonly maxTitleLength: number;
   private readonly maxDescriptionLength: number;
   private readonly maxTextLength: number;
-  private readonly httpClient: CreateTextApi;
+  private readonly api: CreateTextApi;
   private readonly origin: string;
   private readonly clipboard: Pick<Clipboard, "writeText">;
 
@@ -60,7 +61,7 @@ export class CreateTextRenderer {
     this.containerElement = document.createElement("div");
     this.containerElement.id = "utils-container";
 
-    this.httpClient = options.httpClient;
+    this.api = options.api;
     this.origin = options.origin;
     this.clipboard = options.clipboard;
 
@@ -302,7 +303,7 @@ export class CreateTextRenderer {
       this.blockForm(true);
       generatedUrlContainerElement.classList.add("hide");
 
-      createText(this.httpClient, this.getValues())
+      createText(this.api, this.getValues())
         .then((apiText) => {
           this.cleanForm();
 

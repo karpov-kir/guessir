@@ -12,7 +12,7 @@ Logger.root.setLevel(LogLevel.Silent);
 const mockedText = {
   id: "mocked-id",
 };
-let httpClient: MockProxy<CreateTextApi>;
+let api: MockProxy<CreateTextApi>;
 const clipboard = { writeText: vi.fn<(text: string) => Promise<void>>() };
 let createTextRenderer: CreateTextRenderer;
 
@@ -26,7 +26,7 @@ const createText = async () => {
   } = getElements(createTextRenderer.getElement());
   const deferred = Promise.withResolvers<CreateTextDtoResponse>();
 
-  httpClient.post.mockReturnValue(deferred.promise);
+  api.post.mockReturnValue(deferred.promise);
 
   textInputElement.value = "Text text";
   titleInputElement.value = "Test title";
@@ -46,10 +46,10 @@ describe(CreateTextRenderer, () => {
   beforeEach(() => {
     vi.useRealTimers();
 
-    httpClient = mock<CreateTextApi>();
+    api = mock<CreateTextApi>();
     clipboard.writeText.mockReset();
     createTextRenderer = new CreateTextRenderer({
-      httpClient,
+      api,
       origin: "http://localhost:3000",
       clipboard,
       maxTitleLength: 2,
@@ -67,7 +67,7 @@ describe(CreateTextRenderer, () => {
 
     await createText();
 
-    expect(httpClient.post).toHaveBeenCalledWith(
+    expect(api.post).toHaveBeenCalledWith(
       "texts",
       {
         allowShowingFirstLetters: false,
@@ -102,7 +102,7 @@ describe(CreateTextRenderer, () => {
     const { errorElement, generateUrlButtonElement, textInputElement, titleInputElement } =
       getElements(createTextRenderer.getElement());
 
-    httpClient.post.mockReturnValue(deferred.promise);
+    api.post.mockReturnValue(deferred.promise);
 
     // The renderer submits the form only when the title and the text are set.
     textInputElement.value = "Text text";
@@ -122,7 +122,7 @@ describe(CreateTextRenderer, () => {
     const { errorElement, generateUrlButtonElement, textInputElement, titleInputElement } =
       getElements(createTextRenderer.getElement());
 
-    httpClient.post.mockReturnValue(deferred.promise);
+    api.post.mockReturnValue(deferred.promise);
     textInputElement.value = "Text text";
     titleInputElement.value = "Test title";
 
@@ -141,7 +141,7 @@ describe(CreateTextRenderer, () => {
     const getDisabledElements = () =>
       containerElement.querySelectorAll("input:disabled, textarea:disabled");
 
-    httpClient.post.mockReturnValue(deferred.promise);
+    api.post.mockReturnValue(deferred.promise);
 
     // The renderer submits the form only when the title and the text are set.
     textInputElement.value = "Text text";
@@ -163,7 +163,7 @@ describe(CreateTextRenderer, () => {
 
     generateUrlButtonElement.click();
 
-    expect(httpClient.post).not.toHaveBeenCalled();
+    expect(api.post).not.toHaveBeenCalled();
   });
 
   it("should initialize inputs without validation classes", () => {

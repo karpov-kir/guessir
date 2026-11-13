@@ -54,8 +54,8 @@ function storeTheme(getStorage: () => Storage, theme: Theme) {
  * so the toggle sets `data-theme` on the root only once the user picks a theme.
  */
 export function initThemeToggle({ button, root, getStorage, systemTheme }: ThemeToggleOptions) {
-  // The button holds both icons: `src/styles/header.css` shows the moon in the light theme and the
-  // sun in the dark one.
+  // The button holds both icons: `src/entrypoints/page/styles/header.css` shows the moon in the
+  // light theme and the sun in the dark one.
   button.innerHTML = icon(moonIcon, "icon-moon") + icon(sunIcon, "icon-sun");
 
   const storedTheme = readStoredTheme(getStorage);

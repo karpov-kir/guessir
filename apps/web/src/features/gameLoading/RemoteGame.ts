@@ -7,17 +7,17 @@ import { Game } from "../../entities/game/exports";
 /** Plays a stored text, asking the server for every word a move opens. */
 export class RemoteGame implements Game {
   public readonly skeleton: TextSkeleton;
-  private readonly httpClient: GameApi;
+  private readonly api: GameApi;
   private readonly textPath: string;
 
-  constructor(options: { httpClient: GameApi; textPath: string; skeleton: TextSkeleton }) {
-    this.httpClient = options.httpClient;
+  constructor(options: { api: GameApi; textPath: string; skeleton: TextSkeleton }) {
+    this.api = options.api;
     this.textPath = options.textPath;
     this.skeleton = options.skeleton;
   }
 
   async guess(word: string): Promise<RevealedWord[]> {
-    const { words } = await this.httpClient.post(
+    const { words } = await this.api.post(
       urlJoin(this.textPath, "guesses"),
       { word },
       revealedWordsSchema,
@@ -27,7 +27,7 @@ export class RemoteGame implements Game {
   }
 
   async reveal(index: number): Promise<RevealedWord> {
-    return this.httpClient.post(urlJoin(this.textPath, "reveals"), { index }, revealedWordSchema);
+    return this.api.post(urlJoin(this.textPath, "reveals"), { index }, revealedWordSchema);
   }
 
   async firstLetters(): Promise<RevealedWord[]> {
@@ -39,7 +39,7 @@ export class RemoteGame implements Game {
   }
 
   private async readWords(route: string): Promise<RevealedWord[]> {
-    const { words } = await this.httpClient.get(urlJoin(this.textPath, route), revealedWordsSchema);
+    const { words } = await this.api.get(urlJoin(this.textPath, route), revealedWordsSchema);
 
     return words;
   }

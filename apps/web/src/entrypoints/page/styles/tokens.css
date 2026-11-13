@@ -16,6 +16,7 @@
   --control-lg: 52px;
   --control-xl: 56px;
   --gutter: 32px;
+  --page-width: 1040px;
   --bg: light-dark(#f1eeff, #120d2b);
   --surface: light-dark(#fff, #1d1645);
   --ink: light-dark(#1b1340, #f1eeff);

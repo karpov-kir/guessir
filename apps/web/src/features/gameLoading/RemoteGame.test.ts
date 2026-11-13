@@ -9,13 +9,13 @@ import { RemoteGame } from "./RemoteGame";
 const textPath = "texts/text-id";
 const skeleton = newTextSkeleton();
 const words = [{ index: 0, word: "One" }];
-let httpClient: MockProxy<GameApi>;
+let api: MockProxy<GameApi>;
 let remoteGame: RemoteGame;
 
 describe(RemoteGame, () => {
   beforeEach(() => {
-    httpClient = mock<GameApi>();
-    remoteGame = new RemoteGame({ httpClient, textPath, skeleton });
+    api = mock<GameApi>();
+    remoteGame = new RemoteGame({ api, textPath, skeleton });
   });
 
   it("should keep the skeleton", () => {
@@ -23,10 +23,10 @@ describe(RemoteGame, () => {
   });
 
   it("should ask the server about a guess", async () => {
-    httpClient.post.mockResolvedValue({ words });
+    api.post.mockResolvedValue({ words });
 
     await expect(remoteGame.guess("one")).resolves.toEqual(words);
-    expect(httpClient.post).toHaveBeenCalledWith(
+    expect(api.post).toHaveBeenCalledWith(
       `${textPath}/guesses`,
       { word: "one" },
       revealedWordsSchema,
@@ -34,27 +34,23 @@ describe(RemoteGame, () => {
   });
 
   it("should ask the server to reveal a word", async () => {
-    httpClient.post.mockResolvedValue(words[0]);
+    api.post.mockResolvedValue(words[0]);
 
     await expect(remoteGame.reveal(0)).resolves.toEqual(words[0]);
-    expect(httpClient.post).toHaveBeenCalledWith(
-      `${textPath}/reveals`,
-      { index: 0 },
-      revealedWordSchema,
-    );
+    expect(api.post).toHaveBeenCalledWith(`${textPath}/reveals`, { index: 0 }, revealedWordSchema);
   });
 
   it("should ask the server for the first letters", async () => {
-    httpClient.get.mockResolvedValue({ words });
+    api.get.mockResolvedValue({ words });
 
     await expect(remoteGame.firstLetters()).resolves.toEqual(words);
-    expect(httpClient.get).toHaveBeenCalledWith(`${textPath}/first-letters`, revealedWordsSchema);
+    expect(api.get).toHaveBeenCalledWith(`${textPath}/first-letters`, revealedWordsSchema);
   });
 
   it("should ask the server for the words", async () => {
-    httpClient.get.mockResolvedValue({ words });
+    api.get.mockResolvedValue({ words });
 
     await expect(remoteGame.words()).resolves.toEqual(words);
-    expect(httpClient.get).toHaveBeenCalledWith(`${textPath}/words`, revealedWordsSchema);
+    expect(api.get).toHaveBeenCalledWith(`${textPath}/words`, revealedWordsSchema);
   });
 });
