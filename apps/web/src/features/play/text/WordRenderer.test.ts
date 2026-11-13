@@ -1,8 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 import { WordHint, WordRenderer } from "./WordRenderer";
 import { requireElement } from "../../../shared/dom";
 
+let onRevealRequest: Mock<(index: number) => void>;
 let wordRenderer: WordRenderer;
 const getLexemeElement = () =>
   requireElement({ root: wordRenderer.getElement(), selector: ".lexeme", type: HTMLElement });
@@ -16,7 +17,8 @@ const getLabel = () => wordRenderer.getElement().getAttribute("aria-label");
 
 describe(WordRenderer, () => {
   beforeEach(() => {
-    wordRenderer = new WordRenderer({ index: 2, length: 4 });
+    onRevealRequest = vi.fn<(index: number) => void>();
+    wordRenderer = new WordRenderer({ index: 2, length: 4, onRevealRequest });
   });
 
   it("should render a hidden placeholder as long as the word", () => {
@@ -41,7 +43,7 @@ describe(WordRenderer, () => {
   });
 
   it("should name a one-letter hidden word in the singular", () => {
-    wordRenderer = new WordRenderer({ index: 0, length: 1 });
+    wordRenderer = new WordRenderer({ index: 0, length: 1, onRevealRequest });
 
     expect(getLabel()).toBe("Hidden word, 1 letter");
 
@@ -80,21 +82,15 @@ describe(WordRenderer, () => {
   });
 
   it("should ask to reveal a hidden word on click", () => {
-    const revealRequestCallback = vi.fn<(index: number) => void>();
-
-    wordRenderer.revealRequestEvent.subscribe(revealRequestCallback);
     wordRenderer.getElement().click();
 
-    expect(revealRequestCallback).toHaveBeenCalledWith(2);
+    expect(onRevealRequest).toHaveBeenCalledWith(2);
   });
 
   it("should not ask to reveal a shown word", () => {
-    const revealRequestCallback = vi.fn<(index: number) => void>();
-
-    wordRenderer.revealRequestEvent.subscribe(revealRequestCallback);
     wordRenderer.show("Test");
     wordRenderer.getElement().click();
 
-    expect(revealRequestCallback).not.toHaveBeenCalled();
+    expect(onRevealRequest).not.toHaveBeenCalled();
   });
 });

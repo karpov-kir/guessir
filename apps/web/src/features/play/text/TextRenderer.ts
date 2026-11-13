@@ -1,6 +1,5 @@
 import { RevealedWord, SkeletonLexeme } from "@guessir/game";
 
-import { PubSub } from "../../../shared/PubSub";
 import { requireElement } from "../../../shared/dom";
 import { ChildRenderer } from "../ChildRenderer";
 import { WordHint, WordRenderer } from "./WordRenderer";
@@ -9,7 +8,8 @@ type TextRendererOptions = {
   lexemes: SkeletonLexeme[];
   title?: string;
   description?: string;
-  revealRequestPubSub?: PubSub<number>;
+  /** Receives the lexeme index of a hidden word the user clicks. */
+  onRevealRequest: (index: number) => void;
 };
 
 export class TextRenderer implements ChildRenderer {
@@ -17,7 +17,7 @@ export class TextRenderer implements ChildRenderer {
   private readonly lexemes: SkeletonLexeme[];
   private readonly title?: string;
   private readonly description?: string;
-  private readonly revealRequestPubSub: PubSub<number>;
+  private readonly onRevealRequest: (index: number) => void;
   private readonly wordRenderers = new Map<
     // Lexeme index
     number,
@@ -26,12 +26,8 @@ export class TextRenderer implements ChildRenderer {
   /** Holds the words of the last successful guess, which the renderer highlights for the player. */
   private freshWordRenderers: WordRenderer[] = [];
 
-  /** Publishes the lexeme index of a hidden word the user clicks. */
-  public revealRequestEvent: PubSub<number>["event"];
-
   constructor(options: TextRendererOptions) {
-    this.revealRequestPubSub = options.revealRequestPubSub || new PubSub<number>();
-    this.revealRequestEvent = this.revealRequestPubSub.event;
+    this.onRevealRequest = options.onRevealRequest;
     this.lexemes = options.lexemes;
     this.title = options.title;
     this.description = options.description;
@@ -151,11 +147,12 @@ export class TextRenderer implements ChildRenderer {
 
     for (const lexeme of this.lexemes) {
       if (!("character" in lexeme)) {
-        const wordRenderer = new WordRenderer(lexeme);
+        const wordRenderer = new WordRenderer({
+          index: lexeme.index,
+          length: lexeme.length,
+          onRevealRequest: this.onRevealRequest,
+        });
 
-        wordRenderer.revealRequestEvent.subscribe((index) =>
-          this.revealRequestPubSub.publish(index),
-        );
         this.wordRenderers.set(lexeme.index, wordRenderer);
 
         if (!group || groupHasWord) {

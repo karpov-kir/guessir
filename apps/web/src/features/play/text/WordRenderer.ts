@@ -1,4 +1,3 @@
-import { PubSub } from "../../../shared/PubSub";
 import { ChildRenderer } from "../ChildRenderer";
 
 export enum WordHint {
@@ -10,6 +9,8 @@ export enum WordHint {
 type WordRendererOptions = {
   index: number;
   length: number;
+  /** Receives the lexeme index when the user clicks the word while it is hidden. */
+  onRevealRequest: (index: number) => void;
 };
 
 export class WordRenderer implements ChildRenderer {
@@ -18,18 +19,17 @@ export class WordRenderer implements ChildRenderer {
   private readonly containerElement: HTMLElement;
   private readonly lexemeElement: HTMLElement;
   private readonly firstLetterElement: HTMLElement;
-  private readonly revealRequestPubSub = new PubSub<number>();
+  private readonly onRevealRequest: (index: number) => void;
 
   private hint = WordHint.None;
   private firstLetter?: string;
 
   public isShown = false;
-  /** Publishes the lexeme index when the user clicks the word while it is hidden. */
-  public readonly revealRequestEvent = this.revealRequestPubSub.event;
 
   constructor(options: WordRendererOptions) {
     this.index = options.index;
     this.length = options.length;
+    this.onRevealRequest = options.onRevealRequest;
     this.containerElement = document.createElement("button");
     this.containerElement.classList.add("lexeme-container");
     this.lexemeElement = document.createElement("span");
@@ -104,7 +104,7 @@ export class WordRenderer implements ChildRenderer {
 
     this.containerElement.addEventListener("click", () => {
       if (!this.isShown) {
-        this.revealRequestPubSub.publish(this.index);
+        this.onRevealRequest(this.index);
       }
     });
   }

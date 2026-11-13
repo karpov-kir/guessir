@@ -1,5 +1,5 @@
 import { TextGame } from "@guessir/game";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 import { getElements, TextRenderer } from "./TextRenderer";
 import { WordHint } from "./WordRenderer";
@@ -10,6 +10,7 @@ const textGame = new TextGame(`
   one, @ she's we'd!
 `);
 const lexemes = textGame.lexemes();
+let onRevealRequest: Mock<(index: number) => void>;
 let textRenderer: TextRenderer;
 const getLexemeElements = () =>
   textRenderer.getElement().querySelectorAll<HTMLButtonElement>(".lexeme-container");
@@ -22,10 +23,12 @@ const getWordTexts = () =>
 
 describe(TextRenderer, () => {
   beforeEach(() => {
+    onRevealRequest = vi.fn<(index: number) => void>();
     textRenderer = new TextRenderer({
       lexemes,
       title: "Test title",
       description: "Test description",
+      onRevealRequest,
     });
   });
 
@@ -52,7 +55,7 @@ describe(TextRenderer, () => {
 
   it("should bind opening punctuation to the next word and leave other characters breakable", () => {
     const game = new TextGame('He said "hi" (twice), see a/b.');
-    const lexemesElement = new TextRenderer({ lexemes: game.lexemes() })
+    const lexemesElement = new TextRenderer({ lexemes: game.lexemes(), onRevealRequest })
       .getElement()
       .querySelector("#lexemes");
     const nodes = Array.from(lexemesElement?.childNodes ?? [], (node) =>
@@ -80,7 +83,7 @@ describe(TextRenderer, () => {
 
   it("should close a word with a quote that follows its punctuation and leave a standalone dash breakable", () => {
     const game = new TextGame("He said \"go,\" and 'no,' - fast.");
-    const lexemesElement = new TextRenderer({ lexemes: game.lexemes() })
+    const lexemesElement = new TextRenderer({ lexemes: game.lexemes(), onRevealRequest })
       .getElement()
       .querySelector("#lexemes");
     const groups = Array.from(
@@ -98,7 +101,7 @@ describe(TextRenderer, () => {
 
   it("should not render the title and description if they are empty", () => {
     const { titleElement, descriptionElement } = getElements(
-      new TextRenderer({ lexemes }).getElement(),
+      new TextRenderer({ lexemes, onRevealRequest }).getElement(),
     );
 
     expect(titleElement.classList).toContain("hide");
@@ -160,12 +163,9 @@ describe(TextRenderer, () => {
   });
 
   it("should pass on a click on a hidden word as a request to reveal it", () => {
-    const revealRequestCallback = vi.fn<(index: number) => void>();
-
-    textRenderer.revealRequestEvent.subscribe(revealRequestCallback);
     getLexemeElements()[1].click();
 
-    expect(revealRequestCallback).toHaveBeenCalledWith(textGame.guess("one")[1].index);
+    expect(onRevealRequest).toHaveBeenCalledWith(textGame.guess("one")[1].index);
   });
 
   it("should fill the first letters and the words without showing them", () => {

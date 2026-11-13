@@ -1,11 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LocalGame } from "../../entities/game/exports";
-import { PubSub } from "../../shared/PubSub";
 import { RenderController } from "./RenderController";
-import { ControlsRenderer, GuessEvent } from "./ControlsRenderer";
-import { ScoreRenderer } from "./ScoreRenderer";
-import { TextRenderer } from "./text/TextRenderer";
 import { Logger, LogLevel } from "../../shared/Logger";
 import { requireElement } from "../../shared/dom";
 
@@ -14,18 +10,11 @@ Logger.root.setLevel(LogLevel.Silent);
 
 let game: LocalGame;
 let containerElement: HTMLElement;
-let scoreRenderer: ScoreRenderer;
-
-let controlsRenderer: ControlsRenderer;
-let guessPubSub: PubSub<GuessEvent>;
-let showFirstLettersPubSub: PubSub<boolean>;
-let showTextPubSub: PubSub<boolean>;
-
-let textRenderer: TextRenderer;
-let revealRequestPubSub: PubSub<number>;
 
 /** Lets the game answers, which are promises, reach the renderers. */
 const settle = () => new Promise((resolve) => setTimeout(resolve));
+const getElement = (selector: string) =>
+  requireElement({ root: containerElement, selector, type: HTMLElement });
 const getStatus = () => containerElement.querySelector("#guess-status")?.textContent;
 const getScore = () => containerElement.querySelector("#current-score")?.textContent;
 const getGuessInput = () =>
@@ -47,9 +36,11 @@ const submitGuess = (word: string) => {
     type: HTMLButtonElement,
   }).click();
 };
-const getTextClasses = () => textRenderer.getElement().classList;
+const clickWord = (wordIndex: number) =>
+  containerElement.querySelectorAll<HTMLButtonElement>(".lexeme-container")[wordIndex].click();
+const getTextClasses = () => getElement("#text-container").classList;
 const getWordTexts = () =>
-  Array.from(textRenderer.getElement().querySelectorAll(".lexeme")).map(
+  Array.from(getElement("#text-container").querySelectorAll(".lexeme")).map(
     (element) => element.textContent,
   );
 
@@ -62,26 +53,8 @@ describe(RenderController, () => {
       allowShowingText: true,
     });
 
-    guessPubSub = new PubSub<GuessEvent>();
-    showFirstLettersPubSub = new PubSub<boolean>();
-    showTextPubSub = new PubSub<boolean>();
-    controlsRenderer = new ControlsRenderer({
-      allowShowingFirstLetters: true,
-      allowShowingText: true,
-      guessPubSub,
-      showFirstLettersPubSub,
-      showTextPubSub,
-    });
-
-    scoreRenderer = new ScoreRenderer({ wordLikeCount: game.skeleton.wordCount });
-
-    revealRequestPubSub = new PubSub<number>();
-    textRenderer = new TextRenderer({ lexemes: game.skeleton.lexemes, revealRequestPubSub });
-
     containerElement = document.createElement("div");
-    new RenderController({ game, textRenderer, scoreRenderer, controlsRenderer }).init(
-      containerElement,
-    );
+    new RenderController({ game }).init(containerElement);
   });
 
   it("should render the skeleton of the game", () => {
@@ -95,20 +68,16 @@ describe(RenderController, () => {
   });
 
   it("should put the score and the controls together above the text", () => {
-    const hudElement = requireElement({
-      root: containerElement,
-      selector: "#hud",
-      type: HTMLElement,
-    });
+    const hudElement = getElement("#hud");
 
-    expect(hudElement.contains(scoreRenderer.getElement())).toBe(true);
-    expect(hudElement.contains(controlsRenderer.getElement())).toBe(true);
-    expect(hudElement.nextElementSibling).toBe(textRenderer.getElement());
+    expect(hudElement.contains(getElement("#score-container"))).toBe(true);
+    expect(hudElement.contains(getElement("#controls-container"))).toBe(true);
+    expect(hudElement.nextElementSibling).toBe(getElement("#text-container"));
   });
 
   it("should reveal a clicked word and increase the score once", async () => {
-    revealRequestPubSub.publish(0);
-    revealRequestPubSub.publish(0);
+    clickWord(0);
+    clickWord(0);
     await settle();
 
     expect(getWordTexts()[0]).toBe("One");
@@ -118,7 +87,7 @@ describe(RenderController, () => {
   it("should announce a word that could not be revealed", async () => {
     vi.spyOn(game, "reveal").mockRejectedValue(new Error("Test"));
 
-    revealRequestPubSub.publish(0);
+    clickWord(0);
     await settle();
 
     expect(getStatus()).toBe("Could not open this word");
@@ -126,7 +95,7 @@ describe(RenderController, () => {
   });
 
   it("should increase the score if the user guesses a word", async () => {
-    guessPubSub.publish({ word: "one" });
+    submitGuess("one");
     await settle();
 
     expect(getWordTexts()[0]).toBe("One");
@@ -135,7 +104,7 @@ describe(RenderController, () => {
   });
 
   it("should shake the guess input and keep the score when the user does not guess the word", async () => {
-    guessPubSub.publish({ word: "unknown" });
+    submitGuess("unknown");
     await settle();
 
     expect(getScore()).toBe("0");
@@ -147,7 +116,7 @@ describe(RenderController, () => {
   it("should announce a guess that could not be checked, without counting it as a miss", async () => {
     vi.spyOn(game, "guess").mockRejectedValue(new Error("Test"));
 
-    guessPubSub.publish({ word: "one" });
+    submitGuess("one");
     await settle();
 
     expect(getStatus()).toBe("Could not check this guess");
@@ -208,8 +177,23 @@ describe(RenderController, () => {
   );
 
   it("should keep a status announced while a hit was checked", async () => {
+    const guess = game.guess.bind(game);
+    const guessAnswer = Promise.withResolvers<undefined>();
+
+    vi.spyOn(game, "guess").mockImplementationOnce(async (word) => {
+      await guessAnswer.promise;
+
+      return guess(word);
+    });
+    vi.spyOn(game, "reveal").mockRejectedValue(new Error("Test"));
+
     submitGuess("one");
-    controlsRenderer.announce("Could not open this word");
+    clickWord(1);
+    await settle();
+
+    expect(getStatus()).toBe("Could not open this word");
+
+    guessAnswer.resolve(undefined);
     await settle();
 
     expect(getStatus()).toBe("Could not open this word");
@@ -218,16 +202,18 @@ describe(RenderController, () => {
   it("should load the first letters once and show them", async () => {
     const firstLetters = vi.spyOn(game, "firstLetters");
 
-    showFirstLettersPubSub.publish(true);
+    toggleCheckbox("#show-first-letters-checkbox");
     await settle();
 
     expect(getTextClasses()).toContain("show-first-letters");
-    expect(textRenderer.getElement().querySelector(".lexeme-first-letter")?.textContent).toBe("O");
+    expect(getElement("#text-container").querySelector(".lexeme-first-letter")?.textContent).toBe(
+      "O",
+    );
 
-    showFirstLettersPubSub.publish(false);
+    toggleCheckbox("#show-first-letters-checkbox");
     expect(getTextClasses()).not.toContain("show-first-letters");
 
-    showFirstLettersPubSub.publish(true);
+    toggleCheckbox("#show-first-letters-checkbox");
     await settle();
 
     expect(getTextClasses()).toContain("show-first-letters");
@@ -238,16 +224,16 @@ describe(RenderController, () => {
   it("should load the words once and let the user peek at them", async () => {
     const words = vi.spyOn(game, "words");
 
-    showTextPubSub.publish(true);
+    toggleCheckbox("#show-text-checkbox");
     await settle();
 
     expect(getTextClasses()).toContain("show-text");
     expect(getWordTexts()).toEqual(["One", "two"]);
 
-    showTextPubSub.publish(false);
+    toggleCheckbox("#show-text-checkbox");
     expect(getTextClasses()).not.toContain("show-text");
 
-    showTextPubSub.publish(true);
+    toggleCheckbox("#show-text-checkbox");
     await settle();
 
     expect(words).toHaveBeenCalledTimes(1);
@@ -289,10 +275,10 @@ describe(RenderController, () => {
   );
 
   it("should not turn on a hint the user turned off while it loaded", async () => {
-    showFirstLettersPubSub.publish(true);
-    showFirstLettersPubSub.publish(false);
-    showTextPubSub.publish(true);
-    showTextPubSub.publish(false);
+    toggleCheckbox("#show-first-letters-checkbox");
+    toggleCheckbox("#show-first-letters-checkbox");
+    toggleCheckbox("#show-text-checkbox");
+    toggleCheckbox("#show-text-checkbox");
     await settle();
 
     expect(getTextClasses()).not.toContain("show-first-letters");

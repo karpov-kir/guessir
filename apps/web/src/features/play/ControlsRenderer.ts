@@ -1,26 +1,21 @@
 import arrowIcon from "./arrowIcon.svg?raw";
-import { PubSub } from "../../shared/PubSub";
 import { onChangeAndEnter, onEnter, requireElement } from "../../shared/dom";
 import { icon } from "../../shared/icon";
 import { ChildRenderer } from "./ChildRenderer";
 
-export type GuessEvent = {
-  word: string;
-};
-
 type ControlsRendererOptions = {
   allowShowingText?: boolean;
   allowShowingFirstLetters?: boolean;
-  guessPubSub?: PubSub<GuessEvent>;
-  showFirstLettersPubSub?: PubSub<boolean>;
-  showTextPubSub?: PubSub<boolean>;
+  onGuess: (word: string) => void;
+  onShowFirstLetters: (isShown: boolean) => void;
+  onShowText: (isShown: boolean) => void;
 };
 
 export class ControlsRenderer implements ChildRenderer {
   private readonly containerElement: HTMLElement;
-  private readonly guessPubSub: PubSub<GuessEvent>;
-  private readonly showFirstLettersPubSub: PubSub<boolean>;
-  private readonly showTextPubSub: PubSub<boolean>;
+  private readonly onGuess: (word: string) => void;
+  private readonly onShowFirstLetters: (isShown: boolean) => void;
+  private readonly onShowText: (isShown: boolean) => void;
   private isTextShown = false;
   private isFirstLettersShown = false;
   /**
@@ -30,18 +25,10 @@ export class ControlsRenderer implements ChildRenderer {
    */
   private readonly statusesByCheckedWord = new Map<string, string>();
 
-  public readonly guessEvent: PubSub<GuessEvent>["event"];
-  public readonly showFirstLettersEvent: PubSub<boolean>["event"];
-  public readonly showTextEvent: PubSub<boolean>["event"];
-
-  constructor(options: ControlsRendererOptions = {}) {
-    this.guessPubSub = options.guessPubSub || new PubSub<GuessEvent>();
-    this.showFirstLettersPubSub = options.showFirstLettersPubSub || new PubSub<boolean>();
-    this.showTextPubSub = options.showTextPubSub || new PubSub<boolean>();
-
-    this.guessEvent = this.guessPubSub.event;
-    this.showFirstLettersEvent = this.showFirstLettersPubSub.event;
-    this.showTextEvent = this.showTextPubSub.event;
+  constructor(options: ControlsRendererOptions) {
+    this.onGuess = options.onGuess;
+    this.onShowFirstLetters = options.onShowFirstLetters;
+    this.onShowText = options.onShowText;
 
     this.containerElement = document.createElement("div");
     this.containerElement.id = "controls-container";
@@ -97,7 +84,7 @@ export class ControlsRenderer implements ChildRenderer {
     statusElement.textContent = status;
   }
 
-  /** Unchecks the first letters hint without publishing, for a hint that could not turn on. */
+  /** Unchecks the first letters hint without calling back, for a hint that could not turn on. */
   public uncheckFirstLetters() {
     const { showFirstLettersCheckboxElement } = this.getElements();
 
@@ -105,7 +92,7 @@ export class ControlsRenderer implements ChildRenderer {
     showFirstLettersCheckboxElement.checked = false;
   }
 
-  /** Unchecks the text hint without publishing, for a hint that could not turn on. */
+  /** Unchecks the text hint without calling back, for a hint that could not turn on. */
   public uncheckText() {
     const { showTextCheckboxElement } = this.getElements();
 
@@ -208,9 +195,7 @@ export class ControlsRenderer implements ChildRenderer {
       this.statusesByCheckedWord.set(word, statusElement.textContent ?? "");
       this.renderGuessButton();
       guessInputElement.focus();
-      this.guessPubSub.publish({
-        word,
-      });
+      this.onGuess(word);
     };
 
     guessButtonElement.addEventListener("click", guessHandler);
@@ -227,7 +212,7 @@ export class ControlsRenderer implements ChildRenderer {
 
       this.isTextShown = !this.isTextShown;
       showTextCheckboxElement.checked = this.isTextShown;
-      this.showTextPubSub.publish(this.isTextShown);
+      this.onShowText(this.isTextShown);
     });
   }
 
@@ -241,7 +226,7 @@ export class ControlsRenderer implements ChildRenderer {
 
       this.isFirstLettersShown = !this.isFirstLettersShown;
       showFirstLettersCheckboxElement.checked = this.isFirstLettersShown;
-      this.showFirstLettersPubSub.publish(this.isFirstLettersShown);
+      this.onShowFirstLetters(this.isFirstLettersShown);
     });
   }
 }

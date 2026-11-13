@@ -1,7 +1,7 @@
 import { RevealedWord } from "@guessir/game";
 
 import { Game } from "../../entities/game/exports";
-import { ControlsRenderer, GuessEvent } from "./ControlsRenderer";
+import { ControlsRenderer } from "./ControlsRenderer";
 import { ScoreRenderer } from "./ScoreRenderer";
 import { TextRenderer } from "./text/TextRenderer";
 import { WordHint } from "./text/WordRenderer";
@@ -11,9 +11,6 @@ const logger = Logger.root.scope("RenderController");
 
 export type RenderControllerOptions = {
   game: Game;
-  textRenderer?: TextRenderer;
-  controlsRenderer?: ControlsRenderer;
-  scoreRenderer?: ScoreRenderer;
 };
 
 export class RenderController {
@@ -32,38 +29,27 @@ export class RenderController {
     const { skeleton } = options.game;
 
     this.game = options.game;
-    this.textRenderer =
-      options.textRenderer ||
-      new TextRenderer({
-        lexemes: skeleton.lexemes,
-        title: skeleton.title,
-        description: skeleton.description,
-      });
-    this.controlsRenderer =
-      options.controlsRenderer ||
-      new ControlsRenderer({
-        allowShowingText: skeleton.allowShowingText,
-        allowShowingFirstLetters: skeleton.allowShowingFirstLetters,
-      });
-    this.scoreRenderer =
-      options.scoreRenderer ||
-      new ScoreRenderer({
-        wordLikeCount: skeleton.wordCount,
-      });
+    this.textRenderer = new TextRenderer({
+      lexemes: skeleton.lexemes,
+      title: skeleton.title,
+      description: skeleton.description,
+      onRevealRequest: (index) => void this.handleRevealRequest(index),
+    });
+    this.controlsRenderer = new ControlsRenderer({
+      allowShowingText: skeleton.allowShowingText,
+      allowShowingFirstLetters: skeleton.allowShowingFirstLetters,
+      onGuess: (word) => void this.handleGuess(word),
+      onShowFirstLetters: (isFirstLettersShown) =>
+        void this.handleShowFirstLetters(isFirstLettersShown),
+      onShowText: (isTextShown) => void this.handleShowText(isTextShown),
+    });
+    this.scoreRenderer = new ScoreRenderer({
+      wordLikeCount: skeleton.wordCount,
+    });
   }
 
   /** Renders the game into the container element and starts answering the player's moves. */
   public init(containerElement: HTMLElement) {
-    this.textRenderer.revealRequestEvent.subscribe((index) => void this.handleRevealRequest(index));
-
-    this.controlsRenderer.guessEvent.subscribe((guessEvent) => void this.handleGuess(guessEvent));
-    this.controlsRenderer.showTextEvent.subscribe(
-      (isTextShown) => void this.handleShowText(isTextShown),
-    );
-    this.controlsRenderer.showFirstLettersEvent.subscribe(
-      (isFirstLettersShown) => void this.handleShowFirstLetters(isFirstLettersShown),
-    );
-
     // The HUD holds the score and the controls and sticks to the screen edge, so a long text never
     // scrolls them away. The HUD shares a wrapper with the text alone, so it stops sticking at the
     // text end and leaves the create-text form below it uncovered.
@@ -97,7 +83,7 @@ export class RenderController {
     }
   }
 
-  private async handleGuess({ word }: GuessEvent) {
+  private async handleGuess(word: string) {
     let guessedWords: RevealedWord[];
 
     try {
