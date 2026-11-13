@@ -174,4 +174,30 @@ describe("the texts API over HTTP", () => {
 
     expect(response.statusCode).toBe(400);
   });
+
+  it("should answer an invalid body with one message per problem", async () => {
+    const response = await request("POST", "/texts", { title: "", allowShowingText: "yes" });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json()).toEqual({
+      message: [
+        "title: Too small: expected string to have >=1 characters",
+        "text: Invalid input: expected string, received undefined",
+        "allowShowingText: Invalid input: expected boolean, received string",
+      ],
+      error: "Bad Request",
+      statusCode: 400,
+    });
+  });
+
+  it("should store a text sent without flags as one that shows no hints", async () => {
+    const response = await request("POST", "/texts", { title: "Title", text: "One two" });
+    const { id } = response.json<{ id: string }>();
+
+    expect(response.statusCode).toBe(201);
+    expect(await textRows.getById(id)).toMatchObject({
+      allowShowingFirstLetters: false,
+      allowShowingText: false,
+    });
+  });
 });

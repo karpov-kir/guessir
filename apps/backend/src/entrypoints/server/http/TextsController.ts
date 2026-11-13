@@ -1,9 +1,18 @@
-import { CreateTextDtoResponse, RevealedWord, RevealedWords, TextSkeleton } from "@guessir/game";
+import {
+  CreateTextDto,
+  createTextDtoSchema,
+  CreateTextDtoResponse,
+  GuessDto,
+  guessDtoSchema,
+  RevealDto,
+  revealDtoSchema,
+  RevealedWord,
+  RevealedWords,
+  TextSkeleton,
+} from "@guessir/game";
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from "@nestjs/common";
 
-import { CreateTextDtoRequest } from "./dto/CreateTextDtoRequest.js";
-import { GuessDtoRequest } from "./dto/GuessDtoRequest.js";
-import { RevealDtoRequest } from "./dto/RevealDtoRequest.js";
+import { ZodBodyPipe } from "./ZodBodyPipe.js";
 import { Texts } from "../../../features/texts/exports.js";
 
 /**
@@ -21,13 +30,19 @@ export class TextsController {
 
   @Post("/:id/guesses")
   @HttpCode(HttpStatus.OK)
-  guess(@Param("id") id: string, @Body() { word }: GuessDtoRequest): Promise<RevealedWords> {
+  guess(
+    @Param("id") id: string,
+    @Body(new ZodBodyPipe(guessDtoSchema)) { word }: GuessDto,
+  ): Promise<RevealedWords> {
     return this.texts.guess(id, word);
   }
 
   @Post("/:id/reveals")
   @HttpCode(HttpStatus.OK)
-  reveal(@Param("id") id: string, @Body() { index }: RevealDtoRequest): Promise<RevealedWord> {
+  reveal(
+    @Param("id") id: string,
+    @Body(new ZodBodyPipe(revealDtoSchema)) { index }: RevealDto,
+  ): Promise<RevealedWord> {
     return this.texts.reveal(id, index);
   }
 
@@ -42,7 +57,9 @@ export class TextsController {
   }
 
   @Post()
-  create(@Body() newTextDto: CreateTextDtoRequest): Promise<CreateTextDtoResponse> {
+  create(
+    @Body(new ZodBodyPipe(createTextDtoSchema)) newTextDto: CreateTextDto,
+  ): Promise<CreateTextDtoResponse> {
     return this.texts.create(newTextDto);
   }
 }
