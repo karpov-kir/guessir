@@ -6,7 +6,8 @@ import { Logger } from "@nestjs/common";
 
 import { createDbPing } from "../../infra/db/exports.js";
 import { errorText, waitForDb, watchDb } from "./dbWatch.js";
-import { compose } from "./compositionRoot.js";
+import { compose, type ServerHandle } from "./compositionRoot.js";
+import { stopOnSignals } from "./stopOnSignals.js";
 
 // The server waits for the database at start. A deploy of a Postgres patch release restarts the
 // database, and a task that exits at once pauses the Swarm rolling update. After `lostAfterMs`
@@ -19,13 +20,19 @@ const pingEveryMs = 1_000;
 const logger = new Logger("server");
 
 /**
- * Starts the server on HOST and PORT once the database answers, and exits the process when the
- * database stays unreachable.
+ * Starts the server on HOST and PORT once the database answers. Exits the
+ * process when the database stays unreachable. Stops the server and exits
+ * on SIGTERM or SIGINT.
  */
 export async function startServer() {
   const host = process.env.HOST ?? "0.0.0.0";
   const port = process.env.PORT ? Number.parseInt(process.env.PORT) : 3020;
   const pingDb = createDbPing();
+  let server: ServerHandle | undefined;
+
+  // The signal handlers go in before the database wait, so SIGTERM or SIGINT
+  // during that wait also ends the process.
+  stopOnSignals({ stop: async () => server?.stop() });
 
   await waitForDb(pingDb, { limitMs: startupWaitMs, intervalMs: pingEveryMs }).catch(
     (error: unknown) => {
@@ -34,7 +41,7 @@ export async function startServer() {
     },
   );
 
-  const server = await compose();
+  server = await compose();
 
   await server.start(host, port);
 
