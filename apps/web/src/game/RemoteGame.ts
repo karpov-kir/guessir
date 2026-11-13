@@ -8,30 +8,30 @@ import { Game } from "./Game";
 export class RemoteGame implements Game {
   public readonly skeleton: TextSkeleton;
   private readonly httpClient: HttpClient;
-  private readonly textUrl: string;
+  private readonly textPath: string;
 
-  constructor(options: { httpClient: HttpClient; textUrl: string; skeleton: TextSkeleton }) {
+  constructor(options: { httpClient: HttpClient; textPath: string; skeleton: TextSkeleton }) {
     this.httpClient = options.httpClient;
-    this.textUrl = options.textUrl;
+    this.textPath = options.textPath;
     this.skeleton = options.skeleton;
   }
 
   async guess(word: string): Promise<RevealedWord[]> {
-    return this.readWords(this.httpClient.post(urlJoin(this.textUrl, "guesses"), { word }));
+    return this.readWords(this.httpClient.post(urlJoin(this.textPath, "guesses"), { word }));
   }
 
   async reveal(index: number): Promise<RevealedWord> {
-    return (await this.httpClient.post(urlJoin(this.textUrl, "reveals"), {
+    return (await this.httpClient.post(urlJoin(this.textPath, "reveals"), {
       index,
     })) as RevealedWord;
   }
 
   async firstLetters(): Promise<RevealedWord[]> {
-    return this.readWords(this.httpClient.get(urlJoin(this.textUrl, "first-letters")));
+    return this.readWords(this.httpClient.get(urlJoin(this.textPath, "first-letters")));
   }
 
   async words(): Promise<RevealedWord[]> {
-    return this.readWords(this.httpClient.get(urlJoin(this.textUrl, "words")));
+    return this.readWords(this.httpClient.get(urlJoin(this.textPath, "words")));
   }
 
   private async readWords(response: Promise<unknown>): Promise<RevealedWord[]> {

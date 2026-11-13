@@ -12,11 +12,13 @@ describe(FetchHttpClient, () => {
 
     vi.stubGlobal("fetch", fetchMock);
 
-    await expect(new FetchHttpClient().post("/texts", { title: "T" })).resolves.toEqual({
+    await expect(
+      new FetchHttpClient("https://api.test/").post("/texts", { title: "T" }),
+    ).resolves.toEqual({
       id: "a",
     });
     expect(fetchMock).toBeCalledWith(
-      "/texts",
+      "https://api.test/texts",
       expect.objectContaining({ method: "POST", body: '{"title":"T"}' }),
     );
   });
@@ -24,7 +26,9 @@ describe(FetchHttpClient, () => {
   it("should get and return the parsed body", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response('{"words":[]}')));
 
-    await expect(new FetchHttpClient().get("/texts/x/words")).resolves.toEqual({ words: [] });
+    await expect(new FetchHttpClient("https://api.test/").get("/texts/x/words")).resolves.toEqual({
+      words: [],
+    });
   });
 
   it.each([
@@ -36,6 +40,6 @@ describe(FetchHttpClient, () => {
   ])("should reject a $method answered with a non-2xx status", async ({ call }) => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("", { status: 404 })));
 
-    await expect(call(new FetchHttpClient())).rejects.toThrow("Request failed");
+    await expect(call(new FetchHttpClient("https://api.test/"))).rejects.toThrow("Request failed");
   });
 });

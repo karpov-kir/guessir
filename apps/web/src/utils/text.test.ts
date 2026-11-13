@@ -1,21 +1,19 @@
 import { describe, expect, it } from "vitest";
 
-import { parseTextIdFromUrl } from "./text";
+import { parseTextId, textUrl } from "./text";
 
-describe(parseTextIdFromUrl, () => {
-  Object.defineProperty(window, "location", {
-    value: {
-      search: "",
-    },
+describe(textUrl, () => {
+  it("should link the page to the text", () => {
+    expect(textUrl("https://guessir.test", "a1")).toBe("https://guessir.test?textId=a1");
   });
+});
 
-  it("should parse a text ID from the URL", () => {
-    window.location.search = "?textId=1";
-    expect(parseTextIdFromUrl()).toEqual("1");
-  });
-
-  it("should throw an error if the text ID is not found in the URL", () => {
-    window.location.search = "?textId=";
-    expect(() => parseTextIdFromUrl()).toThrow(new Error("Text ID is empty"));
+describe(parseTextId, () => {
+  it.each([
+    { search: "?textId=1", expected: "1" },
+    { search: "?textId=", expected: undefined },
+    { search: "", expected: undefined },
+  ])("should return $expected for $search", ({ search, expected }) => {
+    expect(parseTextId(search)).toBe(expected);
   });
 });

@@ -1,15 +1,19 @@
+import urlJoin from "url-join";
+
 /**
- * Sends HTTP requests and returns the parsed JSON body. Rejects when the response status is not
- * 2xx.
+ * Sends HTTP requests to paths under the API's base URL and returns the parsed JSON body. Rejects
+ * when the response status is not 2xx.
  */
 export interface HttpClient {
-  post: (url: string, payload: unknown) => Promise<unknown>;
-  get: (url: string) => Promise<unknown>;
+  post: (path: string, payload: unknown) => Promise<unknown>;
+  get: (path: string) => Promise<unknown>;
 }
 
 export class FetchHttpClient implements HttpClient {
-  async post(url: string, payload: unknown): Promise<unknown> {
-    const response = await fetch(url, {
+  constructor(private readonly baseUrl: string) {}
+
+  async post(path: string, payload: unknown): Promise<unknown> {
+    const response = await fetch(urlJoin(this.baseUrl, path), {
       method: "POST",
       body: JSON.stringify(payload),
       headers: {
@@ -24,8 +28,8 @@ export class FetchHttpClient implements HttpClient {
     return response.json();
   }
 
-  async get(url: string): Promise<unknown> {
-    const response = await fetch(url, {
+  async get(path: string): Promise<unknown> {
+    const response = await fetch(urlJoin(this.baseUrl, path), {
       method: "GET",
     });
 

@@ -18,9 +18,9 @@ export type SystemThemeQuery = {
 
 type ThemeToggleOptions = {
   button: HTMLButtonElement;
-  root?: HTMLElement;
-  getStorage?: () => Storage;
-  systemTheme?: SystemThemeQuery;
+  root: HTMLElement;
+  getStorage: () => Storage;
+  systemTheme: SystemThemeQuery;
 };
 
 const storageKey = "guessir.theme";
@@ -52,12 +52,7 @@ function storeTheme(getStorage: () => Storage, theme: Theme) {
  * Wires the dark theme toggle. Without a stored choice, CSS makes the page follow the system theme,
  * so the toggle sets `data-theme` on the root only once the user picks a theme.
  */
-export function initThemeToggle({
-  button,
-  root = document.documentElement,
-  getStorage = () => globalThis.localStorage,
-  systemTheme = globalThis.matchMedia("(prefers-color-scheme: dark)"),
-}: ThemeToggleOptions) {
+export function initThemeToggle({ button, root, getStorage, systemTheme }: ThemeToggleOptions) {
   // The button holds both icons: `src/styles/header.css` shows the moon in the light theme and the
   // sun in the dark one.
   button.innerHTML = icon(moonIcon, "icon-moon") + icon(sunIcon, "icon-sun");

@@ -1,27 +1,9 @@
-import { CreateTextDtoResponse } from "@guessir/game";
-
-// v8 ignore next: nothing worth testing (no logic)
-export function generateTextUrl(apiText: CreateTextDtoResponse) {
-  return `${window.location.origin}?textId=${apiText.id}`;
+/** Returns the link that opens the stored text with `id` on the page at `origin`. */
+export function textUrl(origin: string, id: string) {
+  return `${origin}?textId=${id}`;
 }
 
-// v8 ignore next: nothing worth testing
-export function hasTextParametersInUrl() {
-  const urlParams = new URLSearchParams(window.location.search);
-  return !!urlParams.get("textId");
-}
-
-/**
- * Returns the `textId` query parameter of the current URL. Throws when the parameter is missing or
- * empty.
- */
-export function parseTextIdFromUrl(): string {
-  const urlParams = new URLSearchParams(window.location.search);
-  const textId = urlParams.get("textId");
-
-  if (!textId) {
-    throw new Error("Text ID is empty");
-  }
-
-  return textId;
+/** Returns the text id in the query string `search`, or undefined when it names no text. */
+export function parseTextId(search: string): string | undefined {
+  return new URLSearchParams(search).get("textId") || undefined;
 }

@@ -2,7 +2,7 @@ import { CreateTextDtoResponse } from "@guessir/game";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mock, MockProxy } from "vitest-mock-extended";
 
-import { ApiClient } from "../utils/ApiClient";
+import { HttpClient } from "../utils/HttpClient";
 import { Logger, LogLevel } from "../utils/Logger";
 import { CreateTextRenderer, getElements } from "./CreateTextRenderer";
 
@@ -12,7 +12,8 @@ Logger.root.setLevel(LogLevel.Silent);
 const mockedText = {
   id: "mocked-id",
 };
-let mockedApiClient: MockProxy<ApiClient>;
+let httpClient: MockProxy<HttpClient>;
+const clipboard = { writeText: vi.fn<(text: string) => Promise<void>>() };
 let createTextRenderer: CreateTextRenderer;
 
 const createText = async () => {
@@ -25,7 +26,7 @@ const createText = async () => {
   } = getElements(createTextRenderer.getElement());
   const deferred = Promise.withResolvers<CreateTextDtoResponse>();
 
-  mockedApiClient.createText.mockReturnValue(deferred.promise);
+  httpClient.post.mockReturnValue(deferred.promise);
 
   textInputElement.value = "Text text";
   titleInputElement.value = "Test title";
@@ -45,12 +46,15 @@ describe(CreateTextRenderer, () => {
   beforeEach(() => {
     vi.useRealTimers();
 
-    mockedApiClient = mock<ApiClient>();
+    httpClient = mock<HttpClient>();
+    clipboard.writeText.mockReset();
     createTextRenderer = new CreateTextRenderer({
+      httpClient,
+      origin: "http://localhost:3000",
+      clipboard,
       maxTitleLength: 2,
       maxDescriptionLength: 2,
       maxTextLength: 2,
-      apiClient: mockedApiClient,
     });
   });
 
@@ -63,7 +67,7 @@ describe(CreateTextRenderer, () => {
 
     await createText();
 
-    expect(mockedApiClient.createText).toBeCalledWith({
+    expect(httpClient.post).toBeCalledWith("texts", {
       allowShowingFirstLetters: false,
       allowShowingText: true,
       description: "Test description",
@@ -94,7 +98,7 @@ describe(CreateTextRenderer, () => {
     const { errorElement, generateUrlButtonElement, textInputElement, titleInputElement } =
       getElements(createTextRenderer.getElement());
 
-    mockedApiClient.createText.mockReturnValue(deferred.promise);
+    httpClient.post.mockReturnValue(deferred.promise);
 
     // The renderer submits the form only when the title and the text are set.
     textInputElement.value = "Text text";
@@ -114,7 +118,7 @@ describe(CreateTextRenderer, () => {
     const { errorElement, generateUrlButtonElement, textInputElement, titleInputElement } =
       getElements(createTextRenderer.getElement());
 
-    mockedApiClient.createText.mockReturnValue(deferred.promise);
+    httpClient.post.mockReturnValue(deferred.promise);
     textInputElement.value = "Text text";
     titleInputElement.value = "Test title";
 
@@ -133,7 +137,7 @@ describe(CreateTextRenderer, () => {
     const getDisabledElements = () =>
       containerElement.querySelectorAll("input:disabled, textarea:disabled");
 
-    mockedApiClient.createText.mockReturnValue(deferred.promise);
+    httpClient.post.mockReturnValue(deferred.promise);
 
     // The renderer submits the form only when the title and the text are set.
     textInputElement.value = "Text text";
@@ -155,7 +159,7 @@ describe(CreateTextRenderer, () => {
 
     generateUrlButtonElement.click();
 
-    expect(mockedApiClient.createText).not.toBeCalled();
+    expect(httpClient.post).not.toBeCalled();
   });
 
   it("should initialize inputs without validation classes", () => {
@@ -232,19 +236,12 @@ describe(CreateTextRenderer, () => {
   });
 
   it("should copy a generated URL on click", async () => {
-    const mockedWriteText = vi.fn();
     const { copyGeneratedUrlButtonElement } = getElements(createTextRenderer.getElement());
-
-    Object.assign(navigator, {
-      clipboard: {
-        writeText: mockedWriteText,
-      },
-    });
 
     await createText();
     copyGeneratedUrlButtonElement.click();
 
-    expect(mockedWriteText).toBeCalledWith("http://localhost:3000?textId=mocked-id");
+    expect(clipboard.writeText).toBeCalledWith("http://localhost:3000?textId=mocked-id");
   });
 
   it("should hide the alert that a generated URL was copied on a timeout", async () => {
