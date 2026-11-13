@@ -9,7 +9,7 @@ import { LocalGame } from "./game/LocalGame";
 import { RemoteGame } from "./game/RemoteGame";
 import { RenderController } from "./RenderController";
 import { HttpClient } from "./utils/HttpClient";
-import { Logger, LogLevel } from "./utils/Logger";
+import { Logger, LogLevel } from "./shared/Logger";
 
 // Silences the logger: these tests make loading fail on purpose.
 Logger.root.setLevel(LogLevel.Silent);
@@ -25,7 +25,7 @@ const bootWith = (search: string) => {
   const dependencies: BootDependencies = {
     httpClient,
     location: { origin: "https://guessir.test", search },
-    clipboard: { writeText: vi.fn() },
+    clipboard: { writeText: vi.fn<(text: string) => Promise<void>>() },
   };
 
   return boot(containerElement, dependencies);
@@ -52,7 +52,7 @@ describe(boot, () => {
 
     await bootWith(`?textId=${textId}`);
 
-    expect(httpClient.get).toBeCalledWith(`texts/${textId}`, textSkeletonSchema);
+    expect(httpClient.get).toHaveBeenCalledWith(`texts/${textId}`, textSkeletonSchema);
     expect(getRenderedGame()).toBeInstanceOf(RemoteGame);
     expect(getRenderedGame().skeleton).toEqual(skeleton);
   });
@@ -82,7 +82,7 @@ describe(boot, () => {
   it("should render a default text if a text ID is not set in the URL", async () => {
     await bootWith("");
 
-    expect(httpClient.get).not.toBeCalled();
+    expect(httpClient.get).not.toHaveBeenCalled();
     expect(getRenderedGame()).toBeInstanceOf(LocalGame);
     expect(getRenderedGame().skeleton.title).toBe("Hello!");
     await expect(getRenderedGame().guess("order")).resolves.toEqual([{ index: 2, word: "order" }]);
@@ -95,7 +95,7 @@ describe(boot, () => {
 
     const mainElement = containerElement.querySelector("main#guessir");
 
-    expect(init).toBeCalledWith(mainElement);
+    expect(init).toHaveBeenCalledWith(mainElement);
     expect(mainElement?.lastElementChild?.id).toBe("utils-container");
   });
 });

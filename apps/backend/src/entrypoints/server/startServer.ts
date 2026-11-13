@@ -1,6 +1,7 @@
+// Coverage skips the process lifecycle: it waits on a live database and exits the process, which a test
+// cannot host. dbWatch's tests cover the waiting, and compose()'s tests cover the server.
 /* v8 ignore start */
 
-import "reflect-metadata";
 import { Logger } from "@nestjs/common";
 
 import { createDbPing } from "../../dbUtils.js";

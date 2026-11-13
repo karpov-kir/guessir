@@ -22,8 +22,8 @@ describe(loadRemoteGame, () => {
     await game.guess("one");
 
     expect(game.skeleton).toEqual(skeleton);
-    expect(httpClient.get).toBeCalledWith("texts/text-id", textSkeletonSchema);
-    expect(httpClient.post).toBeCalledWith(
+    expect(httpClient.get).toHaveBeenCalledWith("texts/text-id", textSkeletonSchema);
+    expect(httpClient.post).toHaveBeenCalledWith(
       "texts/text-id/guesses",
       { word: "one" },
       revealedWordsSchema,
@@ -35,6 +35,6 @@ describe(loadRemoteGame, () => {
 
     await loadRemoteGame(httpClient, "../admin?x#y");
 
-    expect(httpClient.get).toBeCalledWith("texts/..%2Fadmin%3Fx%23y", textSkeletonSchema);
+    expect(httpClient.get).toHaveBeenCalledWith("texts/..%2Fadmin%3Fx%23y", textSkeletonSchema);
   });
 });

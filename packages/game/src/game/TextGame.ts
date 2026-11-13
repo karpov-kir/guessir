@@ -1,5 +1,5 @@
-import { LexemeAnalyzer } from "../lexemeAnalyzer/LexemeAnalyzer.js";
-import { LexemeNormalizer } from "../lexemeAnalyzer/LexemeNormalizer.js";
+import * as LexemeAnalyzer from "../lexemeAnalyzer/LexemeAnalyzer.js";
+import * as LexemeNormalizer from "../lexemeAnalyzer/LexemeNormalizer.js";
 import { LexemeAnalysis } from "../lexemeAnalyzer/types.js";
 import { RevealedWord, SkeletonLexeme } from "./types.js";
 

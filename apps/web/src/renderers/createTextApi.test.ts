@@ -18,6 +18,6 @@ describe(createText, () => {
     httpClient.post.mockResolvedValue({ id: "text-id" });
 
     await expect(createText(httpClient, payload)).resolves.toEqual({ id: "text-id" });
-    expect(httpClient.post).toBeCalledWith("texts", payload, createTextDtoResponseSchema);
+    expect(httpClient.post).toHaveBeenCalledWith("texts", payload, createTextDtoResponseSchema);
   });
 });

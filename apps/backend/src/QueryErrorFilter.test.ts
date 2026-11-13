@@ -63,9 +63,9 @@ describe(QueryErrorFilter, () => {
 
     expect(response.statusCode).toBe(500);
     expect(response.json()).toEqual({ statusCode: 500, message: "Internal server error" });
-    expect(logError).toBeCalledTimes(1);
+    expect(logError).toHaveBeenCalledTimes(1);
     expect(inspect(logError.mock.calls, { depth: Infinity })).not.toContain(secretText);
-    expect(logError).toBeCalledWith(
+    expect(logError).toHaveBeenCalledWith(
       `Query failed: QueryFailedError: value too long for type character varying(4000); ${insertQuery}; code 22001`,
     );
   });
@@ -75,6 +75,6 @@ describe(QueryErrorFilter, () => {
 
     expect(response.statusCode).toBe(500);
     expect(response.json()).toEqual({ statusCode: 500, message: "Internal server error" });
-    expect(logError).toBeCalledWith(otherError);
+    expect(logError).toHaveBeenCalledWith(otherError);
   });
 });

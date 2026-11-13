@@ -9,8 +9,8 @@ const calls = (
 ): unknown[][] =>
   vi
     .mocked(console[method])
-    .mock.calls.map((args) =>
-      args.map((arg, index) =>
+    .mock.calls.map((args: unknown[]) =>
+      args.map((arg: unknown, index) =>
         index === 0 && typeof arg === "string" ? arg.replace(/^\[GS [\d:.]+\]/, "[GS]") : arg,
       ),
     );

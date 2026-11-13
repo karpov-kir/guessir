@@ -34,8 +34,8 @@ describe(ParameterFreeLogger, () => {
   it("should log a failed query with its error but without its parameters", () => {
     parameterFreeLogger.logQueryError(new Error("connection lost"), insertQuery, [secretText]);
 
-    expect(logSpies.error).toBeCalledTimes(1);
-    expect(logSpies.error).toBeCalledWith(
+    expect(logSpies.error).toHaveBeenCalledTimes(1);
+    expect(logSpies.error).toHaveBeenCalledWith(
       "Query failed: Error: connection lost; INSERT INTO texts VALUES ($1)",
     );
   });
@@ -45,7 +45,7 @@ describe(ParameterFreeLogger, () => {
     parameterFreeLogger.logQuerySlow(5_000, insertQuery, [secretText]);
 
     for (const level of levels) {
-      expect(logSpies[level]).not.toBeCalled();
+      expect(logSpies[level]).not.toHaveBeenCalled();
     }
   });
 
@@ -54,24 +54,24 @@ describe(ParameterFreeLogger, () => {
     parameterFreeLogger.log("info", "connected");
     parameterFreeLogger.log("log", "connected");
 
-    expect(logSpies.warn).toBeCalledTimes(1);
-    expect(logSpies.warn).toBeCalledWith("deprecated option");
+    expect(logSpies.warn).toHaveBeenCalledTimes(1);
+    expect(logSpies.warn).toHaveBeenCalledWith("deprecated option");
     for (const level of levels.filter((level) => level !== "warn")) {
-      expect(logSpies[level]).not.toBeCalled();
+      expect(logSpies[level]).not.toHaveBeenCalled();
     }
   });
 
   it("should inspect a warning that is not a string", () => {
     parameterFreeLogger.log("warn", { reason: "pool error" });
 
-    expect(logSpies.warn).toBeCalledWith("{ reason: 'pool error' }");
+    expect(logSpies.warn).toHaveBeenCalledWith("{ reason: 'pool error' }");
   });
 
   it("should log schema builds and migrations", () => {
     parameterFreeLogger.logSchemaBuild("schema built");
     parameterFreeLogger.logMigration("migration applied");
 
-    expect(logSpies.log).toBeCalledWith("schema built");
-    expect(logSpies.log).toBeCalledWith("migration applied");
+    expect(logSpies.log).toHaveBeenCalledWith("schema built");
+    expect(logSpies.log).toHaveBeenCalledWith("migration applied");
   });
 });

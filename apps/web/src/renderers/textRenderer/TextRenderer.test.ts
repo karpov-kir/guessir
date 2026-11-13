@@ -160,12 +160,12 @@ describe(TextRenderer, () => {
   });
 
   it("should pass on a click on a hidden word as a request to reveal it", () => {
-    const revealRequestCallback = vi.fn();
+    const revealRequestCallback = vi.fn<(index: number) => void>();
 
     textRenderer.revealRequestEvent.subscribe(revealRequestCallback);
     getLexemeElements()[1].click();
 
-    expect(revealRequestCallback).toBeCalledWith(textGame.guess("one")[1].index);
+    expect(revealRequestCallback).toHaveBeenCalledWith(textGame.guess("one")[1].index);
   });
 
   it("should fill the first letters and the words without showing them", () => {

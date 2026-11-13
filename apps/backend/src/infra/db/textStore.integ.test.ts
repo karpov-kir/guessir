@@ -35,9 +35,10 @@ describe("the texts table on Postgres", () => {
     await applyDbMigrations(dataSource);
 
     // The name carries the file's extension: .ts when the tests run the sources, .js on the server
-    expect(await dataSource.query("select name from migrations")).toEqual([
-      { name: expect.stringMatching(/^2022-03-23-initial\.(ts|js)$/) },
-    ]);
+    const migrations = await dataSource.query<{ name: string }[]>("select name from migrations");
+
+    expect(migrations).toHaveLength(1);
+    expect(migrations[0].name).toMatch(/^2022-03-23-initial\.(ts|js)$/);
   });
 
   it("should give back a stored text and nothing for an unknown id", async () => {
@@ -55,7 +56,7 @@ describe("the texts table on Postgres", () => {
 
     await store.insert({ ...record, id });
 
-    await expect(store.insert({ ...record, id })).rejects.toThrow();
+    await expect(store.insert({ ...record, id })).rejects.toThrow(/duplicate key value/);
   });
 
   it("should answer a ping while the database is up", async () => {

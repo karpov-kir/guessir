@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mock, MockProxy } from "vitest-mock-extended";
 
 import { HttpClient } from "../utils/HttpClient";
-import { Logger, LogLevel } from "../utils/Logger";
+import { Logger, LogLevel } from "../shared/Logger";
 import { CreateTextRenderer, getElements } from "./CreateTextRenderer";
 
 // Silences the logger: these tests make creating a text fail on purpose.
@@ -67,7 +67,7 @@ describe(CreateTextRenderer, () => {
 
     await createText();
 
-    expect(httpClient.post).toBeCalledWith(
+    expect(httpClient.post).toHaveBeenCalledWith(
       "texts",
       {
         allowShowingFirstLetters: false,
@@ -163,7 +163,7 @@ describe(CreateTextRenderer, () => {
 
     generateUrlButtonElement.click();
 
-    expect(httpClient.post).not.toBeCalled();
+    expect(httpClient.post).not.toHaveBeenCalled();
   });
 
   it("should initialize inputs without validation classes", () => {
@@ -245,7 +245,7 @@ describe(CreateTextRenderer, () => {
     await createText();
     copyGeneratedUrlButtonElement.click();
 
-    expect(clipboard.writeText).toBeCalledWith("http://localhost:3000?textId=mocked-id");
+    expect(clipboard.writeText).toHaveBeenCalledWith("http://localhost:3000?textId=mocked-id");
   });
 
   it("should hide the alert that a generated URL was copied on a timeout", async () => {
