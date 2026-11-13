@@ -9,7 +9,7 @@ import {
   PrimitiveLexemeNominal,
 } from "./types.js";
 
-const PUNCTUATION_CHARACTERS = [",", ".", "!", "?", ";"];
+const PUNCTUATION_CHARACTERS = new Set([",", ".", "!", "?", ";"]);
 
 /**
  * Splits the trimmed text into normalized lexemes, and a contraction such as `I'm` into its
@@ -103,7 +103,7 @@ function addPrimitiveLexeme(
       1,
       (lexeme) => lexeme.normalized === " ",
     );
-    const isCurrentPunctuation = PUNCTUATION_CHARACTERS.includes(newLexeme.normalized);
+    const isCurrentPunctuation = PUNCTUATION_CHARACTERS.has(newLexeme.normalized);
     const isCurrentNewLine = newLexeme.normalized === "\n";
 
     if ((isLastSpace && isCurrentPunctuation) || (isLastSpace && isCurrentNewLine)) {

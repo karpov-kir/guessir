@@ -15,8 +15,8 @@ const CHARACTERS_TO_NORMALIZED_CHARACTERS = new Map([
   ["`", asNormalized("'")],
 ]);
 const NORMALIZED_WORDS_TO_NORMALIZED_WORDS = new Map([[asNormalized("i"), asNormalized("I")]]);
-const NORMALIZED_CONTRACTION_CHARACTERS = [asNormalized("'")];
-const NORMALIZED_WORD_SEPARATION_CHARACTERS = [asNormalized("-")];
+const NORMALIZED_CONTRACTION_CHARACTERS = new Set([asNormalized("'")]);
+const NORMALIZED_WORD_SEPARATION_CHARACTERS = new Set([asNormalized("-")]);
 const LETTER_RE = /^[A-Za-z]$/;
 
 const NORMALIZED_CONTRACTION_TO_NORMALIZED_NORMAL = new Map<
@@ -146,8 +146,8 @@ export function isWordHelpingCharacter(
   normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal,
 ) {
   return (
-    NORMALIZED_CONTRACTION_CHARACTERS.includes(normalizedPrimitiveLexeme) ||
-    NORMALIZED_WORD_SEPARATION_CHARACTERS.includes(normalizedPrimitiveLexeme)
+    NORMALIZED_CONTRACTION_CHARACTERS.has(normalizedPrimitiveLexeme) ||
+    NORMALIZED_WORD_SEPARATION_CHARACTERS.has(normalizedPrimitiveLexeme)
   );
 }
 
