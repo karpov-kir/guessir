@@ -46,6 +46,9 @@
     "vitest-sonar-reporter": "^3.0.0"
   },
   "allowScripts": {
-    "fsevents": false
+    "cpu-features": false,
+    "fsevents": false,
+    "protobufjs": false,
+    "ssh2": false
   }
 }

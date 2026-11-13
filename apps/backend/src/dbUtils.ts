@@ -1,5 +1,3 @@
-/* v8 ignore start */
-
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -28,9 +26,11 @@ const migrationTable = "migrations";
 
 const entities = [TextEntity];
 
-export const getTypeOrmConfig = (): DataSourceOptions => ({
+export type DbSettings = ReturnType<typeof getDbSettings>;
+
+export const getTypeOrmConfig = (settings: DbSettings = getDbSettings()): DataSourceOptions => ({
   type: "postgres",
-  ...getDbSettings(),
+  ...settings,
   // Umzug migrations in `applyDbMigrations` own the schema, so TypeORM must not.
   synchronize: false,
   logger: new ParameterFreeLogger(),
@@ -45,10 +45,10 @@ export const getTypeOrmConfig = (): DataSourceOptions => ({
  * exit. The timeouts end a dial to a database host that is gone and a query on a dropped
  * connection.
  */
-export const createDbPing = () => {
+export const createDbPing = (settings: DbSettings = getDbSettings()) => {
   const dataSource = new DataSource({
     type: "postgres",
-    ...getDbSettings(),
+    ...settings,
     connectTimeoutMS: 2_000,
     extra: { max: 1, query_timeout: 2_000 },
   });
@@ -62,24 +62,23 @@ export const createDbPing = () => {
   };
 };
 
-const getContext = async (): Promise<MigrationContext> => {
-  const dataSource = new DataSource(getTypeOrmConfig());
-
-  const connection = await dataSource.initialize();
-
-  return {
-    query: (sql: string, parameters?: unknown[]) => connection.manager.query(sql, parameters),
-  };
-};
+/** Connects to the database with the TypeORM settings the server queries through. */
+export async function openPostgres(settings: DbSettings = getDbSettings()): Promise<DataSource> {
+  return new DataSource(getTypeOrmConfig(settings)).initialize();
+}
 
 const logger = new Logger("dbUtils");
 
-export async function applyDbMigrations() {
+/** Applies the migrations the database has not run yet, through `dataSource`. */
+export async function applyDbMigrations(dataSource: DataSource) {
+  const context: MigrationContext = {
+    query: (sql, parameters) => dataSource.query(sql, parameters),
+  };
   const migrator = new Umzug({
     migrations: {
       glob: ["migrations/*.{js,ts}", { cwd: __dirname }],
     },
-    context: await getContext(),
+    context,
     storage: {
       async executed({ context: client }) {
         await client.query(`create table if not exists ${migrationTable}(name text)`);
@@ -106,5 +105,3 @@ export async function applyDbMigrations() {
 
   await migrator.up();
 }
-
-/* v8 ignore stop */

@@ -1,4 +1,4 @@
-import { MigrationFn } from "../dbUtils.js";
+import type { MigrationFn } from "../dbUtils.js";
 
 export const up: MigrationFn = async ({ context: { query } }) => {
   await query(`

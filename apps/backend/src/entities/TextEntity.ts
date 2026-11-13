@@ -8,10 +8,8 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 
-import { Text } from "./Text.js";
-
 @Entity("texts")
-export class TextEntity implements Text {
+export class TextEntity {
   @PrimaryGeneratedColumn()
   pk!: number;
 
