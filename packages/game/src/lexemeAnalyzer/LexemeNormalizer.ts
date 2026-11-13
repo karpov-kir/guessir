@@ -28,7 +28,10 @@ export class LexemeNormalizer {
   ] as NormalizedPrimitiveLexemeNominal[];
   private static readonly LETTER_RE = /^[A-Za-z]$/;
 
-  private static readonly NORMALIZED_CONTRACTION_TO_NORMALIZED_NORMAL = new Map<string, string>([
+  private static readonly NORMALIZED_CONTRACTION_TO_NORMALIZED_NORMAL = new Map<
+    string,
+    NormalizedPrimitiveLexemeNominal
+  >([
     ["don't", "do not"],
     ["doesn't", "does not"],
     ["didn't", "did not"],
@@ -63,7 +66,7 @@ export class LexemeNormalizer {
 
     // The table leaves out `'d` and `'s` contractions, such as I'd and he's. Each has more than one
     // expansion, so `getGroupingWords` handles them instead.
-  ]);
+  ] as Array<[string, NormalizedPrimitiveLexemeNominal]>);
 
   /**
    * Returns `newNormalizedLexeme` with its first letter in upper case when `originalLexeme` starts
@@ -121,7 +124,7 @@ export class LexemeNormalizer {
   ) {
     const converted = LexemeNormalizer.NORMALIZED_CONTRACTION_TO_NORMALIZED_NORMAL.get(
       normalizedPrimitiveLexeme.toLowerCase(),
-    ) as NormalizedPrimitiveLexemeNominal;
+    );
 
     if (converted) {
       return this.syncCase(normalizedPrimitiveLexeme, converted);
