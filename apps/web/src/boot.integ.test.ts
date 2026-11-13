@@ -2,29 +2,33 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mock, MockProxy } from "vitest-mock-extended";
 
 import { newTextSkeleton } from "../tests/utils/textSkeleton";
-import { boot } from "./boot";
+import { boot, BootDependencies } from "./boot";
 import { Game } from "./game/Game";
 import { LocalGame } from "./game/LocalGame";
 import { RemoteGame } from "./game/RemoteGame";
 import { RenderController } from "./RenderController";
-import { ApiClient } from "./utils/ApiClient";
 import { HttpClient } from "./utils/HttpClient";
 import { Logger, LogLevel } from "./utils/Logger";
 
 // Silences the logger: these tests make loading fail on purpose.
 Logger.root.setLevel(LogLevel.Silent);
 
-let mockedApiClient: MockProxy<ApiClient>;
 vi.mock("./RenderController");
 
 const textId = "text-id";
 const skeleton = newTextSkeleton();
+let httpClient: MockProxy<HttpClient>;
+let containerElement: HTMLElement;
 
-Object.defineProperty(window, "location", {
-  value: {
-    search: `?textId=${textId}`,
-  },
-});
+const bootWith = (search: string) => {
+  const dependencies: BootDependencies = {
+    httpClient,
+    location: { origin: "https://guessir.test", search },
+    clipboard: { writeText: vi.fn() },
+  };
+
+  return boot(containerElement, dependencies);
+};
 
 const getRenderedGame = (): Game => {
   const options = vi.mocked(RenderController).mock.lastCall?.[0];
@@ -38,28 +42,24 @@ const getRenderedGame = (): Game => {
 
 describe(boot, () => {
   beforeEach(() => {
-    mockedApiClient = mock<ApiClient>();
+    httpClient = mock<HttpClient>();
+    containerElement = document.createElement("div");
   });
 
   it("should load and render a remote text", async () => {
-    const remoteGame = new RemoteGame({
-      httpClient: mock<HttpClient>(),
-      textUrl: "texts/text-id",
-      skeleton,
-    });
+    httpClient.get.mockResolvedValue(skeleton);
 
-    mockedApiClient.loadGame.mockResolvedValue(remoteGame);
+    await bootWith(`?textId=${textId}`);
 
-    await boot(document.createElement("div"), mockedApiClient);
-
-    expect(mockedApiClient.loadGame).toBeCalledWith(textId);
-    expect(getRenderedGame()).toBe(remoteGame);
+    expect(httpClient.get).toBeCalledWith(`texts/${textId}`);
+    expect(getRenderedGame()).toBeInstanceOf(RemoteGame);
+    expect(getRenderedGame().skeleton).toEqual(skeleton);
   });
 
   it("should render an error text if loading a remote text fails", async () => {
-    mockedApiClient.loadGame.mockRejectedValue(new Error("Test"));
+    httpClient.get.mockRejectedValue(new Error("Test"));
 
-    await boot(document.createElement("div"), mockedApiClient);
+    await bootWith(`?textId=${textId}`);
 
     expect(getRenderedGame()).toBeInstanceOf(LocalGame);
     expect(getRenderedGame().skeleton).toEqual(
@@ -79,13 +79,22 @@ describe(boot, () => {
   });
 
   it("should render a default text if a text ID is not set in the URL", async () => {
-    window.location.search = "";
+    await bootWith("");
 
-    await boot(document.createElement("div"), mockedApiClient);
-
-    expect(mockedApiClient.loadGame).not.toBeCalled();
+    expect(httpClient.get).not.toBeCalled();
     expect(getRenderedGame()).toBeInstanceOf(LocalGame);
     expect(getRenderedGame().skeleton.title).toBe("Hello!");
     await expect(getRenderedGame().guess("order")).resolves.toEqual([{ index: 2, word: "order" }]);
+  });
+
+  it("should render the game into the page's main column with the create-text form", async () => {
+    const init = vi.spyOn(RenderController.prototype, "init");
+
+    await bootWith("");
+
+    const mainElement = containerElement.querySelector("main#guessir");
+
+    expect(init).toBeCalledWith(mainElement);
+    expect(mainElement?.lastElementChild?.id).toBe("utils-container");
   });
 });

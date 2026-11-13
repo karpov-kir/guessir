@@ -2,7 +2,6 @@ import { RevealedWord } from "@guessir/game";
 
 import { Game } from "./game/Game";
 import { ControlsRenderer, GuessEvent } from "./renderers/ControlsRenderer";
-import { CreateTextRenderer } from "./renderers/CreateTextRenderer";
 import { ScoreRenderer } from "./renderers/ScoreRenderer";
 import { TextRenderer } from "./renderers/textRenderer/TextRenderer";
 import { WordHint } from "./renderers/textRenderer/WordRenderer";
@@ -15,17 +14,14 @@ export type RenderControllerOptions = {
   textRenderer?: TextRenderer;
   controlsRenderer?: ControlsRenderer;
   scoreRenderer?: ScoreRenderer;
-  createTextRenderer?: CreateTextRenderer;
 };
 
 export class RenderController {
-  private readonly guessirContainer: HTMLElement;
   private readonly game: Game;
 
   private readonly textRenderer: TextRenderer;
   private readonly controlsRenderer: ControlsRenderer;
   private readonly scoreRenderer: ScoreRenderer;
-  private readonly utilsRenderer: CreateTextRenderer;
 
   /** The hint the user turned on last, which turns on once its letters load. */
   private wantedHint = WordHint.None;
@@ -36,8 +32,6 @@ export class RenderController {
     const { skeleton } = options.game;
 
     this.game = options.game;
-    this.guessirContainer = document.createElement("main");
-    this.guessirContainer.id = "guessir";
     this.textRenderer =
       options.textRenderer ||
       new TextRenderer({
@@ -56,12 +50,10 @@ export class RenderController {
       new ScoreRenderer({
         wordLikeCount: skeleton.wordCount,
       });
-    this.utilsRenderer = options.createTextRenderer || new CreateTextRenderer();
   }
 
+  /** Renders the game into the container element and starts answering the player's moves. */
   public init(containerElement: HTMLElement) {
-    containerElement.appendChild(this.guessirContainer);
-
     this.textRenderer.revealRequestEvent.subscribe((index) => void this.handleRevealRequest(index));
 
     this.controlsRenderer.guessEvent.subscribe((guessEvent) => void this.handleGuess(guessEvent));
@@ -86,8 +78,7 @@ export class RenderController {
 
     gameElement.appendChild(hudElement);
     gameElement.appendChild(this.textRenderer.getElement());
-    this.guessirContainer.appendChild(gameElement);
-    this.guessirContainer.appendChild(this.utilsRenderer.getElement());
+    containerElement.appendChild(gameElement);
   }
 
   private async handleRevealRequest(index: number) {

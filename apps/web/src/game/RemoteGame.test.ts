@@ -5,7 +5,7 @@ import { newTextSkeleton } from "../../tests/utils/textSkeleton";
 import { HttpClient } from "../utils/HttpClient";
 import { RemoteGame } from "./RemoteGame";
 
-const textUrl = "https://api.test/texts/text-id";
+const textPath = "texts/text-id";
 const skeleton = newTextSkeleton();
 const words = [{ index: 0, word: "One" }];
 let httpClient: MockProxy<HttpClient>;
@@ -14,7 +14,7 @@ let remoteGame: RemoteGame;
 describe(RemoteGame, () => {
   beforeEach(() => {
     httpClient = mock<HttpClient>();
-    remoteGame = new RemoteGame({ httpClient, textUrl, skeleton });
+    remoteGame = new RemoteGame({ httpClient, textPath, skeleton });
   });
 
   it("should keep the skeleton", () => {
@@ -25,27 +25,27 @@ describe(RemoteGame, () => {
     httpClient.post.mockResolvedValue({ words });
 
     await expect(remoteGame.guess("one")).resolves.toEqual(words);
-    expect(httpClient.post).toBeCalledWith(`${textUrl}/guesses`, { word: "one" });
+    expect(httpClient.post).toBeCalledWith(`${textPath}/guesses`, { word: "one" });
   });
 
   it("should ask the server to reveal a word", async () => {
     httpClient.post.mockResolvedValue(words[0]);
 
     await expect(remoteGame.reveal(0)).resolves.toEqual(words[0]);
-    expect(httpClient.post).toBeCalledWith(`${textUrl}/reveals`, { index: 0 });
+    expect(httpClient.post).toBeCalledWith(`${textPath}/reveals`, { index: 0 });
   });
 
   it("should ask the server for the first letters", async () => {
     httpClient.get.mockResolvedValue({ words });
 
     await expect(remoteGame.firstLetters()).resolves.toEqual(words);
-    expect(httpClient.get).toBeCalledWith(`${textUrl}/first-letters`);
+    expect(httpClient.get).toBeCalledWith(`${textPath}/first-letters`);
   });
 
   it("should ask the server for the words", async () => {
     httpClient.get.mockResolvedValue({ words });
 
     await expect(remoteGame.words()).resolves.toEqual(words);
-    expect(httpClient.get).toBeCalledWith(`${textUrl}/words`);
+    expect(httpClient.get).toBeCalledWith(`${textPath}/words`);
   });
 });

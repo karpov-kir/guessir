@@ -1,20 +1,24 @@
 import { createTextLimits } from "@guessir/game";
 
 import copyIcon from "../icons/copyIcon.svg?raw";
-import { ApiClient } from "../utils/ApiClient";
 import { onChangeAndEnter, requireElement } from "../utils/dom";
 import { icon } from "../utils/icon";
-import { generateTextUrl } from "../utils/text";
+import { HttpClient } from "../utils/HttpClient";
+import { textUrl } from "../utils/text";
+import { createText } from "./createTextApi";
 import { ChildRenderer } from "./types";
 import { Logger } from "../utils/Logger";
 
 const logger = Logger.root.scope("CreateTextRenderer");
 
 interface CreateTextRendererOptions {
+  httpClient: HttpClient;
+  /** The page origin the link to a created text starts with. */
+  origin: string;
+  clipboard: Pick<Clipboard, "writeText">;
   maxTitleLength?: number;
   maxDescriptionLength?: number;
   maxTextLength?: number;
-  apiClient?: ApiClient;
 }
 
 /**
@@ -50,13 +54,17 @@ export class CreateTextRenderer implements ChildRenderer {
   private readonly maxTitleLength: number;
   private readonly maxDescriptionLength: number;
   private readonly maxTextLength: number;
-  private readonly apiClient: ApiClient;
+  private readonly httpClient: HttpClient;
+  private readonly origin: string;
+  private readonly clipboard: Pick<Clipboard, "writeText">;
 
-  constructor(options: CreateTextRendererOptions = {}) {
+  constructor(options: CreateTextRendererOptions) {
     this.containerElement = document.createElement("div");
     this.containerElement.id = "utils-container";
 
-    this.apiClient = options.apiClient || new ApiClient();
+    this.httpClient = options.httpClient;
+    this.origin = options.origin;
+    this.clipboard = options.clipboard;
 
     this.maxTitleLength = options.maxTitleLength ?? createTextLimits.title;
     this.maxDescriptionLength = options.maxDescriptionLength ?? createTextLimits.description;
@@ -296,12 +304,11 @@ export class CreateTextRenderer implements ChildRenderer {
       this.blockForm(true);
       generatedUrlContainerElement.classList.add("hide");
 
-      this.apiClient
-        .createText(this.getValues())
+      createText(this.httpClient, this.getValues())
         .then((apiText) => {
           this.cleanForm();
 
-          this.generatedUrl = generateTextUrl(apiText);
+          this.generatedUrl = textUrl(this.origin, apiText.id);
 
           generatedUrlContainerElement.classList.remove("hide");
 
@@ -333,7 +340,7 @@ export class CreateTextRenderer implements ChildRenderer {
     let changeTextTimeoutId: ReturnType<typeof setTimeout> | undefined;
 
     copyGeneratedUrlButtonElement.addEventListener("click", () => {
-      void navigator.clipboard.writeText(this.generatedUrl);
+      void this.clipboard.writeText(this.generatedUrl);
       copyGeneratedUrlButtonElement.appendChild(this.copiedAlertElement);
 
       if (changeTextTimeoutId) {
