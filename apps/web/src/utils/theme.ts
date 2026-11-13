@@ -2,10 +2,11 @@ import moonIcon from "../icons/moonIcon.svg?raw";
 import sunIcon from "../icons/sunIcon.svg?raw";
 import { icon } from "./icon";
 
-enum Theme {
-  Light = "light",
-  Dark = "dark",
-}
+const Theme = {
+  Light: "light",
+  Dark: "dark",
+} as const;
+type Theme = (typeof Theme)[keyof typeof Theme];
 
 /**
  * Describes the part of `MediaQueryList` the toggle reads, so a test can stand in for the system
@@ -64,7 +65,7 @@ export function initThemeToggle({ button, root, getStorage, systemTheme }: Theme
   }
 
   const isDark = () =>
-    root.dataset.theme ? root.dataset.theme === String(Theme.Dark) : systemTheme.matches;
+    root.dataset.theme ? root.dataset.theme === Theme.Dark : systemTheme.matches;
   const renderPressed = () => button.setAttribute("aria-pressed", String(isDark()));
 
   renderPressed();

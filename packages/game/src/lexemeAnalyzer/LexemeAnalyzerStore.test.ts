@@ -1,15 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import { LexemeAnalyzerStore } from "./LexemeAnalyzerStore.js";
-import { LexemeAnalyzerUtils } from "./lexemeAnalyzerUtils.js";
-import { NormalizedPrimitiveLexemeNominal, PrimitiveLexemeNominal } from "./types.js";
+import * as LexemeAnalyzerUtils from "./lexemeAnalyzerUtils.js";
+import { asNormalized, asPrimitive } from "./types.js";
 
-const lexeme = LexemeAnalyzerUtils.createLexeme(
-  "One" as PrimitiveLexemeNominal,
-  "One" as NormalizedPrimitiveLexemeNominal,
-  0,
-  2,
-);
+const lexeme = LexemeAnalyzerUtils.createLexeme(asPrimitive("One"), asNormalized("One"), 0, 2);
 
 describe(LexemeAnalyzerStore, () => {
   it("should give the lexeme at an index, or undefined where there is none", () => {

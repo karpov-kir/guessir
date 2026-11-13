@@ -5,7 +5,7 @@ import { ControlsRenderer, GuessEvent } from "./renderers/ControlsRenderer";
 import { ScoreRenderer } from "./renderers/ScoreRenderer";
 import { TextRenderer } from "./renderers/textRenderer/TextRenderer";
 import { WordHint } from "./renderers/textRenderer/WordRenderer";
-import { Logger } from "./utils/Logger";
+import { Logger } from "./shared/Logger";
 
 const logger = Logger.root.scope("RenderController");
 

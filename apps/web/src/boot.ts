@@ -7,7 +7,7 @@ import { LocalGame } from "./game/LocalGame";
 import { RenderController } from "./RenderController";
 import { CreateTextRenderer } from "./renderers/CreateTextRenderer";
 import { HttpClient } from "./utils/HttpClient";
-import { Logger } from "./utils/Logger";
+import { Logger } from "./shared/Logger";
 import { parseTextId } from "./utils/text";
 
 const logger = Logger.root.scope("boot");

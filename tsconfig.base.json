@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "noEmit": true,
+    "noImplicitReturns": true,
     "paths": {
       "@guessir/game": ["./packages/game/src/exports.ts"]
     }

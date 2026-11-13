@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { getElementText } from "../../tests/utils/dom";
 import { ScoreRenderer } from "./ScoreRenderer";
+import { requireElement } from "../utils/dom";
 
 let scoreRenderer: ScoreRenderer;
 
@@ -35,8 +36,13 @@ describe(ScoreRenderer, () => {
 
   it("should show the progress", () => {
     const getProgressElement = () =>
-      scoreRenderer.getElement().querySelector('[role="progressbar"]') as HTMLElement;
-    const getProgressBarElement = () => getProgressElement().firstElementChild as HTMLElement;
+      requireElement({
+        root: scoreRenderer.getElement(),
+        selector: '[role="progressbar"]',
+        type: HTMLElement,
+      });
+    const getProgressBarElement = () =>
+      requireElement({ root: getProgressElement(), selector: ":scope > *", type: HTMLElement });
 
     expect(getProgressElement().getAttribute("aria-valuenow")).toBe("0");
     expect(getProgressElement().getAttribute("aria-valuemax")).toBe("10");

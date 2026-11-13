@@ -7,7 +7,7 @@ import { HttpClient } from "../utils/HttpClient";
 import { textUrl } from "../utils/text";
 import { createText } from "./createTextApi";
 import { ChildRenderer } from "./types";
-import { Logger } from "../utils/Logger";
+import { Logger } from "../shared/Logger";
 
 const logger = Logger.root.scope("CreateTextRenderer");
 

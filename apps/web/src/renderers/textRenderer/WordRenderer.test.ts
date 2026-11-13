@@ -1,11 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { WordHint, WordRenderer } from "./WordRenderer";
+import { requireElement } from "../../utils/dom";
 
 let wordRenderer: WordRenderer;
-const getLexemeElement = () => wordRenderer.getElement().querySelector(".lexeme") as HTMLElement;
+const getLexemeElement = () =>
+  requireElement({ root: wordRenderer.getElement(), selector: ".lexeme", type: HTMLElement });
 const getLexemeFirstLetterElement = () =>
-  wordRenderer.getElement().querySelector(".lexeme-first-letter") as HTMLElement;
+  requireElement({
+    root: wordRenderer.getElement(),
+    selector: ".lexeme-first-letter",
+    type: HTMLElement,
+  });
 const getLabel = () => wordRenderer.getElement().getAttribute("aria-label");
 
 describe(WordRenderer, () => {
@@ -74,21 +80,21 @@ describe(WordRenderer, () => {
   });
 
   it("should ask to reveal a hidden word on click", () => {
-    const revealRequestCallback = vi.fn();
+    const revealRequestCallback = vi.fn<(index: number) => void>();
 
     wordRenderer.revealRequestEvent.subscribe(revealRequestCallback);
     wordRenderer.getElement().click();
 
-    expect(revealRequestCallback).toBeCalledWith(2);
+    expect(revealRequestCallback).toHaveBeenCalledWith(2);
   });
 
   it("should not ask to reveal a shown word", () => {
-    const revealRequestCallback = vi.fn();
+    const revealRequestCallback = vi.fn<(index: number) => void>();
 
     wordRenderer.revealRequestEvent.subscribe(revealRequestCallback);
     wordRenderer.show("Test");
     wordRenderer.getElement().click();
 
-    expect(revealRequestCallback).not.toBeCalled();
+    expect(revealRequestCallback).not.toHaveBeenCalled();
   });
 });

@@ -6,7 +6,8 @@ import { RenderController } from "./RenderController";
 import { ControlsRenderer, GuessEvent } from "./renderers/ControlsRenderer";
 import { ScoreRenderer } from "./renderers/ScoreRenderer";
 import { TextRenderer } from "./renderers/textRenderer/TextRenderer";
-import { Logger, LogLevel } from "./utils/Logger";
+import { Logger, LogLevel } from "./shared/Logger";
+import { requireElement } from "./utils/dom";
 
 // Silences the logger: these tests make the game fail to answer on purpose.
 Logger.root.setLevel(LogLevel.Silent);
@@ -27,10 +28,11 @@ let revealRequestPubSub: PubSub<number>;
 const settle = () => new Promise((resolve) => setTimeout(resolve));
 const getStatus = () => containerElement.querySelector("#guess-status")?.textContent;
 const getScore = () => containerElement.querySelector("#current-score")?.textContent;
-const getGuessInput = () => containerElement.querySelector("#guess-input") as HTMLInputElement;
+const getGuessInput = () =>
+  requireElement({ root: containerElement, selector: "#guess-input", type: HTMLInputElement });
 const isGuessInputShaken = () => getGuessInput().classList.contains("shake-and-error");
 const getCheckbox = (selector: string) =>
-  containerElement.querySelector(selector) as HTMLInputElement;
+  requireElement({ root: containerElement, selector, type: HTMLInputElement });
 const toggleCheckbox = (selector: string) =>
   getCheckbox(selector).dispatchEvent(new Event("change"));
 const typeGuess = (word: string) => {
@@ -39,7 +41,11 @@ const typeGuess = (word: string) => {
 };
 const submitGuess = (word: string) => {
   typeGuess(word);
-  (containerElement.querySelector("#guess-button") as HTMLButtonElement).click();
+  requireElement({
+    root: containerElement,
+    selector: "#guess-button",
+    type: HTMLButtonElement,
+  }).click();
 };
 const getTextClasses = () => textRenderer.getElement().classList;
 const getWordTexts = () =>
@@ -89,7 +95,11 @@ describe(RenderController, () => {
   });
 
   it("should put the score and the controls together above the text", () => {
-    const hudElement = containerElement.querySelector("#hud") as HTMLElement;
+    const hudElement = requireElement({
+      root: containerElement,
+      selector: "#hud",
+      type: HTMLElement,
+    });
 
     expect(hudElement.contains(scoreRenderer.getElement())).toBe(true);
     expect(hudElement.contains(controlsRenderer.getElement())).toBe(true);
@@ -221,7 +231,7 @@ describe(RenderController, () => {
     await settle();
 
     expect(getTextClasses()).toContain("show-first-letters");
-    expect(firstLetters).toBeCalledTimes(1);
+    expect(firstLetters).toHaveBeenCalledTimes(1);
     expect(getScore()).toBe("0");
   });
 
@@ -240,7 +250,7 @@ describe(RenderController, () => {
     showTextPubSub.publish(true);
     await settle();
 
-    expect(words).toBeCalledTimes(1);
+    expect(words).toHaveBeenCalledTimes(1);
     expect(getScore()).toBe("0");
   });
 
@@ -274,7 +284,7 @@ describe(RenderController, () => {
       toggleCheckbox(checkbox);
       await settle();
 
-      expect(game[load]).toBeCalledTimes(2);
+      expect(game[load]).toHaveBeenCalledTimes(2);
     },
   );
 

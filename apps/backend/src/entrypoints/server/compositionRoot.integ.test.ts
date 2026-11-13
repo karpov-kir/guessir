@@ -47,7 +47,8 @@ describe("the texts API over HTTP", () => {
     const { id } = response.json<{ id: string }>();
 
     expect(response.statusCode).toBe(201);
-    expect(response.json()).toEqual({ id: expect.stringMatching(/^[\w-]{20}$/) });
+    expect(response.json()).toEqual({ id });
+    expect(id).toMatch(/^[\w-]{20}$/);
     expect(await textRows.getById(id)).toEqual({
       id,
       title: "Title",
@@ -107,7 +108,7 @@ describe("the texts API over HTTP", () => {
 
     expect(response.statusCode).toBe(500);
     expect(response.json()).toEqual({ statusCode: 500, message: "Internal server error" });
-    expect(errorLog).toBeCalled();
+    expect(errorLog).toHaveBeenCalled();
     expect(JSON.stringify(errorLog.mock.calls)).not.toContain("One two");
   });
 

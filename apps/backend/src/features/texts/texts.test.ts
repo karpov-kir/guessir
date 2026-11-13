@@ -123,14 +123,14 @@ describe(Texts, () => {
       await texts.guess("id", "one");
       await texts.words("id");
 
-      expect(rows.getById).toBeCalledTimes(1);
+      expect(rows.getById).toHaveBeenCalledTimes(1);
     });
 
     it("should read again for an unknown text", async () => {
       await expect(texts.findSkeleton("unknown")).rejects.toBeInstanceOf(TextNotFoundError);
       await expect(texts.findSkeleton("unknown")).rejects.toBeInstanceOf(TextNotFoundError);
 
-      expect(rows.getById).toBeCalledTimes(2);
+      expect(rows.getById).toHaveBeenCalledTimes(2);
     });
 
     it("should keep a bounded number of texts and read again one it dropped", async () => {
@@ -146,7 +146,7 @@ describe(Texts, () => {
 
       await texts.findSkeleton("id-0");
 
-      expect(rows.getById).toBeCalledTimes(textCount + 1);
+      expect(rows.getById).toHaveBeenCalledTimes(textCount + 1);
     });
   });
 });

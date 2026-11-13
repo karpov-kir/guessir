@@ -94,7 +94,7 @@ export class Logger {
       try {
         return JSON.stringify(
           arg,
-          (_key, value) =>
+          (_key, value: unknown) =>
             isErrorLike(value)
               ? { name: value.name, message: value.message, stack: value.stack }
               : value,

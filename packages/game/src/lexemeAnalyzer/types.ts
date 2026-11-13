@@ -53,3 +53,23 @@ export type PrimitiveLexemeNominal = string & {
 export type GroupWordLikeNominal = string & {
   __type: "groupWordLike";
 };
+
+// A brand exists only in the type system, so a cast is the one way to give a string its brand. These
+// three functions hold the analyzer's only casts.
+/* oxlint-disable typescript/no-unsafe-type-assertion */
+
+/** Marks text as read from the source text, before normalization. */
+export function asPrimitive(text: string): PrimitiveLexemeNominal {
+  return text as PrimitiveLexemeNominal;
+}
+
+/** Marks text as normalized. */
+export function asNormalized(text: string): NormalizedPrimitiveLexemeNominal {
+  return text as NormalizedPrimitiveLexemeNominal;
+}
+
+/** Marks text as a lower-cased word that groups lexemes. */
+export function asGroupWordLike(text: string): GroupWordLikeNominal {
+  return text as GroupWordLikeNominal;
+}
+/* oxlint-enable typescript/no-unsafe-type-assertion */

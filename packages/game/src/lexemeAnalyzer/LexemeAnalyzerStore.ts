@@ -1,4 +1,4 @@
-import { LexemeNormalizer } from "./LexemeNormalizer.js";
+import * as LexemeNormalizer from "./LexemeNormalizer.js";
 import { GroupWordLikeNominal, Lexeme, LexemeAnalysis } from "./types.js";
 
 export class LexemeAnalyzerStore implements LexemeAnalysis {

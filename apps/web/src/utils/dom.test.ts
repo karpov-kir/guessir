@@ -11,7 +11,7 @@ const enterPressEvent = new KeyboardEvent("keypress", {
 describe(onChangeAndEnter, () => {
   beforeEach(() => {
     inputElement = document.createElement("input");
-    callback = vi.fn();
+    callback = vi.fn<() => void>();
 
     onChangeAndEnter(inputElement, callback, { toggleChecked: true });
   });
@@ -21,7 +21,7 @@ describe(onChangeAndEnter, () => {
 
     inputElement.dispatchEvent(changeEvent);
 
-    expect(callback).toBeCalledWith(changeEvent);
+    expect(callback).toHaveBeenCalledWith(changeEvent);
   });
 
   it("should call the callback on enter press", () => {
@@ -43,7 +43,7 @@ describe(onChangeAndEnter, () => {
 
     inputElement.dispatchEvent(keypressEvent);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).not.toHaveBeenCalled();
   });
 
   it("should toggle the checked attribute on enter press", () => {

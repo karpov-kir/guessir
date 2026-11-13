@@ -1,3 +1,5 @@
+// Coverage skips the page's entry: it wires the real browser objects. `boot` and `initThemeToggle` have
+// their own tests.
 /* v8 ignore start */
 
 import { boot } from "./boot";

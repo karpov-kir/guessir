@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { LexemeAnalyzer } from "./LexemeAnalyzer.js";
+import * as LexemeAnalyzer from "./LexemeAnalyzer.js";
 
-describe(LexemeAnalyzer, () => {
+describe(LexemeAnalyzer.analyze, () => {
   it("should build lexemes", () => {
     // The input text holds an example of each case the analyzer handles when it builds a lexeme, so
     // a change to any of those cases fails this test.
