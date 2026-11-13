@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@fastify/helmet": "^13.2.0",
-    "@guessir/shared": "^1.0.0",
+    "@guessir/game": "^1.0.0",
     "@nestjs/common": "^12.3.2",
     "@nestjs/core": "^12.3.2",
     "@nestjs/platform-fastify": "^12.3.2",

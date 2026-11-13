@@ -1,4 +1,4 @@
-import { CreateTextDto, createTextLimits } from "@guessir/shared/dist/CreateTextDto.js";
+import { CreateTextDto, createTextLimits } from "@guessir/game";
 import { IsBoolean, IsNotEmpty, IsOptional } from "class-validator";
 
 import { HasNoNullCharacter, MaxCodePoints } from "./dbTextValidators.js";

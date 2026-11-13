@@ -1,4 +1,4 @@
-import { RevealedWord, RevealedWords, TextSkeleton } from "@guessir/shared/dist/game/types";
+import { RevealedWord, RevealedWords, TextSkeleton } from "@guessir/game";
 import urlJoin from "url-join";
 
 import { HttpClient } from "../utils/HttpClient";

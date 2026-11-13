@@ -1,4 +1,4 @@
-import { TextGame } from "@guessir/shared/dist/game/TextGame";
+import { TextGame } from "@guessir/game";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getElements, TextRenderer } from "./TextRenderer";

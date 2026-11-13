@@ -11,7 +11,7 @@ RUN npm run build -w @guessir/backend
 
 FROM base AS deps
 
-# The backend's production dependencies need only the root, shared and backend manifests
+# The backend's production dependencies need only the root, game and backend manifests
 COPY package.json package-lock.json .npmrc ./
 COPY packages/game/package.json packages/game/
 COPY apps/backend/package.json apps/backend/

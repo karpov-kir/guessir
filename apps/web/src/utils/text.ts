@@ -1,4 +1,4 @@
-import { CreateTextDtoResponse } from "@guessir/shared/dist/CreateTextDtoResponse";
+import { CreateTextDtoResponse } from "@guessir/game";
 
 // v8 ignore next: nothing worth testing (no logic)
 export function generateTextUrl(apiText: CreateTextDtoResponse) {

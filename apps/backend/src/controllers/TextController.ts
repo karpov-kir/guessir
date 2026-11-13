@@ -1,6 +1,10 @@
-import { CreateTextDtoResponse } from "@guessir/shared/dist/CreateTextDtoResponse.js";
-import { TextGame } from "@guessir/shared/dist/game/TextGame.js";
-import { RevealedWord, RevealedWords, TextSkeleton } from "@guessir/shared/dist/game/types.js";
+import {
+  CreateTextDtoResponse,
+  RevealedWord,
+  RevealedWords,
+  TextGame,
+  TextSkeleton,
+} from "@guessir/game";
 import {
   Body,
   Controller,
