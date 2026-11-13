@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { textSkeletonSchema } from "./types.js";
+import { guessDtoSchema, revealDtoSchema, textSkeletonSchema } from "./types.js";
 
 const skeleton = {
   title: "Title",
@@ -41,4 +41,30 @@ describe("textSkeletonSchema", () => {
   ])("should reject a skeleton whose $field is $value", ({ field, value }) => {
     expect(textSkeletonSchema.safeParse({ ...skeleton, [field]: value }).success).toBe(false);
   });
+});
+
+describe("guessDtoSchema", () => {
+  it("should read a word", () => {
+    expect(guessDtoSchema.parse({ word: "one" })).toEqual({ word: "one" });
+  });
+
+  it.each([{}, { word: 3 }, { word: "" }, { word: "a".repeat(101) }, { word: "one", index: 0 }])(
+    "should reject the body %o",
+    (body) => {
+      expect(guessDtoSchema.safeParse(body).success).toBe(false);
+    },
+  );
+});
+
+describe("revealDtoSchema", () => {
+  it("should read an index", () => {
+    expect(revealDtoSchema.parse({ index: 0 })).toEqual({ index: 0 });
+  });
+
+  it.each([{}, { index: "1" }, { index: 1.5 }, { index: -1 }, { index: 0, word: "one" }])(
+    "should reject the body %o",
+    (body) => {
+      expect(revealDtoSchema.safeParse(body).success).toBe(false);
+    },
+  );
 });

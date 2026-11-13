@@ -1,5 +1,5 @@
 import fastifyHelmet from "@fastify/helmet";
-import { NotAcceptableException, ValidationPipe } from "@nestjs/common";
+import { NotAcceptableException } from "@nestjs/common";
 import { IEntryNestModule, NestFactory } from "@nestjs/core";
 import { FastifyAdapter, NestFastifyApplication } from "@nestjs/platform-fastify";
 
@@ -7,7 +7,7 @@ import { TextErrorFilter } from "./TextErrorFilter.js";
 import { QueryErrorFilter } from "./QueryErrorFilter.js";
 
 /**
- * Creates the HTTP app of `module` with the server's headers, CORS, validation and query error
+ * Creates the HTTP app of `module` with the server's headers, CORS and query error
  * handling, and returns it without listening.
  */
 export async function newApp(module: IEntryNestModule, { logger = true } = {}) {
@@ -42,12 +42,6 @@ export async function newApp(module: IEntryNestModule, { logger = true } = {}) {
     },
   });
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-    }),
-  );
   app.useGlobalFilters(new QueryErrorFilter(), new TextErrorFilter());
 
   return app;
