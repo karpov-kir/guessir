@@ -39,5 +39,12 @@ function toRecord({
   allowShowingFirstLetters,
   allowShowingText,
 }: TextRow): TextRecord {
-  return { id, title, description, text, allowShowingFirstLetters, allowShowingText };
+  return {
+    id,
+    title,
+    description: description ?? undefined,
+    text,
+    allowShowingFirstLetters,
+    allowShowingText,
+  };
 }

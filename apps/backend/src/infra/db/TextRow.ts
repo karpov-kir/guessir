@@ -24,11 +24,14 @@ export class TextRow {
   })
   title!: string;
 
+  // The column names its type. TypeORM reads a `string | null` property as Object and then
+  // refuses to start.
   @Column({
+    type: "varchar",
     length: createTextLimits.description,
     nullable: true,
   })
-  description?: string;
+  description!: string | null;
 
   @Column({
     length: createTextLimits.text,
