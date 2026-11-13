@@ -1,3 +1,4 @@
+import { revealedWordSchema, revealedWordsSchema } from "@guessir/game";
 import { beforeEach, describe, expect, it } from "vitest";
 import { mock, MockProxy } from "vitest-mock-extended";
 
@@ -25,27 +26,31 @@ describe(RemoteGame, () => {
     httpClient.post.mockResolvedValue({ words });
 
     await expect(remoteGame.guess("one")).resolves.toEqual(words);
-    expect(httpClient.post).toBeCalledWith(`${textPath}/guesses`, { word: "one" });
+    expect(httpClient.post).toBeCalledWith(
+      `${textPath}/guesses`,
+      { word: "one" },
+      revealedWordsSchema,
+    );
   });
 
   it("should ask the server to reveal a word", async () => {
     httpClient.post.mockResolvedValue(words[0]);
 
     await expect(remoteGame.reveal(0)).resolves.toEqual(words[0]);
-    expect(httpClient.post).toBeCalledWith(`${textPath}/reveals`, { index: 0 });
+    expect(httpClient.post).toBeCalledWith(`${textPath}/reveals`, { index: 0 }, revealedWordSchema);
   });
 
   it("should ask the server for the first letters", async () => {
     httpClient.get.mockResolvedValue({ words });
 
     await expect(remoteGame.firstLetters()).resolves.toEqual(words);
-    expect(httpClient.get).toBeCalledWith(`${textPath}/first-letters`);
+    expect(httpClient.get).toBeCalledWith(`${textPath}/first-letters`, revealedWordsSchema);
   });
 
   it("should ask the server for the words", async () => {
     httpClient.get.mockResolvedValue({ words });
 
     await expect(remoteGame.words()).resolves.toEqual(words);
-    expect(httpClient.get).toBeCalledWith(`${textPath}/words`);
+    expect(httpClient.get).toBeCalledWith(`${textPath}/words`, revealedWordsSchema);
   });
 });

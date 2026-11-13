@@ -1,3 +1,4 @@
+import { createTextDtoResponseSchema } from "@guessir/game";
 import { describe, expect, it } from "vitest";
 import { mock } from "vitest-mock-extended";
 
@@ -17,6 +18,6 @@ describe(createText, () => {
     httpClient.post.mockResolvedValue({ id: "text-id" });
 
     await expect(createText(httpClient, payload)).resolves.toEqual({ id: "text-id" });
-    expect(httpClient.post).toBeCalledWith("texts", payload);
+    expect(httpClient.post).toBeCalledWith("texts", payload, createTextDtoResponseSchema);
   });
 });

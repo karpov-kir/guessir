@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export interface CreateTextDto {
   title: string;
   description?: string;
@@ -12,6 +14,6 @@ export interface CreateTextDto {
  */
 export const createTextLimits = { title: 500, description: 4000, text: 4000 } as const;
 
-export interface CreateTextDtoResponse {
-  id: string;
-}
+export const createTextDtoResponseSchema = z.object({ id: z.string().min(1) });
+
+export type CreateTextDtoResponse = z.output<typeof createTextDtoResponseSchema>;

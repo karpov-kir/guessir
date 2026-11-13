@@ -1,3 +1,4 @@
+import { textSkeletonSchema } from "@guessir/game";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mock, MockProxy } from "vitest-mock-extended";
 
@@ -51,7 +52,7 @@ describe(boot, () => {
 
     await bootWith(`?textId=${textId}`);
 
-    expect(httpClient.get).toBeCalledWith(`texts/${textId}`);
+    expect(httpClient.get).toBeCalledWith(`texts/${textId}`, textSkeletonSchema);
     expect(getRenderedGame()).toBeInstanceOf(RemoteGame);
     expect(getRenderedGame().skeleton).toEqual(skeleton);
   });
