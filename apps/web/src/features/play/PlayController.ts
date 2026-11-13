@@ -23,8 +23,6 @@ export class PlayController {
 
   /** The hint the user turned on last, which turns on once its letters load. */
   private wantedHint = WordHint.None;
-  private firstLettersLoad?: Promise<void>;
-  private wordsLoad?: Promise<void>;
 
   constructor(options: PlayControllerOptions) {
     const { skeleton } = options.game;
@@ -118,7 +116,7 @@ export class PlayController {
     await this.switchHint({
       hint: WordHint.Text,
       isShown: isTextShown,
-      load: () => this.loadWords(),
+      load: async () => this.textRenderer.fillWords(await this.game.words()),
       uncheck: () => this.controlsRenderer.uncheckText(),
       failureStatus: "Could not load the text",
     });
@@ -128,7 +126,7 @@ export class PlayController {
     await this.switchHint({
       hint: WordHint.FirstLetters,
       isShown: isFirstLettersShown,
-      load: () => this.loadFirstLetters(),
+      load: async () => this.textRenderer.fillFirstLetters(await this.game.firstLetters()),
       uncheck: () => this.controlsRenderer.uncheckFirstLetters(),
       failureStatus: "Could not load first letters",
     });
@@ -171,31 +169,5 @@ export class PlayController {
     if (this.wantedHint === options.hint) {
       this.textRenderer.setHint(options.hint);
     }
-  }
-
-  /** Loads the first letters into the text once, and again after a failed load. */
-  private loadFirstLetters(): Promise<void> {
-    this.firstLettersLoad ??= this.game.firstLetters().then(
-      (firstLetters) => this.textRenderer.fillFirstLetters(firstLetters),
-      (error: unknown) => {
-        this.firstLettersLoad = undefined;
-        throw error;
-      },
-    );
-
-    return this.firstLettersLoad;
-  }
-
-  /** Loads the words into the text once, and again after a failed load. */
-  private loadWords(): Promise<void> {
-    this.wordsLoad ??= this.game.words().then(
-      (words) => this.textRenderer.fillWords(words),
-      (error: unknown) => {
-        this.wordsLoad = undefined;
-        throw error;
-      },
-    );
-
-    return this.wordsLoad;
   }
 }

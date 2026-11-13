@@ -9,6 +9,7 @@ export class RemoteGame implements Game {
   public readonly skeleton: TextSkeleton;
   private readonly api: GameApi;
   private readonly textPath: string;
+  private readonly wordReads = new Map<string, Promise<RevealedWord[]>>();
 
   constructor(options: { api: GameApi; textPath: string; skeleton: TextSkeleton }) {
     this.api = options.api;
@@ -38,9 +39,25 @@ export class RemoteGame implements Game {
     return this.readWords("words");
   }
 
-  private async readWords(route: string): Promise<RevealedWord[]> {
-    const { words } = await this.api.get(urlJoin(this.textPath, route), revealedWordsSchema);
+  /**
+   * Asks the server for the words at `route` once and answers every later call from that read. The
+   * server answers the same words for a text every time. A failed read is dropped, so the next
+   * call asks again.
+   */
+  private readWords(route: string): Promise<RevealedWord[]> {
+    let read = this.wordReads.get(route);
 
-    return words;
+    if (!read) {
+      read = this.api.get(urlJoin(this.textPath, route), revealedWordsSchema).then(
+        ({ words }) => words,
+        (error: unknown) => {
+          this.wordReads.delete(route);
+          throw error;
+        },
+      );
+      this.wordReads.set(route, read);
+    }
+
+    return read;
   }
 }
