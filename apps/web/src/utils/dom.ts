@@ -35,3 +35,26 @@ export const onChangeAndEnter = (
 
   onEnter(element, callback, options);
 };
+
+/**
+ * Returns the element that `selector` finds under `root`. Throws when there is none, or when it is
+ * not an instance of `type`. A renderer whose markup lost or changed an element then fails where it
+ * reads it.
+ */
+export function requireElement<T extends Element>({
+  root,
+  selector,
+  type,
+}: {
+  root: ParentNode;
+  selector: string;
+  type: new () => T;
+}): T {
+  const element = root.querySelector(selector);
+
+  if (!(element instanceof type)) {
+    throw new Error(`Expected an instance of ${type.name} at "${selector}"`);
+  }
+
+  return element;
+}

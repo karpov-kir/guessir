@@ -1,3 +1,4 @@
+import { requireElement } from "../utils/dom";
 import { ChildRenderer } from "./types";
 
 type ScoreRendererOptions = {
@@ -58,14 +59,26 @@ export class ScoreRenderer implements ChildRenderer {
   }
 
   private getElements() {
-    const currentScoreElement = this.containerElement.querySelector(
-      "#current-score",
-    ) as HTMLElement;
-    const percentElement = this.containerElement.querySelector("#score-percent") as HTMLElement;
-    const progressElement = this.containerElement.querySelector("#score-progress") as HTMLElement;
-    const progressBarElement = this.containerElement.querySelector(
-      "#score-progress-bar",
-    ) as HTMLElement;
+    const currentScoreElement = requireElement({
+      root: this.containerElement,
+      selector: "#current-score",
+      type: HTMLElement,
+    });
+    const percentElement = requireElement({
+      root: this.containerElement,
+      selector: "#score-percent",
+      type: HTMLElement,
+    });
+    const progressElement = requireElement({
+      root: this.containerElement,
+      selector: "#score-progress",
+      type: HTMLElement,
+    });
+    const progressBarElement = requireElement({
+      root: this.containerElement,
+      selector: "#score-progress-bar",
+      type: HTMLElement,
+    });
 
     return { currentScoreElement, percentElement, progressElement, progressBarElement };
   }

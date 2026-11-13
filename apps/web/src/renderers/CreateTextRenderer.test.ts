@@ -109,6 +109,21 @@ describe(CreateTextRenderer, () => {
     expect(errorElement.classList).not.toContain("hide");
   });
 
+  it("should render a fallback error if text creation fails with something other than an Error", async () => {
+    const deferred = Promise.withResolvers<CreateTextDtoResponse>();
+    const { errorElement, generateUrlButtonElement, textInputElement, titleInputElement } =
+      getElements(createTextRenderer.getElement());
+
+    mockedApiClient.createText.mockReturnValue(deferred.promise);
+    textInputElement.value = "Text text";
+    titleInputElement.value = "Test title";
+
+    generateUrlButtonElement.click();
+    deferred.reject("Test error");
+
+    await vi.waitFor(() => expect(errorElement.textContent).toBe("Could not create the text"));
+  });
+
   it("should disable form while a request is executing", async () => {
     const deferred = Promise.withResolvers<CreateTextDtoResponse>();
     const { textInputElement, titleInputElement, generateUrlButtonElement } = getElements(

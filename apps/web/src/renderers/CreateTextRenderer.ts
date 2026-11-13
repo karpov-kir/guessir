@@ -2,7 +2,7 @@ import { createTextLimits } from "@guessir/game";
 
 import copyIcon from "../icons/copyIcon.svg?raw";
 import { ApiClient } from "../utils/ApiClient";
-import { onChangeAndEnter } from "../utils/dom";
+import { onChangeAndEnter, requireElement } from "../utils/dom";
 import { icon } from "../utils/icon";
 import { generateTextUrl } from "../utils/text";
 import { ChildRenderer } from "./types";
@@ -147,7 +147,7 @@ export class CreateTextRenderer implements ChildRenderer {
 
     // The function counts and cuts in code points, not UTF-16 units. The server and its Postgres
     // columns count code points. So the server accepts every value that the form keeps.
-    const limitLength = (element: HTMLInputElement, maxLength: number) => {
+    const limitLength = (element: HTMLInputElement | HTMLTextAreaElement, maxLength: number) => {
       let codePoints = Array.from(element.value.trim());
 
       if (codePoints.length > maxLength) {
@@ -249,8 +249,8 @@ export class CreateTextRenderer implements ChildRenderer {
     this.limitInputsLength();
 
     [titleInputElement, descriptionInputElement, textInputElement].forEach((element) => {
-      element.addEventListener("input", (event) => {
-        this.handleInputsChange(event.currentTarget as HTMLElement);
+      element.addEventListener("input", () => {
+        this.handleInputsChange(element);
       });
     });
 
@@ -258,8 +258,8 @@ export class CreateTextRenderer implements ChildRenderer {
       (element) => {
         onChangeAndEnter(
           element,
-          (event) => {
-            this.handleInputsChange(event.currentTarget as HTMLElement);
+          () => {
+            this.handleInputsChange(element);
           },
           {
             toggleChecked: true,
@@ -308,10 +308,11 @@ export class CreateTextRenderer implements ChildRenderer {
           generatedUrlElement.textContent = this.generatedUrl;
           generatedUrlElement.href = this.generatedUrl;
         })
-        .catch((error: Error) => {
+        .catch((error: unknown) => {
           logger.error("Failed to create the text", error);
           errorElement.classList.remove("hide");
-          errorElement.textContent = error.message;
+          errorElement.textContent =
+            error instanceof Error ? error.message : "Could not create the text";
         })
         .finally(() => {
           this.blockForm(false);
@@ -347,28 +348,56 @@ export class CreateTextRenderer implements ChildRenderer {
 }
 
 export function getElements(containerElement: HTMLElement) {
-  const titleInputElement = containerElement.querySelector("#title-input") as HTMLInputElement;
-  const descriptionInputElement = containerElement.querySelector(
-    "#description-input",
-  ) as HTMLInputElement;
-  const textInputElement = containerElement.querySelector("#text-input") as HTMLInputElement;
-  const allowShowingFirstLettersCheckboxElement = containerElement.querySelector(
-    "#allow-showing-first-letters-checkbox",
-  ) as HTMLInputElement;
-  const allowShowingTextCheckboxElement = containerElement.querySelector(
-    "#allow-showing-text-checkbox",
-  ) as HTMLInputElement;
-  const generateUrlButtonElement = containerElement.querySelector(
-    "#generate-url-button",
-  ) as HTMLButtonElement;
-  const errorElement = containerElement.querySelector("#generate-url-error") as HTMLButtonElement;
-  const generatedUrlContainerElement = containerElement.querySelector(
-    "#generated-url-container",
-  ) as HTMLElement;
-  const generatedUrlElement = containerElement.querySelector("#generated-url") as HTMLAnchorElement;
-  const copyGeneratedUrlButtonElement = containerElement.querySelector(
-    "#copy-generated-url-button",
-  ) as HTMLAnchorElement;
+  const titleInputElement = requireElement({
+    root: containerElement,
+    selector: "#title-input",
+    type: HTMLInputElement,
+  });
+  const descriptionInputElement = requireElement({
+    root: containerElement,
+    selector: "#description-input",
+    type: HTMLTextAreaElement,
+  });
+  const textInputElement = requireElement({
+    root: containerElement,
+    selector: "#text-input",
+    type: HTMLTextAreaElement,
+  });
+  const allowShowingFirstLettersCheckboxElement = requireElement({
+    root: containerElement,
+    selector: "#allow-showing-first-letters-checkbox",
+    type: HTMLInputElement,
+  });
+  const allowShowingTextCheckboxElement = requireElement({
+    root: containerElement,
+    selector: "#allow-showing-text-checkbox",
+    type: HTMLInputElement,
+  });
+  const generateUrlButtonElement = requireElement({
+    root: containerElement,
+    selector: "#generate-url-button",
+    type: HTMLButtonElement,
+  });
+  const errorElement = requireElement({
+    root: containerElement,
+    selector: "#generate-url-error",
+    type: HTMLElement,
+  });
+  const generatedUrlContainerElement = requireElement({
+    root: containerElement,
+    selector: "#generated-url-container",
+    type: HTMLElement,
+  });
+  const generatedUrlElement = requireElement({
+    root: containerElement,
+    selector: "#generated-url",
+    type: HTMLAnchorElement,
+  });
+  const copyGeneratedUrlButtonElement = requireElement({
+    root: containerElement,
+    selector: "#copy-generated-url-button",
+    type: HTMLButtonElement,
+  });
 
   return {
     titleInputElement,

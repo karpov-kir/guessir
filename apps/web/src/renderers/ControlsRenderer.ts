@@ -1,6 +1,6 @@
 import arrowIcon from "../icons/arrowIcon.svg?raw";
 import { PubSub } from "../pubSub/PubSub";
-import { onChangeAndEnter, onEnter } from "../utils/dom";
+import { onChangeAndEnter, onEnter, requireElement } from "../utils/dom";
 import { icon } from "../utils/icon";
 import { ChildRenderer } from "./types";
 
@@ -247,15 +247,31 @@ export class ControlsRenderer implements ChildRenderer {
 }
 
 export function getElements(containerElement: HTMLElement) {
-  const showTextCheckboxElement = containerElement.querySelector(
-    "#show-text-checkbox",
-  ) as HTMLInputElement;
-  const showFirstLettersCheckboxElement = containerElement.querySelector(
-    "#show-first-letters-checkbox",
-  ) as HTMLInputElement;
-  const guessButtonElement = containerElement.querySelector("#guess-button") as HTMLButtonElement;
-  const guessInputElement = containerElement.querySelector("#guess-input") as HTMLInputElement;
-  const statusElement = containerElement.querySelector("#guess-status") as HTMLElement;
+  const showTextCheckboxElement = requireElement({
+    root: containerElement,
+    selector: "#show-text-checkbox",
+    type: HTMLInputElement,
+  });
+  const showFirstLettersCheckboxElement = requireElement({
+    root: containerElement,
+    selector: "#show-first-letters-checkbox",
+    type: HTMLInputElement,
+  });
+  const guessButtonElement = requireElement({
+    root: containerElement,
+    selector: "#guess-button",
+    type: HTMLButtonElement,
+  });
+  const guessInputElement = requireElement({
+    root: containerElement,
+    selector: "#guess-input",
+    type: HTMLInputElement,
+  });
+  const statusElement = requireElement({
+    root: containerElement,
+    selector: "#guess-status",
+    type: HTMLElement,
+  });
 
   return {
     showTextCheckboxElement,
