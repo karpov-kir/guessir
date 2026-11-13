@@ -23,6 +23,10 @@
       </a>
       <button id="theme-toggle" type="button" aria-label="Dark theme" aria-pressed="false"></button>
     </header>
-    <script type="module" src="/src/main.ts"></script>
+    <script type="module">
+      import { mountPage } from "/src/entrypoints/page/mountPage.ts";
+
+      mountPage();
+    </script>
   </body>
 </html>
