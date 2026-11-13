@@ -1,6 +1,6 @@
 import { DataSource } from "typeorm";
 
-import { TextEntity } from "../../entities/TextEntity.js";
+import { TextRow } from "./TextRow.js";
 
 /** Means one row of the `texts` table, without the columns the database fills in itself. */
 export type TextRecord = {
@@ -14,7 +14,7 @@ export type TextRecord = {
 
 /** Reads and adds rows of the `texts` table, and keeps TypeORM out of its callers. */
 export function newTextStore(dataSource: DataSource) {
-  const repository = dataSource.getRepository(TextEntity);
+  const repository = dataSource.getRepository(TextRow);
 
   return {
     /** Returns the text with `id`, or undefined when there is none. */
@@ -38,6 +38,6 @@ function toRecord({
   text,
   allowShowingFirstLetters,
   allowShowingText,
-}: TextEntity): TextRecord {
+}: TextRow): TextRecord {
   return { id, title, description, text, allowShowingFirstLetters, allowShowingText };
 }

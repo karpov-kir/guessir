@@ -1,14 +1,15 @@
 {
   "extends": [
     "./node_modules/@kk-forge/oxlint-config/typescript.json",
-    "./node_modules/@kk-forge/oxlint-config/vitest.json"
+    "./node_modules/@kk-forge/oxlint-config/vitest.json",
+    "./node_modules/@kk-forge/oxlint-config/layers.json"
   ],
   "overrides": [
     {
       // A Nest module is an empty class that its @Module decorator describes, and Nest accepts no other shape
       "files": [
         "apps/backend/src/entrypoints/server/compositionRoot.ts",
-        "apps/backend/src/QueryErrorFilter.test.ts"
+        "apps/backend/src/entrypoints/server/http/QueryErrorFilter.test.ts"
       ],
       "rules": { "typescript/no-extraneous-class": ["error", { "allowWithDecorator": true }] }
     }

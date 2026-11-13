@@ -1,13 +1,11 @@
 import { Logger, Module } from "@nestjs/common";
 import type { InjectOptions, LightMyRequestResponse } from "fastify";
-import { DataSource } from "typeorm";
 
-import { HealthController } from "../../controllers/HealthController.js";
-import { TextsController } from "../../controllers/TextController.js";
-import { applyDbMigrations, DbSettings, openPostgres } from "../../dbUtils.js";
+import { HealthController } from "./http/HealthController.js";
+import { TextsController } from "./http/TextsController.js";
 import { Texts, type TextRows } from "../../features/texts/exports.js";
-import { newTextStore } from "../../infra/db/textStore.js";
-import { newApp } from "../../newApp.js";
+import { type Db, DbSettings, openDb } from "../../infra/db/exports.js";
+import { newApp } from "./http/newApp.js";
 
 const logger = new Logger("server");
 
@@ -33,12 +31,12 @@ export type ServerHandle = {
  * Returns the server's handle without listening.
  */
 export async function compose(overrides: ServerOverrides = {}): Promise<ServerHandle> {
-  let dataSource: DataSource | undefined;
+  let db: Db | undefined;
   let textRows = overrides.textRows;
 
   if (!textRows) {
-    dataSource = await openPostgres(overrides.dbSettings);
-    textRows = newTextStore(dataSource);
+    db = await openDb(overrides.dbSettings);
+    textRows = db.texts;
   }
 
   @Module({
@@ -54,16 +52,16 @@ export async function compose(overrides: ServerOverrides = {}): Promise<ServerHa
 
   return {
     async start(host, port) {
-      if (dataSource) {
+      if (db) {
         logger.log("Applying DB migrations");
-        await applyDbMigrations(dataSource);
+        await db.migrate();
       }
 
       await app.listen(port, host);
     },
     async stop() {
       await app.close();
-      await dataSource?.destroy();
+      await db?.close();
     },
     handle: (request) => app.getHttpAdapter().getInstance().inject(request),
   };

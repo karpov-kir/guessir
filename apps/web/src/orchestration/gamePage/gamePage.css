@@ -1,0 +1,15 @@
+#guessir {
+  display: flex;
+  max-width: var(--page-width);
+  margin: 0 auto;
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px var(--gutter) 64px;
+}
+
+@media (width <= 640px) {
+  #guessir {
+    gap: 16px;
+    padding: 0 var(--gutter);
+  }
+}

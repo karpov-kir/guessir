@@ -6,7 +6,7 @@ import {
   TextSkeleton,
 } from "@guessir/game";
 
-import { LruCache } from "../../LruCache.js";
+import { LruCache } from "../../shared/LruCache.js";
 import { createText } from "./createText.js";
 import {
   HintNotAllowedError,
