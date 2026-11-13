@@ -195,9 +195,7 @@ describe(PlayController, () => {
     expect(getStatus()).toBe("Could not open this word");
   });
 
-  it("should load the first letters once and show them", async () => {
-    const firstLetters = vi.spyOn(game, "firstLetters");
-
+  it("should show the first letters and hide them again", async () => {
     toggleCheckbox("#show-first-letters-checkbox");
     await settle();
 
@@ -213,13 +211,10 @@ describe(PlayController, () => {
     await settle();
 
     expect(getTextClasses()).toContain("show-first-letters");
-    expect(firstLetters).toHaveBeenCalledTimes(1);
     expect(getScore()).toBe("0");
   });
 
-  it("should load the words once and let the user peek at them", async () => {
-    const words = vi.spyOn(game, "words");
-
+  it("should let the user peek at the words and hide them again", async () => {
     toggleCheckbox("#show-text-checkbox");
     await settle();
 
@@ -232,7 +227,7 @@ describe(PlayController, () => {
     toggleCheckbox("#show-text-checkbox");
     await settle();
 
-    expect(words).toHaveBeenCalledTimes(1);
+    expect(getTextClasses()).toContain("show-text");
     expect(getScore()).toBe("0");
   });
 
@@ -242,16 +237,18 @@ describe(PlayController, () => {
       load: "firstLetters",
       checkbox: "#show-first-letters-checkbox",
       status: "Could not load first letters",
+      shownClass: "show-first-letters",
     },
     {
       hint: "text",
       load: "words",
       checkbox: "#show-text-checkbox",
       status: "Could not load the text",
+      shownClass: "show-text",
     },
   ] as const)(
-    "should uncheck $hint and announce it when they fail to load",
-    async ({ load, checkbox, status }) => {
+    "should uncheck $hint and announce it when they fail to load, and show them on the next try",
+    async ({ load, checkbox, status, shownClass }) => {
       vi.spyOn(game, load).mockRejectedValueOnce(new Error("Test"));
 
       toggleCheckbox(checkbox);
@@ -266,7 +263,8 @@ describe(PlayController, () => {
       toggleCheckbox(checkbox);
       await settle();
 
-      expect(game[load]).toHaveBeenCalledTimes(2);
+      expect(getCheckbox(checkbox).checked).toBe(true);
+      expect(getTextClasses()).toContain(shownClass);
     },
   );
 

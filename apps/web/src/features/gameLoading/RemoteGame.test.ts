@@ -53,4 +53,26 @@ describe(RemoteGame, () => {
     await expect(remoteGame.words()).resolves.toEqual(words);
     expect(api.get).toHaveBeenCalledWith(`${textPath}/words`, revealedWordsSchema);
   });
+
+  it.each(["firstLetters", "words"] as const)(
+    "should ask the server for %s once and answer later calls from that answer",
+    async (read) => {
+      api.get.mockResolvedValue({ words });
+
+      await remoteGame[read]();
+      await expect(remoteGame[read]()).resolves.toEqual(words);
+      expect(api.get).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it.each(["firstLetters", "words"] as const)(
+    "should ask the server for %s again after a failed read",
+    async (read) => {
+      api.get.mockRejectedValueOnce(new Error("Test")).mockResolvedValue({ words });
+
+      await expect(remoteGame[read]()).rejects.toThrow("Test");
+      await expect(remoteGame[read]()).resolves.toEqual(words);
+      expect(api.get).toHaveBeenCalledTimes(2);
+    },
+  );
 });
