@@ -3,6 +3,7 @@ import { NotAcceptableException, ValidationPipe } from "@nestjs/common";
 import { IEntryNestModule, NestFactory } from "@nestjs/core";
 import { FastifyAdapter, NestFastifyApplication } from "@nestjs/platform-fastify";
 
+import { TextErrorFilter } from "./entrypoints/server/http/TextErrorFilter.js";
 import { QueryErrorFilter } from "./QueryErrorFilter.js";
 
 /**
@@ -47,7 +48,7 @@ export async function newApp(module: IEntryNestModule, { logger = true } = {}) {
       forbidNonWhitelisted: true,
     }),
   );
-  app.useGlobalFilters(new QueryErrorFilter());
+  app.useGlobalFilters(new QueryErrorFilter(), new TextErrorFilter());
 
   return app;
 }

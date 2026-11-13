@@ -1,58 +1,39 @@
-import { Logger, Module } from "@nestjs/common";
-import { NestFastifyApplication } from "@nestjs/platform-fastify";
-import { getRepositoryToken } from "@nestjs/typeorm";
-import { QueryFailedError, Repository } from "typeorm";
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { Logger } from "@nestjs/common";
+import { QueryFailedError } from "typeorm";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
-import { mockRepository } from "../tests/utils/mockRepository.js";
-import { HealthController } from "./controllers/HealthController.js";
-import { TextsController } from "./controllers/TextController.js";
-import { TextEntity } from "./entities/TextEntity.js";
-import { newApp } from "./newApp.js";
-import { version } from "./version.js";
+import { fakeTextRows } from "../../../tests/utils/fakeTextRows.js";
+import { Text } from "../../features/texts/exports.js";
+import { version } from "../../version.js";
+import { compose, ServerHandle } from "./compositionRoot.js";
 
-const text: TextEntity = {
-  pk: 1,
+const text: Text = {
   id: "text-id",
   title: "Title",
   text: "One two",
   allowShowingFirstLetters: true,
   allowShowingText: true,
-  updatedAt: new Date(),
-  createdAt: new Date(),
 };
-const textsRepository: Repository<TextEntity> = mockRepository<TextEntity>();
-
-@Module({
-  controllers: [HealthController, TextsController],
-  providers: [{ provide: getRepositoryToken(TextEntity), useValue: textsRepository }],
-})
-class TestModule {}
+let textRows: ReturnType<typeof fakeTextRows>;
 
 describe("the texts API over HTTP", () => {
-  let app: NestFastifyApplication;
+  let server: ServerHandle;
   const request = (
     method: "GET" | "HEAD" | "POST",
     url: string,
     payload?: object,
     headers?: Record<string, string>,
-  ) => app.getHttpAdapter().getInstance().inject({ method, url, payload, headers });
+  ) => server.handle({ method, url, payload, headers });
 
   beforeAll(async () => {
-    app = await newApp(TestModule, { logger: false });
-    await app.init();
-    await app.getHttpAdapter().getInstance().ready();
+    textRows = fakeTextRows([text, { ...text, id: "locked", allowShowingText: false }]);
+    server = await compose({ textRows, logger: false });
   });
 
-  afterAll(() => app.close());
+  afterAll(() => server.stop());
 
   afterEach(() => {
     vi.restoreAllMocks();
-  });
-
-  beforeEach(() => {
-    vi.spyOn(textsRepository, "findOne").mockResolvedValue(text);
-    vi.spyOn(textsRepository, "save").mockResolvedValue(text);
   });
 
   it("should create a text and answer only its id", async () => {
@@ -63,8 +44,42 @@ describe("the texts API over HTTP", () => {
       allowShowingText: true,
     });
 
+    const { id } = response.json<{ id: string }>();
+
     expect(response.statusCode).toBe(201);
-    expect(response.json()).toEqual({ id: "text-id" });
+    expect(response.json()).toEqual({ id: expect.stringMatching(/^[\w-]{20}$/) });
+    expect(await textRows.getById(id)).toEqual({
+      id,
+      title: "Title",
+      text: "One two",
+      allowShowingFirstLetters: true,
+      allowShowingText: true,
+    });
+  });
+
+  it.each([
+    { route: "an unknown text", method: "GET" as const, url: "/texts/unknown", status: 404 },
+    {
+      route: "a hint the text does not allow",
+      method: "GET" as const,
+      url: "/texts/locked/words",
+      status: 403,
+    },
+    {
+      route: "an index that holds no word",
+      method: "POST" as const,
+      url: "/texts/text-id/reveals",
+      payload: { index: 1 },
+      status: 404,
+    },
+  ])("should answer $status for $route", async ({ method, url, payload, status }) => {
+    const response = await request(method, url, payload);
+
+    expect(response.statusCode).toBe(status);
+    expect(response.json()).toEqual({
+      statusCode: status,
+      message: status === 403 ? "Forbidden" : "Not Found",
+    });
   });
 
   it("should send the security headers and allow the web origin", async () => {
@@ -79,7 +94,7 @@ describe("the texts API over HTTP", () => {
   it("should answer and log a failed query without the text it carried", async () => {
     const errorLog = vi.spyOn(Logger.prototype, "error");
 
-    vi.spyOn(textsRepository, "save").mockRejectedValue(
+    textRows.insert.mockRejectedValueOnce(
       new QueryFailedError('INSERT INTO "texts"', ["One two"], new Error("value too long")),
     );
 
