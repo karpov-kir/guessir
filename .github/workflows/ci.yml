@@ -1,10 +1,12 @@
 name: CI
 on:
+  # A branch runs CI through its PR, once per push, and SonarQube analyses it as that PR. main runs it on its own
+  # push: SonarQube compares each PR with main's analysis.
   push:
-    branches: ["**"]
-  # A PR opened after its last push gets its SonarQube PR analysis. A fork's PR skips the scan.
+    branches: [main]
+  # A fork's PR skips the scan.
   pull_request:
-    types: [opened, reopened]
+    types: [opened, synchronize, reopened]
   # A manual run releases <version>-dev.<run> from its branch, for a trial on the server
   workflow_dispatch:
     inputs:
