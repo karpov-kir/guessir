@@ -20,11 +20,7 @@ const columnString = (max: number) =>
 /** Validates the body of a create-text request. */
 export const createTextDtoSchema = z.strictObject({
   title: columnString(createTextLimits.title).min(1),
-  // A client may send null for a text without a description. The schema maps it to undefined.
-  description: columnString(createTextLimits.description)
-    .nullish()
-    .transform((description) => description ?? undefined)
-    .optional(),
+  description: columnString(createTextLimits.description).optional(),
   text: columnString(createTextLimits.text).min(1),
   allowShowingFirstLetters: z.boolean().default(false),
   allowShowingText: z.boolean().default(false),

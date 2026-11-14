@@ -21,8 +21,10 @@ describe("createTextDtoSchema", () => {
     });
   });
 
-  it.each([null, undefined])("should read the description %s as no description", (description) => {
-    expect(createTextDtoSchema.parse({ ...validText, description }).description).toBeUndefined();
+  it("should read a text without a description", () => {
+    expect(createTextDtoSchema.parse({ title: "Title", text: "Text" })).not.toHaveProperty(
+      "description",
+    );
   });
 
   it("should accept an empty description", () => {
@@ -35,6 +37,7 @@ describe("createTextDtoSchema", () => {
     { field: "text", value: "" },
     { field: "text", value: 5 },
     { field: "description", value: {} },
+    { field: "description", value: null },
     { field: "allowShowingFirstLetters", value: "yes" },
     { field: "allowShowingText", value: 1 },
   ])("should reject a text whose $field is $value", ({ field, value }) => {
