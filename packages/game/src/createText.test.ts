@@ -21,12 +21,24 @@ describe("createTextDtoSchema", () => {
     });
   });
 
-  it.each([null, undefined])("should read the description %s as no description", (description) => {
-    expect(createTextDtoSchema.parse({ ...validText, description }).description).toBeUndefined();
+  it("should read a text without a description", () => {
+    expect(createTextDtoSchema.parse({ title: "Title", text: "Text" })).not.toHaveProperty(
+      "description",
+    );
   });
 
-  it("should accept an empty description", () => {
-    expect(problems("description", "")).toEqual([]);
+  it.each(
+    ["title", "description", "text"].flatMap((field) =>
+      ["", "   ", "\n\t", "\u00a0\u3000"].map((value) => [field, value]),
+    ),
+  )("should reject the blank %s %j", (field, value) => {
+    expect(problems(field, value)).toEqual(["Invalid string: must not be blank"]);
+  });
+
+  it("should keep each field as sent", () => {
+    const padded = { title: " Title ", description: " About ", text: " One two " };
+
+    expect(createTextDtoSchema.parse(padded)).toMatchObject(padded);
   });
 
   it.each([
@@ -35,6 +47,7 @@ describe("createTextDtoSchema", () => {
     { field: "text", value: "" },
     { field: "text", value: 5 },
     { field: "description", value: {} },
+    { field: "description", value: null },
     { field: "allowShowingFirstLetters", value: "yes" },
     { field: "allowShowingText", value: 1 },
   ])("should reject a text whose $field is $value", ({ field, value }) => {
