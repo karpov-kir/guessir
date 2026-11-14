@@ -41,8 +41,10 @@ describe("the texts table on Postgres", () => {
 
     await dataSource.destroy();
 
-    expect(migrations).toHaveLength(1);
-    expect(migrations[0].name).toMatch(/^2022-03-23-initial\.(ts|js)$/);
+    expect(migrations.map(({ name }) => name.replace(/\.(ts|js)$/, ""))).toEqual([
+      "2022-03-23-initial",
+      "2026-11-14-blank-texts",
+    ]);
   });
 
   it("should give back a stored text and nothing for an unknown id", async () => {

@@ -12,8 +12,12 @@ import { ParameterFreeLogger } from "./ParameterFreeLogger.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+type Query = <T = unknown>(sql: string, parameters?: unknown[]) => Promise<T>;
+
 interface MigrationContext {
-  query: <T = unknown>(sql: string, parameters?: unknown[]) => Promise<T>;
+  query: Query;
+  /** Runs `work` in one transaction, which rolls back if `work` throws. */
+  transaction: (work: (query: Query) => Promise<void>) => Promise<void>;
 }
 
 export type MigrationFn = UmzugMigrationFn<MigrationContext>;
@@ -73,6 +77,10 @@ const logger = new Logger("postgres");
 export async function applyDbMigrations(dataSource: DataSource) {
   const context: MigrationContext = {
     query: (sql, parameters) => dataSource.query(sql, parameters),
+    transaction: (work) =>
+      dataSource.transaction((manager) =>
+        work((sql, parameters) => manager.query(sql, parameters)),
+      ),
   };
   const migrator = new Umzug({
     migrations: {
