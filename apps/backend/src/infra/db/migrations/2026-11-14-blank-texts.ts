@@ -1,7 +1,8 @@
-import type { MigrationFn, MigrationKind } from "../postgres.js";
+import { type MigrationFn, MigrationKind } from "../migrationFile.js";
 
-// It changes rows and no column: older code reads the texts that remain as it always did
-export const kind: MigrationKind = "expand";
+// This migration changes rows and no column, and the earlier code reads the texts that remain as
+// before
+export const kind = MigrationKind.Expand;
 
 /**
  * Matches a value that is empty or holds only the characters `String.prototype.trim` strips, so
@@ -19,5 +20,3 @@ export const up: MigrationFn = async ({ context: { transaction } }) => {
     await query(`UPDATE texts SET description = NULL WHERE description ~ ${blankPattern}`);
   });
 };
-
-export const down = async () => {};

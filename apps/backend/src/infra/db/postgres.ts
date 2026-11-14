@@ -1,45 +1,24 @@
-import { readdirSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 import { Logger } from "@nestjs/common";
 import { DataSource, DataSourceOptions } from "typeorm";
-import { MigrationFn as UmzugMigrationFn, Umzug } from "umzug";
-import { z } from "zod";
+import { RunnableMigration, Umzug } from "umzug";
 
+import {
+  loadMigration,
+  MigrationContext,
+  migrationFileNames,
+  MigrationKind,
+  migrationsDir,
+  withoutExtension,
+} from "./migrationFile.js";
 import { TextRow } from "./TextRow.js";
 import { ParameterFreeLogger } from "./ParameterFreeLogger.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-type Query = <T = unknown>(sql: string, parameters?: unknown[]) => Promise<T>;
-
-interface MigrationContext {
-  query: Query;
-  /** Runs `work` in one transaction, which rolls back if `work` throws. */
-  transaction: (work: (query: Query) => Promise<void>) => Promise<void>;
-}
-
-export type MigrationFn = UmzugMigrationFn<MigrationContext>;
-
-/**
- * Tells older code whether it still runs on the database after a migration. An expand migration
- * only adds a table, a column or an index, or changes rows the older code reads the same way, so
- * the older code does not notice it. A contract migration drops, renames or changes the type of
- * something the older code reads.
- */
-export type MigrationKind = "expand" | "contract";
-
-/** Means a migration file: the kind it declares and the change it makes. */
-const migrationModuleSchema = z.object({
-  kind: z.enum(["expand", "contract"]),
-  up: z.custom<MigrationFn>((up) => typeof up === "function", { error: "must be a function" }),
-});
-
 interface MigrationLog {
   name: string;
-  /** The migration's kind, or null in a row that code before the kinds wrote. */
+  /** The migration's kind, or null in a row that a release before migrations recorded a kind wrote. */
   kind: MigrationKind | null;
 }
 
@@ -133,37 +112,6 @@ export async function openPostgres(settings: DbSettings): Promise<DataSource> {
 
 const logger = new Logger("postgres");
 
-const migrationsDir = join(__dirname, "migrations");
-
-// The migrator logs a migration as its file name, .ts when the tests run the sources and .js in the
-// image, so names compare without the extension
-const withoutExtension = (name: string) => name.replace(/\.(ts|js)$/, "");
-
-/** Returns the names of the migration files beside this file, the same files the migrator's glob takes. */
-const migrationFileNames = () =>
-  readdirSync(migrationsDir).filter((name) => /\.(js|ts)$/.test(name));
-
-/** Loads the migration file at `path`, and throws when it declares no kind or no `up`. */
-export async function loadMigration(path: string) {
-  const parsed = migrationModuleSchema.safeParse(await import(pathToFileURL(path).href));
-
-  if (!parsed.success) {
-    throw new Error(`The migration ${path} is invalid:\n${z.prettifyError(parsed.error)}`);
-  }
-
-  return parsed.data;
-}
-
-/** Loads every migration file beside this file, and throws on the first that is invalid. */
-export async function loadMigrations() {
-  return Promise.all(
-    migrationFileNames().map(async (name) => ({
-      name: withoutExtension(name),
-      ...(await loadMigration(join(migrationsDir, name))),
-    })),
-  );
-}
-
 /** Returns the migrator of the database behind `dataSource`, over the migration files beside this file. */
 function newMigrator(dataSource: DataSource) {
   // Each migration declares its kind in its file. The migrator writes it beside the migration's
@@ -178,23 +126,22 @@ function newMigrator(dataSource: DataSource) {
   };
 
   return new Umzug({
-    migrations: {
-      glob: ["migrations/*.{js,ts}", { cwd: __dirname }],
-      resolve: ({ name, path }) => ({
-        name,
-        async up(params) {
-          const migration = await loadMigration(path ?? join(migrationsDir, name));
+    // The migrator and the check of a database take the same list of files
+    migrations: migrationFileNames().map((name): RunnableMigration<MigrationContext> => ({
+      name,
+      path: join(migrationsDir, name),
+      async up(params) {
+        const migration = await loadMigration(join(migrationsDir, name));
 
-          kinds.set(name, migration.kind);
-          await migration.up(params);
-        },
-      }),
-    },
+        kinds.set(name, migration.kind);
+        await migration.up(params);
+      },
+    })),
     context,
     storage: {
       async executed({ context: client }) {
         await client.query(`create table if not exists ${migrationTable}(name text)`);
-        // Code before the kinds made the table without the column
+        // Releases before migrations recorded a kind made the table without the column
         await client.query(`alter table ${migrationTable} add column if not exists kind text`);
         const results = await client.query<MigrationLog[]>(`select name from ${migrationTable}`);
 
@@ -222,19 +169,20 @@ function newMigrator(dataSource: DataSource) {
 }
 
 /**
- * Returns the migrations beside this file that the database lacks, and the ones it holds that this
- * code does not know, split by the kind the database records. A row without a kind counts as a
- * contract, the kind older code cannot run past.
+ * Returns the migrations that the database lacks, and the ones it holds that this code does not
+ * know, split by the kind the database records. A row without a kind counts as a contract, the kind
+ * the earlier code cannot run past.
  */
 async function compareMigrations(dataSource: DataSource) {
   const known = migrationFileNames().map(withoutExtension);
+  // Both look at the table the queries below reach, the first on the search path
   const [{ hasTable, hasKind }] = await dataSource.query<{ hasTable: boolean; hasKind: boolean }[]>(
     `SELECT to_regclass('${migrationTable}') IS NOT NULL AS "hasTable",
-       EXISTS (SELECT FROM information_schema.columns
-         WHERE table_schema = current_schema() AND table_name = '${migrationTable}'
-           AND column_name = 'kind') AS "hasKind"`,
+       EXISTS (SELECT FROM pg_attribute
+         WHERE attrelid = to_regclass('${migrationTable}') AND attname = 'kind'
+           AND NOT attisdropped) AS "hasKind"`,
   );
-  // Code before the kinds made the table without the column
+  // Releases before migrations recorded a kind made the table without the column
   const executed = hasTable
     ? (
         await dataSource.query<MigrationLog[]>(
@@ -243,18 +191,20 @@ async function compareMigrations(dataSource: DataSource) {
       ).map(({ name, kind }) => ({ name: withoutExtension(name), kind }))
     : [];
   const unknown = executed.filter(({ name }) => !known.includes(name));
+  const isExpand = ({ kind }: { kind: MigrationKind | null }) => kind === MigrationKind.Expand;
 
   return {
     missing: known.filter((name) => !executed.some((row) => row.name === name)),
-    unknownExpand: unknown.filter(({ kind }) => kind === "expand").map(({ name }) => name),
-    unknownContract: unknown.filter(({ kind }) => kind !== "expand").map(({ name }) => name),
+    unknownExpand: unknown.filter(isExpand).map(({ name }) => name),
+    unknownContract: unknown.filter((row) => !isExpand(row)).map(({ name }) => name),
   };
 }
 
 const newerContractError = (names: string[]) =>
   new Error(
-    `The database holds the contract migrations ${names.join(", ")}, which this code does not ` +
-      "know: newer code migrated it in a way this code cannot run on",
+    `The database holds the migrations ${names.join(", ")}, which this code does not know and ` +
+      "which are contracts or record no kind: newer code changed it in a way this code cannot " +
+      "run on",
   );
 
 const warnOfNewerExpand = (names: string[]) => {

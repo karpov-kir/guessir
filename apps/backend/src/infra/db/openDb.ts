@@ -11,7 +11,10 @@ export type Db = {
   };
   /** Applies the migrations the database has not run yet. */
   migrate(): Promise<void>;
-  /** Throws unless the database has run exactly this code's migrations, and writes nothing. */
+  /**
+   * Throws unless the database has run every migration of this code and no contract migration
+   * this code does not know, and writes nothing.
+   */
   checkMigrated(): Promise<void>;
   /** Closes the connection pool. */
   close(): Promise<void>;

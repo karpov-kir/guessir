@@ -77,8 +77,8 @@ const exitOnDbLost = (error: unknown) => {
 
 /**
  * Builds the HTTP server and the texts feature over the database, or over `overrides.textRows`.
- * Waits until the database answers, and throws when it stays silent or has not run exactly this
- * code's migrations. Returns the server's handle without listening.
+ * Waits until the database answers. Throws when it stays silent, lacks a migration, or holds a
+ * contract migration this code does not know. Returns the server's handle without listening.
  */
 export async function compose(overrides: ServerOverrides = {}): Promise<ServerHandle> {
   const config = overrides.config ?? parseConfig(readEnv());

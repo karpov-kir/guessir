@@ -8,4 +8,4 @@ Raise `version` in `apps/backend/package.json` or `apps/web/package.json`. CI on
 
 ## Database migrations
 
-The server runs no migration, and it refuses to start on a database short of one, or on one that newer code migrated. The migrate step applies them: `npm run migrate -w @guessir/backend` after a build, or `node apps/backend/dist/entrypoints/migrate/start.js` in the backend image, which a deploy runs as a one-off job before the server rolls. `npm run start:dev -w @guessir/backend` runs it on the local database first.
+The server runs no migration, and it refuses to start on a database short of one, or on one that holds a contract migration from newer code. The migrate step applies them: `npm run migrate -w @guessir/backend` after a build, or `node apps/backend/dist/entrypoints/migrate/start.js` in the backend image, which a deploy runs as a one-off job before the server rolls. `npm run start:dev -w @guessir/backend` runs it on the local database first.

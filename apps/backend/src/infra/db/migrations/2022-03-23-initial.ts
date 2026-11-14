@@ -1,7 +1,7 @@
-import type { MigrationFn, MigrationKind } from "../postgres.js";
+import { type MigrationFn, MigrationKind } from "../migrationFile.js";
 
-// It only creates the table and its index
-export const kind: MigrationKind = "expand";
+// This migration only creates the table and its index
+export const kind = MigrationKind.Expand;
 
 export const up: MigrationFn = async ({ context: { query } }) => {
   await query(`
@@ -19,5 +19,3 @@ export const up: MigrationFn = async ({ context: { query } }) => {
   `);
   await query(`CREATE UNIQUE INDEX id_idx ON texts (id)`);
 };
-
-export const down = async () => {};

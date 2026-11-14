@@ -83,7 +83,7 @@ describe("the migrate step", () => {
       await compose({ config: testConfig(postgres.settings) }).run();
       await recordNewerMigration(postgres.settings, kind);
       const newerContract =
-        /^The database holds the contract migrations 2099-01-01-from-newer-code, which this code does not know: newer code migrated it in a way this code cannot run on$/;
+        /^The database holds the migrations 2099-01-01-from-newer-code, which this code does not know and which are contracts or record no kind: newer code changed it in a way this code cannot run on$/;
 
       await expect(compose({ config: testConfig(postgres.settings) }).run()).rejects.toThrow(
         newerContract,
@@ -113,10 +113,10 @@ describe("the migrate step", () => {
     ).toHaveLength(2);
   }, 120_000);
 
-  it("should take a database that code before the kinds migrated", async () => {
+  it("should take a database that a release before migrations recorded a kind migrated", async () => {
     postgres = await startPostgres();
     await compose({ config: testConfig(postgres.settings) }).run();
-    // The table code before the kinds made has no kind column
+    // Such a release made the table without the kind column
     dataSource = await openPostgres(postgres.settings);
     await dataSource.query("ALTER TABLE migrations DROP COLUMN kind");
 

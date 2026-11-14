@@ -4,9 +4,14 @@ import { join } from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
 
-import { loadMigration, loadMigrations } from "./postgres.js";
+import {
+  loadMigration,
+  migrationFileNames,
+  migrationsDir,
+  withoutExtension,
+} from "./migrationFile.js";
 
-describe("the migrations' kinds", () => {
+describe("the migration files", () => {
   let tempDir: string | undefined;
 
   afterEach(() => {
@@ -17,9 +22,14 @@ describe("the migrations' kinds", () => {
   });
 
   it("should load every migration with the kind it declares", async () => {
-    const migrations = await loadMigrations();
+    const migrations = await Promise.all(
+      migrationFileNames().map(async (fileName) => ({
+        name: withoutExtension(fileName),
+        kind: (await loadMigration(join(migrationsDir, fileName))).kind,
+      })),
+    );
 
-    expect(migrations.map(({ name, kind }) => ({ name, kind }))).toEqual([
+    expect(migrations).toEqual([
       { name: "2022-03-23-initial", kind: "expand" },
       { name: "2026-11-14-blank-texts", kind: "expand" },
     ]);
