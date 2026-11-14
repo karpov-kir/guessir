@@ -46,9 +46,10 @@ describe("the server's database lifecycle", () => {
 
   it("should report the database lost once it has been gone for the limit", async () => {
     postgres = await startPostgres();
+    let isDbStopped = false;
     let reportLost: (error: unknown) => void = () => {};
-    const lost = new Promise<unknown>((resolve) => {
-      reportLost = resolve;
+    const lost = new Promise<{ error: unknown; isDbStopped: boolean }>((resolve) => {
+      reportLost = (error) => resolve({ error, isDbStopped });
     });
     server = await compose({
       config: testConfig(postgres.settings),
@@ -58,16 +59,21 @@ describe("the server's database lifecycle", () => {
     });
     await server.start();
 
+    isDbStopped = true;
     await postgres.stop();
     postgres = undefined;
 
-    await expect(lost).resolves.toBeInstanceOf(Error);
+    const loss = await lost;
+
+    // The loss comes only once the database is gone
+    expect(loss.isDbStopped).toBe(true);
+    expect(loss.error).toBeInstanceOf(Error);
   }, 120_000);
 
   it("should not report the database lost after the server has stopped", async () => {
     postgres = await startPostgres();
     let lostCount = 0;
-    const stopped = await compose({
+    server = await compose({
       config: testConfig(postgres.settings),
       clock: steppingClock(),
       onDbLost: () => {
@@ -75,13 +81,15 @@ describe("the server's database lifecycle", () => {
       },
       logger: false,
     });
-    await stopped.start();
+    await server.start();
 
-    await stopped.stop();
+    await server.stop();
+    server = undefined;
     await postgres.stop();
     postgres = undefined;
-    // Many watch intervals of the stepping clock pass in this real wait
-    await systemClock.sleep(500);
+    // The real wait spans more than the 30s loss limit on the stepping clock, about 1.5 real
+    // seconds, so a watch left running would have reported the loss
+    await systemClock.sleep(2_500);
 
     expect(lostCount).toBe(0);
   }, 120_000);

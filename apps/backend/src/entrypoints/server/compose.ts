@@ -48,6 +48,31 @@ export type ServerHandle = {
   handle(request: InjectOptions): Promise<LightMyRequestResponse>;
 };
 
+/** Watches the database in the background and calls `onDbLost` once it is lost for good. */
+function watchUntilLost({
+  dbPing,
+  clock,
+  signal,
+  onDbLost,
+}: {
+  dbPing: DbPing;
+  clock: Clock;
+  signal: AbortSignal;
+  onDbLost: (error: unknown) => void;
+}) {
+  void watchDb({
+    ping: dbPing.ping,
+    clock,
+    limitMs: lostAfterMs,
+    intervalMs: pingEveryMs,
+    signal,
+  }).then((error) => {
+    if (error !== undefined) {
+      onDbLost(error);
+    }
+  });
+}
+
 const exitOnDbLost = (error: unknown) => {
   logger.error(`DB has been unreachable for ${lostAfterMs}ms: ${errorText(error)}`);
   process.exit(1);
@@ -112,17 +137,7 @@ export async function compose(overrides: ServerOverrides = {}): Promise<ServerHa
 
         // A stop that came during the migrations leaves the database unwatched
         if (dbPing && !watch.signal.aborted) {
-          void watchDb({
-            ping: dbPing.ping,
-            clock,
-            limitMs: lostAfterMs,
-            intervalMs: pingEveryMs,
-            signal: watch.signal,
-          }).then((error) => {
-            if (error !== undefined) {
-              onDbLost(error);
-            }
-          });
+          watchUntilLost({ dbPing, clock, signal: watch.signal, onDbLost });
         }
       },
       async stop() {

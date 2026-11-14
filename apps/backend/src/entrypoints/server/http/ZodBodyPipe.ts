@@ -1,6 +1,11 @@
 import { BadRequestException, PipeTransform } from "@nestjs/common";
 import type { z } from "zod";
 
+export type ZodBodyPipeOptions<Schema extends z.ZodType> = {
+  /** The schema a body must match. */
+  schema: Schema;
+};
+
 /**
  * Parses a request body with `schema` and hands the route the parsed value.
  * The pipe answers an invalid body with a 400 that lists one message per
@@ -12,7 +17,7 @@ export class ZodBodyPipe<Schema extends z.ZodType> implements PipeTransform<
 > {
   private readonly schema: Schema;
 
-  constructor({ schema }: { schema: Schema }) {
+  constructor({ schema }: ZodBodyPipeOptions<Schema>) {
     this.schema = schema;
   }
 
