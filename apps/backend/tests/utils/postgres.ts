@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { PostgreSqlContainer, StartedPostgreSqlContainer } from "@testcontainers/postgresql";
+import { PostgreSqlContainer } from "@testcontainers/postgresql";
 
 import { DbSettings } from "../../src/infra/db/exports.js";
 
@@ -26,7 +26,6 @@ function setUpDocker() {
 
 /** Means a Postgres in Docker that a test connects to. */
 export type TestPostgres = {
-  container: StartedPostgreSqlContainer;
   /** Names the database, with its password in a file, as the server reads it. */
   settings: DbSettings;
   /** Stops the container and removes the password file. */
@@ -47,7 +46,6 @@ export async function startPostgres(): Promise<TestPostgres> {
   writeFileSync(passwordFile, container.getPassword());
 
   return {
-    container,
     settings: {
       host: container.getHost(),
       port: container.getPort(),

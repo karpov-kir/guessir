@@ -10,7 +10,11 @@ export class ZodBodyPipe<Schema extends z.ZodType> implements PipeTransform<
   unknown,
   z.output<Schema>
 > {
-  constructor(private readonly schema: Schema) {}
+  private readonly schema: Schema;
+
+  constructor({ schema }: { schema: Schema }) {
+    this.schema = schema;
+  }
 
   transform(body: unknown): z.output<Schema> {
     const result = this.schema.safeParse(body);

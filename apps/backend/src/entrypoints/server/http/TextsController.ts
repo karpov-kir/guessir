@@ -32,7 +32,7 @@ export class TextsController {
   @HttpCode(HttpStatus.OK)
   guess(
     @Param("id") id: string,
-    @Body(new ZodBodyPipe(guessDtoSchema)) { word }: GuessDto,
+    @Body(new ZodBodyPipe({ schema: guessDtoSchema })) { word }: GuessDto,
   ): Promise<RevealedWords> {
     return this.texts.guess(id, word);
   }
@@ -41,7 +41,7 @@ export class TextsController {
   @HttpCode(HttpStatus.OK)
   reveal(
     @Param("id") id: string,
-    @Body(new ZodBodyPipe(revealDtoSchema)) { index }: RevealDto,
+    @Body(new ZodBodyPipe({ schema: revealDtoSchema })) { index }: RevealDto,
   ): Promise<RevealedWord> {
     return this.texts.reveal(id, index);
   }
@@ -58,7 +58,7 @@ export class TextsController {
 
   @Post()
   create(
-    @Body(new ZodBodyPipe(createTextDtoSchema)) newTextDto: CreateTextDto,
+    @Body(new ZodBodyPipe({ schema: createTextDtoSchema })) newTextDto: CreateTextDto,
   ): Promise<CreateTextDtoResponse> {
     return this.texts.create(newTextDto);
   }

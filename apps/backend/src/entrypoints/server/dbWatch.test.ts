@@ -28,8 +28,8 @@ const fakeDb = (answer: (ping: number) => Promise<unknown>) => {
 
 describe(watchDb, () => {
   it("should resolve with the last error once the database has failed every ping for the limit", async () => {
-    // The test moves `Date.now` by one interval on each ping. Thus a slow machine cannot end the
-    // watch early.
+    // The test moves the clock's `now` by one interval on each ping. Thus a slow machine cannot
+    // end the watch early.
     let now = 0;
     const clock: Clock = { ...systemClock, now: () => now };
     // Pings 2-4 fail as a short restart, and pings 5-9 answer. From ping 10 on, the database is
@@ -113,8 +113,8 @@ describe(waitForDb, () => {
   });
 
   it("should throw the last ping error once the limit has passed", async () => {
-    // The test moves `Date.now` by one interval on each ping. Thus a slow machine cannot change how
-    // many pings fit in the limit.
+    // The test moves the clock's `now` by one interval on each ping. Thus a slow machine cannot
+    // change how many pings fit in the limit.
     let now = 0;
     const clock: Clock = { ...systemClock, now: () => now };
     const errors: Error[] = [];

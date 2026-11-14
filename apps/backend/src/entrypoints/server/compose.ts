@@ -64,65 +64,79 @@ export async function compose(overrides: ServerOverrides = {}): Promise<ServerHa
   const onDbLost = overrides.onDbLost ?? exitOnDbLost;
   let dbPing: DbPing | undefined;
   let db: Db | undefined;
-  let textRows = overrides.textRows;
 
-  if (!textRows) {
-    dbPing = newDbPing(config.db);
-    await waitForDb({
-      ping: dbPing.ping,
-      clock,
-      limitMs: startupWaitMs,
-      intervalMs: pingEveryMs,
-    }).catch((error: unknown) => {
-      throw new Error(`DB did not answer for ${startupWaitMs}ms: ${errorText(error)}`);
-    });
-    db = await openDb(config.db);
-    textRows = db.texts;
+  logger.log(
+    `Config: listens on ${config.host}:${config.port}, ` +
+      `DB ${config.db.username}@${config.db.host}:${config.db.port}/${config.db.database}`,
+  );
+
+  try {
+    let textRows = overrides.textRows;
+
+    if (!textRows) {
+      dbPing = newDbPing(config.db);
+      await waitForDb({
+        ping: dbPing.ping,
+        clock,
+        limitMs: startupWaitMs,
+        intervalMs: pingEveryMs,
+      }).catch((error: unknown) => {
+        throw new Error(`DB did not answer for ${startupWaitMs}ms: ${errorText(error)}`);
+      });
+      db = await openDb(config.db);
+      textRows = db.texts;
+    }
+
+    const texts = new Texts({ rows: textRows, ids: overrides.ids ?? systemIds });
+
+    @Module({
+      controllers: [HealthController, TextsController],
+      providers: [{ provide: Texts, useValue: texts }],
+    })
+    class ServerModule {}
+
+    const app = await newApp({ module: ServerModule, logger: overrides.logger ?? true });
+    const watch = new AbortController();
+
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    return {
+      async start() {
+        if (db) {
+          logger.log("Applying DB migrations");
+          await db.migrate();
+        }
+
+        await app.listen(config.port, config.host);
+
+        // A stop that came during the migrations leaves the database unwatched
+        if (dbPing && !watch.signal.aborted) {
+          void watchDb({
+            ping: dbPing.ping,
+            clock,
+            limitMs: lostAfterMs,
+            intervalMs: pingEveryMs,
+            signal: watch.signal,
+          }).then((error) => {
+            if (error !== undefined) {
+              onDbLost(error);
+            }
+          });
+        }
+      },
+      async stop() {
+        watch.abort();
+        await app.close();
+        await db?.close();
+        await dbPing?.close();
+      },
+      handle: (request) => app.getHttpAdapter().getInstance().inject(request),
+    };
+  } catch (error) {
+    // A server that fails to build closes what it opened, so an in-process caller leaks no pool
+    await db?.close();
+    await dbPing?.close();
+    throw error;
   }
-
-  const texts = new Texts({ rows: textRows, ids: overrides.ids ?? systemIds });
-
-  @Module({
-    controllers: [HealthController, TextsController],
-    providers: [{ provide: Texts, useValue: texts }],
-  })
-  class ServerModule {}
-
-  const app = await newApp({ module: ServerModule, logger: overrides.logger ?? true });
-  const watch = new AbortController();
-
-  await app.init();
-  await app.getHttpAdapter().getInstance().ready();
-
-  return {
-    async start() {
-      if (db) {
-        logger.log("Applying DB migrations");
-        await db.migrate();
-      }
-
-      await app.listen(config.port, config.host);
-
-      if (dbPing) {
-        void watchDb({
-          ping: dbPing.ping,
-          clock,
-          limitMs: lostAfterMs,
-          intervalMs: pingEveryMs,
-          signal: watch.signal,
-        }).then((error) => {
-          if (error !== undefined) {
-            onDbLost(error);
-          }
-        });
-      }
-    },
-    async stop() {
-      watch.abort();
-      await app.close();
-      await db?.close();
-      await dbPing?.close();
-    },
-    handle: (request) => app.getHttpAdapter().getInstance().inject(request),
-  };
 }

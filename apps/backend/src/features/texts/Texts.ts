@@ -6,7 +6,6 @@ import {
   TextSkeleton,
 } from "@guessir/game";
 
-import type { IdGenerator } from "../../shared/IdGenerator.js";
 import { LruCache } from "../../shared/LruCache.js";
 import { createText } from "./createText.js";
 import {
@@ -14,18 +13,11 @@ import {
   NewText,
   Text,
   TextNotFoundError,
-  TextRows,
+  TextsOptions,
   WordNotFoundError,
 } from "./types.js";
 
 type PlayedText = { text: Text; textGame: TextGame };
-
-export type TextsOptions = {
-  /** Holds the stored texts. */
-  rows: TextRows;
-  /** Makes the id of a new text. */
-  ids: IdGenerator;
-};
 
 const cachedTextCount = 200;
 

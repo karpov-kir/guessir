@@ -1,14 +1,13 @@
 import { CreateTextDtoResponse } from "@guessir/game";
 
-import type { IdGenerator } from "../../shared/IdGenerator.js";
-import { NewText, TextRows } from "./types.js";
+import { NewText, TextsOptions } from "./types.js";
 
 /** The length of a text's id. The `texts` table stores it in a CHAR(20) column. */
 const idLength = 20;
 
 /** Stores a new text under a fresh id and returns the id. */
 export async function createText(
-  { rows, ids }: { rows: TextRows; ids: IdGenerator },
+  { rows, ids }: TextsOptions,
   newText: NewText,
 ): Promise<CreateTextDtoResponse> {
   const id = ids.newId(idLength);

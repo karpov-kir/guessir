@@ -30,8 +30,8 @@ describe(parseConfig, () => {
     ).toMatchObject({ host: "127.0.0.1", port: 8080, db: { port: 5433 } });
   });
 
-  it("should read a variable set to an empty string as unset", () => {
-    expect(parseConfig({ ...env, HOST: "", PORT: "", DATABASE_PORT: "" })).toMatchObject({
+  it("should read a variable that is empty or only whitespace as unset", () => {
+    expect(parseConfig({ ...env, HOST: "", PORT: "  ", DATABASE_PORT: "\t" })).toMatchObject({
       host: "0.0.0.0",
       port: 3020,
       db: { port: 5432 },
@@ -44,7 +44,7 @@ describe(parseConfig, () => {
       const { [name]: _, ...without } = env;
 
       expect(() => parseConfig(without)).toThrow(name);
-      expect(() => parseConfig({ ...env, [name]: "" })).toThrow(`must be set`);
+      expect(() => parseConfig({ ...env, [name]: " " })).toThrow("must be set");
     },
   );
 

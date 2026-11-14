@@ -10,16 +10,18 @@ export type ServerConfig = {
   db: DbSettings;
 };
 
-// A variable set to an empty string counts as unset, so a default or the "required" error applies
-const unsetIfEmpty = (value: unknown) => (value === "" ? undefined : value);
+// A variable that is empty or only whitespace counts as unset, so a default or the "required" error
+// applies
+const unsetIfBlank = (value: unknown) =>
+  typeof value === "string" && value.trim() === "" ? undefined : value;
 
-const required = z.preprocess(unsetIfEmpty, z.string({ error: "must be set" }));
+const required = z.preprocess(unsetIfBlank, z.string({ error: "must be set" }));
 
 const portNumber = (fallback: number) =>
-  z.preprocess(unsetIfEmpty, z.coerce.number().int().min(0).max(65_535).default(fallback));
+  z.preprocess(unsetIfBlank, z.coerce.number().int().min(0).max(65_535).default(fallback));
 
 const envSchema = z.object({
-  HOST: z.preprocess(unsetIfEmpty, z.string().default("0.0.0.0")),
+  HOST: z.preprocess(unsetIfBlank, z.string().default("0.0.0.0")),
   PORT: portNumber(3020),
   DATABASE_HOST: required,
   DATABASE_PORT: portNumber(5432),

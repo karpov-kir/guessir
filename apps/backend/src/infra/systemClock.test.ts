@@ -15,6 +15,8 @@ describe("systemClock", () => {
     await systemClock.sleep(20);
     await systemClock.sleep(20, { holdsProcess: false });
 
+    // The bound allows 1ms short per wait. Node can fire a timer up to a millisecond early by
+    // `Date.now()`, which would fail a check against the full 40ms.
     expect(Date.now() - start).toBeGreaterThanOrEqual(38);
   });
 });
