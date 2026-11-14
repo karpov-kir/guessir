@@ -26,12 +26,7 @@ export const revealedWordsSchema = z.object({ words: z.array(revealedWordSchema)
 
 export const textSkeletonSchema = z.object({
   title: z.string(),
-  // The server sends null for a text stored without a description
-  description: z
-    .string()
-    .nullish()
-    .transform((description) => description ?? undefined)
-    .optional(),
+  description: z.string().optional(),
   allowShowingFirstLetters: z.boolean(),
   allowShowingText: z.boolean(),
   wordCount: z.number().int().nonnegative(),

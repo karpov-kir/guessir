@@ -21,8 +21,8 @@ describe("textSkeletonSchema", () => {
     });
   });
 
-  it.each([null, undefined])("should read the description %s as no description", (description) => {
-    expect(textSkeletonSchema.parse({ ...skeleton, description }).description).toBeUndefined();
+  it("should read a skeleton without a description", () => {
+    expect(textSkeletonSchema.parse(skeleton)).toEqual(skeleton);
   });
 
   it("should drop any letters a word lexeme carries", () => {
@@ -38,6 +38,7 @@ describe("textSkeletonSchema", () => {
     { field: "wordCount", value: -1 },
     { field: "lexemes", value: [{ index: 0 }] },
     { field: "allowShowingText", value: "yes" },
+    { field: "description", value: null },
   ])("should reject a skeleton whose $field is $value", ({ field, value }) => {
     expect(textSkeletonSchema.safeParse({ ...skeleton, [field]: value }).success).toBe(false);
   });
