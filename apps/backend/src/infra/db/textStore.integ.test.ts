@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { startPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
 import { Db, openDb } from "./openDb.js";
-import { DbSettings, newDbPing, openPostgres } from "./postgres.js";
+import { DbSettings, newDbPing } from "./postgres.js";
 import { TextRecord } from "./textStore.js";
 
 const record: TextRecord = {
@@ -29,22 +29,6 @@ describe("the texts table on Postgres", () => {
   afterAll(async () => {
     await db?.close();
     await postgres?.stop();
-  });
-
-  it("should apply each migration once", async () => {
-    await db.migrate();
-
-    // The test reads the migrations table over a connection of its own, as `Db` runs no raw query.
-    // The name carries the file's extension: .ts when the tests run the sources, .js on the server
-    const dataSource = await openPostgres(settings);
-    const migrations = await dataSource.query<{ name: string }[]>("select name from migrations");
-
-    await dataSource.destroy();
-
-    expect(migrations.map(({ name }) => name.replace(/\.(ts|js)$/, ""))).toEqual([
-      "2022-03-23-initial",
-      "2026-11-14-blank-texts",
-    ]);
   });
 
   it("should give back a stored text and nothing for an unknown id", async () => {

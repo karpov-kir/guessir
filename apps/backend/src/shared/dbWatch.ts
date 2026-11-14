@@ -1,10 +1,19 @@
-import { inspect } from "node:util";
-
 import { Logger } from "@nestjs/common";
 
-import type { Clock } from "../../shared/Clock.js";
+import type { Clock } from "./Clock.js";
+import { errorText } from "./errorText.js";
 
 const logger = new Logger("dbWatch");
+
+/**
+ * How long the server's start and the migrate step wait for the database. A deploy of a Postgres
+ * patch release restarts the database, and a task that exits at once pauses the Swarm rolling
+ * update.
+ */
+const startupWaitMs = 60_000;
+
+/** How often a wait or a watch pings the database. */
+export const pingEveryMs = 1_000;
 
 export type WaitOptions = {
   /** Asks the database whether it answers. */
@@ -102,9 +111,16 @@ export async function waitForDb({ ping, clock, limitMs, intervalMs }: WaitOption
 }
 
 /**
- * Returns an error the way it reads in a log line. A thrown value that is not an Error is
- * inspected, so it never reads "[object Object]".
+ * Waits for the database as a start does, pinging every second for up to a minute. Throws with the
+ * wait and the last ping error once the database has not answered for that long.
  */
-export function errorText(error: unknown): string {
-  return error instanceof Error ? String(error) : inspect(error);
+export async function waitForDbAtStart({
+  ping,
+  clock,
+}: Pick<WaitOptions, "ping" | "clock">): Promise<void> {
+  await waitForDb({ ping, clock, limitMs: startupWaitMs, intervalMs: pingEveryMs }).catch(
+    (error: unknown) => {
+      throw new Error(`DB did not answer for ${startupWaitMs}ms: ${errorText(error)}`);
+    },
+  );
 }

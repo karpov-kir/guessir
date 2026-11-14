@@ -1,14 +1,19 @@
 import { Logger } from "@nestjs/common";
 import { describe, expect, it } from "vitest";
 
-import { systemClock } from "../../infra/systemClock.js";
-import type { Clock } from "../../shared/Clock.js";
-import { errorText, waitForDb, watchDb } from "./dbWatch.js";
+import type { Clock } from "./Clock.js";
+import { waitForDb, watchDb } from "./dbWatch.js";
 
 // Silences Nest's logger: these tests make the database fail on purpose.
 Logger.overrideLogger(false);
 
 const down = new Error("getaddrinfo ENOTFOUND guessir_database");
+
+/** Tells the real time and waits on real timers. A unit test of shared code takes no infra. */
+const systemClock: Clock = {
+  now: () => Date.now(),
+  sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+};
 
 // The signal of a watch that nobody ends
 const running = new AbortController().signal;
@@ -139,12 +144,5 @@ describe(waitForDb, () => {
       waitForDb({ ping: db.ping, clock: systemClock, limitMs: 30, intervalMs: 5 }),
     ).rejects.toEqual(new Error("Database ping has not returned for 30ms"));
     expect(db.pings).toBe(1);
-  });
-});
-
-describe(errorText, () => {
-  it("should read an Error as its name and message, and inspect any other thrown value", () => {
-    expect(errorText(new Error("ping failed"))).toBe("Error: ping failed");
-    expect(errorText({ code: "ECONNREFUSED" })).toBe("{ code: 'ECONNREFUSED' }");
   });
 });
