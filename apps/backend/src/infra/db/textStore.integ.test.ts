@@ -1,9 +1,8 @@
-import { StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { startPostgres } from "../../../tests/utils/postgres.js";
+import { startPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
 import { Db, openDb } from "./openDb.js";
-import { createDbPing, DbSettings, openPostgres } from "./postgres.js";
+import { DbSettings, newDbPing, openPostgres } from "./postgres.js";
 import { TextRecord } from "./textStore.js";
 
 const record: TextRecord = {
@@ -16,19 +15,20 @@ const record: TextRecord = {
 };
 
 describe("the texts table on Postgres", () => {
-  let container: StartedPostgreSqlContainer;
+  let postgres: TestPostgres;
   let settings: DbSettings;
   let db: Db;
 
   beforeAll(async () => {
-    ({ container, settings } = await startPostgres());
+    postgres = await startPostgres();
+    settings = postgres.settings;
     db = await openDb(settings);
     await db.migrate();
   }, 120_000);
 
   afterAll(async () => {
     await db?.close();
-    await container?.stop();
+    await postgres?.stop();
   });
 
   it("should apply each migration once", async () => {
@@ -71,6 +71,9 @@ describe("the texts table on Postgres", () => {
   });
 
   it("should answer a ping while the database is up", async () => {
-    await expect(createDbPing(settings)()).resolves.toBeUndefined();
+    const dbPing = newDbPing(settings);
+
+    await expect(dbPing.ping()).resolves.toBeUndefined();
+    await dbPing.close();
   });
 });

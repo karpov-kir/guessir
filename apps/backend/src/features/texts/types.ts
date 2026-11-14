@@ -1,5 +1,7 @@
 import { CreateTextDto } from "@guessir/game";
 
+import type { IdGenerator } from "../../shared/IdGenerator.js";
+
 /** Means a stored text: the words of one game and the hints its author allows. */
 export type Text = {
   id: string;
@@ -20,6 +22,13 @@ export type TextRows = {
 };
 
 export type NewText = CreateTextDto;
+
+export type TextsOptions = {
+  /** Holds the stored texts. */
+  rows: TextRows;
+  /** Makes the id of a new text. */
+  ids: IdGenerator;
+};
 
 /** Means that no text has the id a request names. */
 export class TextNotFoundError extends Error {

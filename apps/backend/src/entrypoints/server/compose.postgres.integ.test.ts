@@ -1,25 +1,24 @@
-import { StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { startPostgres } from "../../../tests/utils/postgres.js";
-import { compose, ServerHandle } from "./compositionRoot.js";
+import { startPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
+import { testConfig } from "../../../tests/utils/testConfig.js";
+import { compose, ServerHandle } from "./compose.js";
 
 describe("the server over Postgres", () => {
-  let container: StartedPostgreSqlContainer;
+  let postgres: TestPostgres;
   let server: ServerHandle;
 
   beforeAll(async () => {
-    const postgres = await startPostgres();
-
-    container = postgres.container;
-    server = await compose({ dbSettings: postgres.settings, logger: false });
-    // Port 0 lets the system pick a free port; start() applies the migrations first
-    await server.start("127.0.0.1", 0);
+    postgres = await startPostgres();
+    server = await compose({ config: testConfig(postgres.settings), logger: false });
+    // The test config's port 0 lets the system pick a free port; start() applies the migrations
+    // first
+    await server.start();
   }, 120_000);
 
   afterAll(async () => {
     await server?.stop();
-    await container?.stop();
+    await postgres?.stop();
   });
 
   it("should store a text and play it back", async () => {

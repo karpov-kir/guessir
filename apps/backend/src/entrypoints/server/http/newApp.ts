@@ -6,11 +6,18 @@ import { FastifyAdapter, NestFastifyApplication } from "@nestjs/platform-fastify
 import { TextErrorFilter } from "./TextErrorFilter.js";
 import { QueryErrorFilter } from "./QueryErrorFilter.js";
 
+export type AppOptions = {
+  /** The Nest module that holds the controllers and their providers. */
+  module: IEntryNestModule;
+  /** Turns Fastify's request log and Nest's log on. */
+  logger: boolean;
+};
+
 /**
  * Creates the HTTP app of `module` with the server's headers, CORS and query error
  * handling, and returns it without listening.
  */
-export async function newApp(module: IEntryNestModule, { logger = true } = {}) {
+export async function newApp({ module, logger }: AppOptions) {
   const allowedOrigins = new Set([
     "http://localhost:5173",
     "http://127.0.0.1:5173",

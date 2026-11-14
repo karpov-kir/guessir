@@ -3,9 +3,10 @@ import { QueryFailedError } from "typeorm";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { fakeTextRows } from "../../../tests/utils/fakeTextRows.js";
+import { testConfig } from "../../../tests/utils/testConfig.js";
 import { Text } from "../../features/texts/exports.js";
-import { version } from "./version.js";
-import { compose, ServerHandle } from "./compositionRoot.js";
+import { version } from "../../infra/version.js";
+import { compose, ServerHandle } from "./compose.js";
 
 const text: Text = {
   id: "text-id",
@@ -27,7 +28,7 @@ describe("the texts API over HTTP", () => {
 
   beforeAll(async () => {
     textRows = fakeTextRows([text, { ...text, id: "locked", allowShowingText: false }]);
-    server = await compose({ textRows, logger: false });
+    server = await compose({ textRows, config: testConfig(), logger: false });
   });
 
   afterAll(() => server.stop());

@@ -13,7 +13,7 @@ import {
   NewText,
   Text,
   TextNotFoundError,
-  TextRows,
+  TextsOptions,
   WordNotFoundError,
 } from "./types.js";
 
@@ -30,13 +30,17 @@ export class Texts {
    * Keeps the analysed game of recently played texts, so a move does not reload and re-analyse its
    * text. A text never changes after it is created, so a cached game never goes stale.
    */
-  private readonly playedTexts = new LruCache<string, PlayedText>(cachedTextCount);
+  private readonly playedTexts = new LruCache<string, PlayedText>({ maxSize: cachedTextCount });
 
-  constructor(private readonly rows: TextRows) {}
+  private readonly deps: TextsOptions;
+
+  constructor(deps: TextsOptions) {
+    this.deps = deps;
+  }
 
   /** Stores a new text and returns its id. */
   public create(newText: NewText): Promise<CreateTextDtoResponse> {
-    return createText(this.rows, newText);
+    return createText(this.deps, newText);
   }
 
   public async findSkeleton(id: string): Promise<TextSkeleton> {
@@ -98,7 +102,7 @@ export class Texts {
       return cachedPlayedText;
     }
 
-    const text = await this.rows.getById(id);
+    const text = await this.deps.rows.getById(id);
 
     if (!text) {
       throw new TextNotFoundError(id);

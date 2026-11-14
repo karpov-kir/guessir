@@ -1,9 +1,8 @@
 import { createTextDtoSchema } from "@guessir/game";
-import { StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import { DataSource } from "typeorm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import { startPostgres } from "../../../tests/utils/postgres.js";
+import { startPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
 import { Db, openDb } from "./openDb.js";
 import { openPostgres } from "./postgres.js";
 
@@ -56,7 +55,7 @@ const cleaned = rows
   }));
 
 describe("the blank texts migration", () => {
-  let container: StartedPostgreSqlContainer;
+  let postgres: TestPostgres;
   let db: Db;
   let dataSource: DataSource;
 
@@ -72,9 +71,7 @@ describe("the blank texts migration", () => {
   };
 
   beforeAll(async () => {
-    const postgres = await startPostgres();
-
-    container = postgres.container;
+    postgres = await startPostgres();
     db = await openDb(postgres.settings);
     await db.migrate();
     dataSource = await openPostgres(postgres.settings);
@@ -83,7 +80,7 @@ describe("the blank texts migration", () => {
   afterAll(async () => {
     await dataSource?.destroy();
     await db?.close();
-    await container?.stop();
+    await postgres?.stop();
   });
 
   beforeEach(async () => {

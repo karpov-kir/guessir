@@ -1,6 +1,6 @@
 {
   "name": "@guessir/backend",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "type": "module",
   "scripts": {
     "build": "npm run clean && tsc -b tsconfig.build.json",

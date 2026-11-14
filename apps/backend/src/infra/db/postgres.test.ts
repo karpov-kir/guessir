@@ -2,32 +2,52 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { getTypeOrmConfig } from "./postgres.js";
+import { DbSettings, getTypeOrmConfig } from "./postgres.js";
 import { ParameterFreeLogger } from "./ParameterFreeLogger.js";
 
 describe(getTypeOrmConfig, () => {
   let tempDir: string;
+  let settings: DbSettings;
 
   beforeEach(() => {
     tempDir = mkdtempSync(join(tmpdir(), "postgres-"));
     const passwordFile = join(tempDir, "password");
     writeFileSync(passwordFile, "file-password\n");
-    vi.stubEnv("DATABASE_HOST", "guessir_database");
-    vi.stubEnv("DATABASE_USER", "guessir-production");
-    vi.stubEnv("DATABASE_NAME", "guessir-production");
-    vi.stubEnv("DATABASE_PASSWORD_FILE", passwordFile);
+    settings = {
+      host: "guessir_database",
+      port: 5432,
+      username: "guessir-production",
+      passwordFile,
+      database: "guessir-production",
+    };
   });
 
   afterEach(() => {
-    vi.unstubAllEnvs();
     rmSync(tempDir, { recursive: true, force: true });
   });
 
-  it("should log queries only through the logger that drops their parameters", () => {
-    const config = getTypeOrmConfig();
+  it("should connect with the trimmed password from its file", () => {
+    expect(getTypeOrmConfig(settings)).toMatchObject({
+      type: "postgres",
+      host: "guessir_database",
+      port: 5432,
+      username: "guessir-production",
+      password: "file-password",
+      database: "guessir-production",
+    });
+  });
 
-    expect(config.logger).toBeInstanceOf(ParameterFreeLogger);
+  it("should throw when the password file cannot be read", () => {
+    const passwordFile = join(tempDir, "missing");
+
+    expect(() => getTypeOrmConfig({ ...settings, passwordFile })).toThrow(
+      `Failed to read the database password file (${passwordFile})`,
+    );
+  });
+
+  it("should log queries only through the logger that drops their parameters", () => {
+    expect(getTypeOrmConfig(settings).logger).toBeInstanceOf(ParameterFreeLogger);
   });
 });
