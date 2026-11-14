@@ -11,23 +11,19 @@ import { systemIds } from "../../infra/systemIds.js";
 import type { Clock } from "../../shared/Clock.js";
 import type { IdGenerator } from "../../shared/IdGenerator.js";
 import { parseConfig, type ServerConfig } from "./config.js";
-import { errorText, waitForDb, watchDb } from "./dbWatch.js";
+import { errorText, pingEveryMs, startupWaitMs, waitForDb, watchDb } from "./dbWatch.js";
 import { newApp } from "./http/newApp.js";
 
-// The server waits for the database at start. A deploy of a Postgres patch release restarts the
-// database, and a task that exits at once pauses the Swarm rolling update. After `lostAfterMs`
-// without the database, the server exits, so Swarm starts a new container with fresh connections
-// and name lookups.
-const startupWaitMs = 60_000;
+// After `lostAfterMs` without the database, the server exits, so Swarm starts a new container with
+// fresh connections and name lookups.
 const lostAfterMs = 30_000;
-const pingEveryMs = 1_000;
 
 const logger = new Logger("server");
 
 export type ServerOverrides = {
   /**
-   * Stands in for the database: a server built with it opens no connection, runs no migration and
-   * watches no database.
+   * Stands in for the database: a server built with it opens no connection, checks no migration
+   * and watches no database.
    */
   textRows?: TextRows;
   /** Stands in for the config the environment holds. */
@@ -41,7 +37,7 @@ export type ServerOverrides = {
 };
 
 export type ServerHandle = {
-  /** Applies the pending migrations, then listens on the configured host and port. */
+  /** Listens on the configured host and port, and watches the database. */
   start(): Promise<void>;
   stop(): Promise<void>;
   /** Answers one request in process, the way a request on the socket is answered. */
@@ -80,8 +76,8 @@ const exitOnDbLost = (error: unknown) => {
 
 /**
  * Builds the HTTP server and the texts feature over the database, or over `overrides.textRows`.
- * Waits until the database answers, and throws when it stays silent. Returns the server's handle
- * without listening.
+ * Waits until the database answers, and throws when it stays silent or lacks a migration. Returns
+ * the server's handle without listening.
  */
 export async function compose(overrides: ServerOverrides = {}): Promise<ServerHandle> {
   const config = overrides.config ?? parseConfig(readEnv());
@@ -109,6 +105,9 @@ export async function compose(overrides: ServerOverrides = {}): Promise<ServerHa
         throw new Error(`DB did not answer for ${startupWaitMs}ms: ${errorText(error)}`);
       });
       db = await openDb(config.db);
+      // The migrate step migrates the database. The server runs no migration and refuses a
+      // database short of one.
+      await db.checkMigrated();
       textRows = db.texts;
     }
 
@@ -128,14 +127,9 @@ export async function compose(overrides: ServerOverrides = {}): Promise<ServerHa
 
     return {
       async start() {
-        if (db) {
-          logger.log("Applying DB migrations");
-          await db.migrate();
-        }
-
         await app.listen(config.port, config.host);
 
-        // A stop that came during the migrations leaves the database unwatched
+        // A stop that came while the server began to listen leaves the database unwatched
         if (dbPing && !watch.signal.aborted) {
           watchUntilLost({ dbPing, clock, signal: watch.signal, onDbLost });
         }

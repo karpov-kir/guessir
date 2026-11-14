@@ -1,5 +1,5 @@
-import { readFileSync } from "node:fs";
-import { dirname } from "node:path";
+import { readdirSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { Logger } from "@nestjs/common";
@@ -116,8 +116,8 @@ export async function openPostgres(settings: DbSettings): Promise<DataSource> {
 
 const logger = new Logger("postgres");
 
-/** Applies the migrations the database has not run yet, through `dataSource`. */
-export async function applyDbMigrations(dataSource: DataSource) {
+/** Returns the migrator of the database behind `dataSource`, over the migration files beside this file. */
+function newMigrator(dataSource: DataSource) {
   const context: MigrationContext = {
     query: (sql, parameters) => dataSource.query(sql, parameters),
     transaction: (work) =>
@@ -125,7 +125,8 @@ export async function applyDbMigrations(dataSource: DataSource) {
         work((sql, parameters) => manager.query(sql, parameters)),
       ),
   };
-  const migrator = new Umzug({
+
+  return new Umzug({
     migrations: {
       glob: ["migrations/*.{js,ts}", { cwd: __dirname }],
     },
@@ -153,6 +154,61 @@ export async function applyDbMigrations(dataSource: DataSource) {
       debug: (message) => logger.debug(message),
     },
   });
+}
 
-  await migrator.up();
+// The migrator logs a migration as its file name, .ts when the tests run the sources and .js in the
+// image, so names compare without the extension
+const withoutExtension = (name: string) => name.replace(/\.(ts|js)$/, "");
+
+/**
+ * Applies the migrations the database has not run yet, through `dataSource`. Two runs on one
+ * database wait for each other on an advisory lock.
+ */
+export async function applyDbMigrations(dataSource: DataSource) {
+  const lock = dataSource.createQueryRunner();
+
+  await lock.connect();
+
+  try {
+    await lock.query(`SELECT pg_advisory_lock(hashtext('${migrationTable}'))`);
+    await newMigrator(dataSource).up();
+  } finally {
+    await lock.query(`SELECT pg_advisory_unlock(hashtext('${migrationTable}'))`);
+    await lock.release();
+  }
+}
+
+/**
+ * Throws unless the database has run exactly the migrations beside this file, and writes nothing.
+ * A database short of a migration needs the migrate step first. One that holds a migration this
+ * code does not know was migrated by newer code.
+ */
+export async function checkDbMigrated(dataSource: DataSource) {
+  // The same files the migrator's glob takes
+  const known = readdirSync(join(__dirname, "migrations"))
+    .filter((name) => /\.(js|ts)$/.test(name))
+    .map(withoutExtension);
+  const [{ hasTable }] = await dataSource.query<{ hasTable: boolean }[]>(
+    `SELECT to_regclass('${migrationTable}') IS NOT NULL AS "hasTable"`,
+  );
+  const executed = hasTable
+    ? (await dataSource.query<MigrationLog[]>(`SELECT name FROM ${migrationTable}`)).map(
+        ({ name }) => withoutExtension(name),
+      )
+    : [];
+  const missing = known.filter((name) => !executed.includes(name));
+  const unknown = executed.filter((name) => !known.includes(name));
+
+  if (missing.length > 0) {
+    throw new Error(
+      `The database lacks the migrations ${missing.join(", ")}: run the migrate step first`,
+    );
+  }
+
+  if (unknown.length > 0) {
+    throw new Error(
+      `The database holds the migrations ${unknown.join(", ")}, which this code does not know: ` +
+        "newer code migrated it",
+    );
+  }
 }

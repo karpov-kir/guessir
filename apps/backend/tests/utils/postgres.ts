@@ -5,7 +5,9 @@ import { join } from "node:path";
 
 import { PostgreSqlContainer } from "@testcontainers/postgresql";
 
+import { compose as composeMigrate } from "../../src/entrypoints/migrate/compose.js";
 import { DbSettings } from "../../src/infra/db/exports.js";
+import { testConfig } from "./testConfig.js";
 
 // The same Postgres major as the server's stack
 const image = "postgres:17";
@@ -58,4 +60,13 @@ export async function startPostgres(): Promise<TestPostgres> {
       rmSync(passwordDir, { recursive: true, force: true });
     },
   };
+}
+
+/** Starts an empty Postgres in Docker and runs the migrate step on it, as a deploy does. */
+export async function startMigratedPostgres(): Promise<TestPostgres> {
+  const postgres = await startPostgres();
+
+  await composeMigrate({ config: testConfig(postgres.settings) }).run();
+
+  return postgres;
 }

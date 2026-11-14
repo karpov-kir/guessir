@@ -4,7 +4,7 @@ import { join } from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
 
-import { startPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
+import { startMigratedPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
 import { steppingClock } from "../../../tests/utils/steppingClock.js";
 import { testConfig } from "../../../tests/utils/testConfig.js";
 import { systemClock } from "../../infra/systemClock.js";
@@ -45,7 +45,7 @@ describe("the server's database lifecycle", () => {
   });
 
   it("should report the database lost once it has been gone for the limit", async () => {
-    postgres = await startPostgres();
+    postgres = await startMigratedPostgres();
     let isDbStopped = false;
     let reportLost: (error: unknown) => void = () => {};
     const lost = new Promise<{ error: unknown; isDbStopped: boolean }>((resolve) => {
@@ -71,7 +71,7 @@ describe("the server's database lifecycle", () => {
   }, 120_000);
 
   it("should not report the database lost after the server has stopped", async () => {
-    postgres = await startPostgres();
+    postgres = await startMigratedPostgres();
     let lostCount = 0;
     server = await compose({
       config: testConfig(postgres.settings),

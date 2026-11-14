@@ -6,6 +6,15 @@ import type { Clock } from "../../shared/Clock.js";
 
 const logger = new Logger("dbWatch");
 
+/**
+ * How long a start waits for the database. A deploy of a Postgres patch release restarts the
+ * database, and a task that exits at once pauses the Swarm rolling update.
+ */
+export const startupWaitMs = 60_000;
+
+/** How often a wait or a watch pings the database. */
+export const pingEveryMs = 1_000;
+
 export type WaitOptions = {
   /** Asks the database whether it answers. */
   ping: () => Promise<unknown>;
