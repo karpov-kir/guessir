@@ -18,7 +18,8 @@ export type MigrateOverrides = {
 export type MigrateHandle = {
   /**
    * Waits until the database answers, applies the migrations it has not run yet and closes its
-   * connections. Throws when the database stays silent or a migration fails.
+   * connections. Throws when the database stays silent or a migration fails, and throws before it
+   * writes when the database holds a migration this code does not know.
    */
   run(): Promise<void>;
 };
