@@ -27,8 +27,14 @@ describe("createTextDtoSchema", () => {
     );
   });
 
-  it("should accept an empty description", () => {
-    expect(problems("description", "")).toEqual([]);
+  it.each(["", "   ", "\n\t"])("should reject the blank description %j", (description) => {
+    expect(problems("description", description)).toEqual(["Invalid string: must not be blank"]);
+  });
+
+  it("should keep a description as sent", () => {
+    expect(createTextDtoSchema.parse({ ...validText, description: " About " }).description).toBe(
+      " About ",
+    );
   });
 
   it.each([

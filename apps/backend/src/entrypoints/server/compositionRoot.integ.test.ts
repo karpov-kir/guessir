@@ -190,19 +190,21 @@ describe("the texts API over HTTP", () => {
     });
   });
 
-  it("should refuse a null description and store nothing", async () => {
+  it.each([
+    [null, "Invalid input: expected string, received null"],
+    ["", "Invalid string: must not be blank"],
+    ["  ", "Invalid string: must not be blank"],
+  ])("should refuse the description %j and store nothing", async (description, problem) => {
     textRows.insert.mockClear();
 
     const response = await request("POST", "/texts", {
       title: "Title",
-      description: null,
+      description,
       text: "One two",
     });
 
     expect(response.statusCode).toBe(400);
-    expect(response.json<{ message: string[] }>().message).toEqual([
-      "description: Invalid input: expected string, received null",
-    ]);
+    expect(response.json<{ message: string[] }>().message).toEqual([`description: ${problem}`]);
     expect(textRows.insert).not.toHaveBeenCalled();
   });
 

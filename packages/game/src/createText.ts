@@ -20,7 +20,13 @@ const columnString = (max: number) =>
 /** Validates the body of a create-text request. */
 export const createTextDtoSchema = z.strictObject({
   title: columnString(createTextLimits.title).min(1),
-  description: columnString(createTextLimits.description).optional(),
+  // This check refuses a blank description. A client sends a text without a description by
+  // leaving the key out, and a blank description must not be a second way to say that.
+  description: columnString(createTextLimits.description)
+    .refine((description) => description.trim() !== "", {
+      error: "Invalid string: must not be blank",
+    })
+    .optional(),
   text: columnString(createTextLimits.text).min(1),
   allowShowingFirstLetters: z.boolean().default(false),
   allowShowingText: z.boolean().default(false),
