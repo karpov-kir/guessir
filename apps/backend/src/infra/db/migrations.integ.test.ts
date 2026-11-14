@@ -1,3 +1,4 @@
+import { createTextDtoSchema } from "@guessir/game";
 import { StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import { DataSource } from "typeorm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
@@ -13,9 +14,20 @@ interface Row {
   text: string;
 }
 
-// Each value is blank, or not, by `String.prototype.trim`, as the API reads it
-const blankValues = ["", "   ", "\t\n\v\f\r", "        　﻿"];
-const filledValues = ["About", " About ", "​"];
+/**
+ * Tells whether the API refuses `value` as a title. Every value here is short and holds no U+0000,
+ * so only blankness decides.
+ */
+const isBlank = (value: string) => !createTextDtoSchema.shape.title.safeParse(value).success;
+
+const blankValues = [
+  "",
+  "   ",
+  "\t\n\v\f\r",
+  "\u00a0\u1680\u2028\u2029\u202f\u205f\u3000\ufeff",
+  "\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a",
+];
+const filledValues = ["About", " About ", "\u200b"];
 
 const row = (id: string, fields: Partial<Row> = {}): Row => ({
   id: id.padEnd(20, "x"),
@@ -36,10 +48,11 @@ const rows: Row[] = [
 const byId = (a: Row, b: Row) => (a.id < b.id ? -1 : 1);
 
 const cleaned = rows
-  .filter(({ title, text }) => title.trim() !== "" && text.trim() !== "")
+  .filter(({ title, text }) => !isBlank(title) && !isBlank(text))
   .map((stored) => ({
     ...stored,
-    description: stored.description?.trim() === "" ? null : stored.description,
+    description:
+      stored.description !== null && isBlank(stored.description) ? null : stored.description,
   }));
 
 describe("the blank texts migration", () => {
@@ -52,7 +65,7 @@ describe("the blank texts migration", () => {
       byId,
     );
 
-  /** Forgets that the migration ran, so the next `migrate` runs it again. */
+  /** Runs the blank texts migration again by deleting its row from `migrations`. */
   const runMigrationAgain = async () => {
     await dataSource.query("DELETE FROM migrations WHERE name LIKE '2026-11-14-blank-texts.%'");
     await db.migrate();
@@ -86,8 +99,8 @@ describe("the blank texts migration", () => {
   });
 
   it("should take the values the API reads as blank and no others", () => {
-    expect(blankValues.every((value) => value.trim() === "")).toBe(true);
-    expect(filledValues.every((value) => value.trim() !== "")).toBe(true);
+    expect(blankValues.every(isBlank)).toBe(true);
+    expect(filledValues.some(isBlank)).toBe(false);
   });
 
   it("should delete a text with a blank title or text and clear a blank description", async () => {

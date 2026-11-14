@@ -17,11 +17,7 @@ const columnString = (max: number) =>
     error: "Invalid string: must not contain the character U+0000",
   });
 
-/**
- * Builds a column string schema that refuses a value that is empty or only whitespace. A client
- * sends a text without a description by leaving the key out, so a blank description is not a
- * second way to say that.
- */
+/** Builds a column string schema that also refuses a value that is empty or only whitespace. */
 const filledColumnString = (max: number) =>
   columnString(max).refine((value) => value.trim() !== "", {
     error: "Invalid string: must not be blank",
@@ -30,6 +26,8 @@ const filledColumnString = (max: number) =>
 /** Validates the body of a create-text request. */
 export const createTextDtoSchema = z.strictObject({
   title: filledColumnString(createTextLimits.title),
+  // The schema refuses a blank description. A client sends a text without a description by
+  // leaving the key out, so a blank one would be a second way to say that.
   description: filledColumnString(createTextLimits.description).optional(),
   text: filledColumnString(createTextLimits.text),
   allowShowingFirstLetters: z.boolean().default(false),
