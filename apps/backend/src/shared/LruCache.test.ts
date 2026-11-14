@@ -4,7 +4,7 @@ import { LruCache } from "./LruCache.js";
 
 describe(LruCache, () => {
   it("should give back a stored value, and undefined for a key it never stored", () => {
-    const lruCache = new LruCache<string, { value: number }>(2);
+    const lruCache = new LruCache<string, { value: number }>({ maxSize: 2 });
 
     lruCache.set("one", { value: 1 });
 
@@ -13,7 +13,7 @@ describe(LruCache, () => {
   });
 
   it("should drop the least recently used value beyond its bound", () => {
-    const lruCache = new LruCache<string, { value: number }>(2);
+    const lruCache = new LruCache<string, { value: number }>({ maxSize: 2 });
 
     lruCache.set("one", { value: 1 });
     lruCache.set("two", { value: 2 });
@@ -26,7 +26,7 @@ describe(LruCache, () => {
   });
 
   it("should keep one value for a key stored twice", () => {
-    const lruCache = new LruCache<string, { value: number }>(2);
+    const lruCache = new LruCache<string, { value: number }>({ maxSize: 2 });
 
     lruCache.set("one", { value: 1 });
     lruCache.set("one", { value: 10 });

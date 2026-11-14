@@ -1,11 +1,17 @@
 import { CreateTextDtoResponse } from "@guessir/game";
-import { nanoid } from "nanoid";
 
+import type { IdGenerator } from "../../shared/IdGenerator.js";
 import { NewText, TextRows } from "./types.js";
 
-/** Stores a new text under a fresh 20-character id and returns the id. */
-export async function createText(rows: TextRows, newText: NewText): Promise<CreateTextDtoResponse> {
-  const id = nanoid(20);
+/** The length of a text's id. The `texts` table stores it in a CHAR(20) column. */
+const idLength = 20;
+
+/** Stores a new text under a fresh id and returns the id. */
+export async function createText(
+  { rows, ids }: { rows: TextRows; ids: IdGenerator },
+  newText: NewText,
+): Promise<CreateTextDtoResponse> {
+  const id = ids.newId(idLength);
 
   await rows.insert({ ...newText, id });
 

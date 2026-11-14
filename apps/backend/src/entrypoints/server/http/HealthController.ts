@@ -1,6 +1,6 @@
 import { Controller, Get } from "@nestjs/common";
 
-import { version } from "../version.js";
+import { version } from "../../../infra/version.js";
 
 /**
  * Answers the backend's package version, the X.Y.Z its stable release is tagged with. A dev release

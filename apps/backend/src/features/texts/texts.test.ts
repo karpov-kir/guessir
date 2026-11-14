@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { fakeIds } from "../../../tests/utils/fakeIds.js";
 import { fakeTextRows } from "../../../tests/utils/fakeTextRows.js";
 import {
   HintNotAllowedError,
@@ -25,7 +26,7 @@ describe(Texts, () => {
   /** Stores `text` with `overrides` under its id. */
   const storeText = (overrides: Partial<Text> = {}) => {
     rows = fakeTextRows([{ ...text, ...overrides }]);
-    texts = new Texts(rows);
+    texts = new Texts({ rows, ids: fakeIds() });
   };
 
   beforeEach(() => storeText());
@@ -152,16 +153,16 @@ describe(Texts, () => {
 });
 
 describe("Texts.create", () => {
-  it("should store the text under a 20-character id and return only the id", async () => {
+  it("should store the text under a new 20-character id and return only the id", async () => {
     const rows = fakeTextRows();
-    const { id } = await new Texts(rows).create({
+    const { id } = await new Texts({ rows, ids: fakeIds() }).create({
       title: "Title",
       text: "One",
       allowShowingFirstLetters: true,
       allowShowingText: false,
     });
 
-    expect(id).toMatch(/^[\w-]{20}$/);
+    expect(id).toBe("id100000000000000000");
     expect(await rows.getById(id)).toEqual({
       id,
       title: "Title",

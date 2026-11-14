@@ -1,25 +1,38 @@
-import { setTimeout as sleep } from "node:timers/promises";
 import { inspect } from "node:util";
 
 import { Logger } from "@nestjs/common";
 
+import type { Clock } from "../../shared/Clock.js";
+
 const logger = new Logger("dbWatch");
 
-interface WatchOptions {
+export type WaitOptions = {
+  /** Asks the database whether it answers. */
+  ping: () => Promise<unknown>;
+  clock: Clock;
   limitMs: number;
   intervalMs: number;
-}
+};
+
+export type WatchOptions = WaitOptions & {
+  /** Ends the watch once aborted. */
+  signal: AbortSignal;
+};
 
 /**
  * Pings every `intervalMs`, one ping at a time, and resolves with the last ping error or a timeout
- * error once no ping has answered for `limitMs`. It never rejects. A ping on a dropped connection
- * can hang for minutes, so a ping that has not returned counts as no answer.
+ * error once no ping has answered for `limitMs`. It resolves with undefined once `signal` aborts,
+ * and never rejects. A ping on a dropped connection can hang for minutes, so a ping that has not
+ * returned counts as no answer.
  */
-export async function watchDb(
-  ping: () => Promise<unknown>,
-  { limitMs, intervalMs }: WatchOptions,
-): Promise<unknown> {
-  let lastAnswerAt = Date.now();
+export async function watchDb({
+  ping,
+  clock,
+  limitMs,
+  intervalMs,
+  signal,
+}: WatchOptions): Promise<unknown> {
+  let lastAnswerAt = clock.now();
   let lastError: unknown;
   let pending: Promise<void> | undefined;
 
@@ -29,7 +42,7 @@ export async function watchDb(
     pending ??= ping()
       .then(
         () => {
-          lastAnswerAt = Date.now();
+          lastAnswerAt = clock.now();
           lastError = undefined;
         },
         (error: unknown) => {
@@ -44,9 +57,13 @@ export async function watchDb(
         pending = undefined;
       });
 
-    await sleep(intervalMs);
+    await clock.sleep(intervalMs);
 
-    if (Date.now() - lastAnswerAt >= limitMs) {
+    if (signal.aborted) {
+      return undefined;
+    }
+
+    if (clock.now() - lastAnswerAt >= limitMs) {
       return lastError ?? new Error(`Database ping has not returned for ${limitMs}ms`);
     }
   }
@@ -57,33 +74,30 @@ export async function watchDb(
  * has passed, or a timeout error when a ping hangs past it, so a dropped connection cannot hold the
  * start forever.
  */
-export async function waitForDb(
-  ping: () => Promise<unknown>,
-  { limitMs, intervalMs }: WatchOptions,
-): Promise<void> {
-  const deadline = Date.now() + limitMs;
+export async function waitForDb({ ping, clock, limitMs, intervalMs }: WaitOptions): Promise<void> {
+  const deadline = clock.now() + limitMs;
   const timeout = new Error(`Database ping has not returned for ${limitMs}ms`);
 
   for (;;) {
     try {
       await Promise.race([
         ping(),
-        sleep(Math.max(deadline - Date.now(), 0), undefined, { ref: false }).then(() => {
+        clock.sleep(Math.max(deadline - clock.now(), 0), { holdsProcess: false }).then(() => {
           throw timeout;
         }),
       ]);
       return;
     } catch (error) {
-      // The check treats the timeout error as the deadline. Its timer can fire a moment before
-      // `Date.now()` reaches the deadline.
-      if (error === timeout || Date.now() >= deadline) {
+      // The check treats the timeout error as the deadline. Its timer can fire a moment before the
+      // clock reaches the deadline.
+      if (error === timeout || clock.now() >= deadline) {
         throw error;
       }
 
       logger.warn(`DB is not reachable yet: ${String(error)}`);
     }
 
-    await sleep(intervalMs);
+    await clock.sleep(intervalMs);
   }
 }
 

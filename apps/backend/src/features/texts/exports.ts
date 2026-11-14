@@ -1,4 +1,4 @@
-export { Texts } from "./Texts.js";
+export { Texts, type TextsOptions } from "./Texts.js";
 export {
   HintNotAllowedError,
   type NewText,

@@ -1,0 +1,128 @@
+import { Logger, Module } from "@nestjs/common";
+import type { InjectOptions, LightMyRequestResponse } from "fastify";
+
+import { HealthController } from "./http/HealthController.js";
+import { TextsController } from "./http/TextsController.js";
+import { Texts, type TextRows } from "../../features/texts/exports.js";
+import { type Db, type DbPing, newDbPing, openDb } from "../../infra/db/exports.js";
+import { readEnv } from "../../infra/env.js";
+import { systemClock } from "../../infra/systemClock.js";
+import { systemIds } from "../../infra/systemIds.js";
+import type { Clock } from "../../shared/Clock.js";
+import type { IdGenerator } from "../../shared/IdGenerator.js";
+import { parseConfig, type ServerConfig } from "./config.js";
+import { errorText, waitForDb, watchDb } from "./dbWatch.js";
+import { newApp } from "./http/newApp.js";
+
+// The server waits for the database at start. A deploy of a Postgres patch release restarts the
+// database, and a task that exits at once pauses the Swarm rolling update. After `lostAfterMs`
+// without the database, the server exits, so Swarm starts a new container with fresh connections
+// and name lookups.
+const startupWaitMs = 60_000;
+const lostAfterMs = 30_000;
+const pingEveryMs = 1_000;
+
+const logger = new Logger("server");
+
+export type ServerOverrides = {
+  /**
+   * Stands in for the database: a server built with it opens no connection, runs no migration and
+   * watches no database.
+   */
+  textRows?: TextRows;
+  /** Stands in for the config the environment holds. */
+  config?: ServerConfig;
+  clock?: Clock;
+  ids?: IdGenerator;
+  /** Runs once the database has been lost for good. By default it exits the process with 1. */
+  onDbLost?: (error: unknown) => void;
+  /** Turns Fastify's request log and Nest's log off, for tests. */
+  logger?: boolean;
+};
+
+export type ServerHandle = {
+  /** Applies the pending migrations, then listens on the configured host and port. */
+  start(): Promise<void>;
+  stop(): Promise<void>;
+  /** Answers one request in process, the way a request on the socket is answered. */
+  handle(request: InjectOptions): Promise<LightMyRequestResponse>;
+};
+
+const exitOnDbLost = (error: unknown) => {
+  logger.error(`DB has been unreachable for ${lostAfterMs}ms: ${errorText(error)}`);
+  process.exit(1);
+};
+
+/**
+ * Builds the HTTP server and the texts feature over the database, or over `overrides.textRows`.
+ * Waits until the database answers, and throws when it stays silent. Returns the server's handle
+ * without listening.
+ */
+export async function compose(overrides: ServerOverrides = {}): Promise<ServerHandle> {
+  const config = overrides.config ?? parseConfig(readEnv());
+  const clock = overrides.clock ?? systemClock;
+  const onDbLost = overrides.onDbLost ?? exitOnDbLost;
+  let dbPing: DbPing | undefined;
+  let db: Db | undefined;
+  let textRows = overrides.textRows;
+
+  if (!textRows) {
+    dbPing = newDbPing(config.db);
+    await waitForDb({
+      ping: dbPing.ping,
+      clock,
+      limitMs: startupWaitMs,
+      intervalMs: pingEveryMs,
+    }).catch((error: unknown) => {
+      throw new Error(`DB did not answer for ${startupWaitMs}ms: ${errorText(error)}`);
+    });
+    db = await openDb(config.db);
+    textRows = db.texts;
+  }
+
+  const texts = new Texts({ rows: textRows, ids: overrides.ids ?? systemIds });
+
+  @Module({
+    controllers: [HealthController, TextsController],
+    providers: [{ provide: Texts, useValue: texts }],
+  })
+  class ServerModule {}
+
+  const app = await newApp({ module: ServerModule, logger: overrides.logger ?? true });
+  const watch = new AbortController();
+
+  await app.init();
+  await app.getHttpAdapter().getInstance().ready();
+
+  return {
+    async start() {
+      if (db) {
+        logger.log("Applying DB migrations");
+        await db.migrate();
+      }
+
+      await app.listen(config.port, config.host);
+
+      if (dbPing) {
+        void watchDb({
+          ping: dbPing.ping,
+          clock,
+          limitMs: lostAfterMs,
+          intervalMs: pingEveryMs,
+          signal: watch.signal,
+        }).then((error) => {
+          if (error !== undefined) {
+            onDbLost(error);
+          }
+        });
+      }
+    },
+    async stop() {
+      watch.abort();
+      await app.close();
+      await db?.close();
+      await dbPing?.close();
+    },
+    handle: (request) => app.getHttpAdapter().getInstance().inject(request),
+  };
+}

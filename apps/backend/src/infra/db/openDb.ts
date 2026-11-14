@@ -15,8 +15,8 @@ export type Db = {
   close(): Promise<void>;
 };
 
-/** Connects to the database that `settings` names, or else the one the environment names. */
-export async function openDb(settings?: DbSettings): Promise<Db> {
+/** Connects to the database that `settings` names. */
+export async function openDb(settings: DbSettings): Promise<Db> {
   const dataSource = await openPostgres(settings);
 
   return {

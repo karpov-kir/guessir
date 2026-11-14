@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -5,7 +6,6 @@ import { Logger } from "@nestjs/common";
 import { DataSource, DataSourceOptions } from "typeorm";
 import { MigrationFn as UmzugMigrationFn, Umzug } from "umzug";
 
-import { getDbSettings } from "./dbEnv.js";
 import { TextRow } from "./TextRow.js";
 import { ParameterFreeLogger } from "./ParameterFreeLogger.js";
 
@@ -30,11 +30,40 @@ const migrationTable = "migrations";
 
 const entities = [TextRow];
 
-export type DbSettings = ReturnType<typeof getDbSettings>;
+/**
+ * Names the database to connect to. The password always comes from a file: a Docker secret on the
+ * server and `env/database-password.development` locally.
+ */
+export type DbSettings = {
+  host: string;
+  port: number;
+  username: string;
+  passwordFile: string;
+  database: string;
+};
 
-export const getTypeOrmConfig = (settings: DbSettings = getDbSettings()): DataSourceOptions => ({
-  type: "postgres",
-  ...settings,
+const readPassword = (passwordFile: string): string => {
+  try {
+    return readFileSync(passwordFile, "utf8").trimEnd();
+  } catch (error) {
+    throw new Error(`Failed to read the database password file (${passwordFile})`, {
+      cause: error,
+    });
+  }
+};
+
+const connectionOptions = ({ host, port, username, passwordFile, database }: DbSettings) => ({
+  type: "postgres" as const,
+  host,
+  port,
+  username,
+  password: readPassword(passwordFile),
+  database,
+});
+
+/** Returns TypeORM's options for the database `settings` names, reading its password file. */
+export const getTypeOrmConfig = (settings: DbSettings): DataSourceOptions => ({
+  ...connectionOptions(settings),
   // Umzug migrations in `applyDbMigrations` own the schema, so TypeORM must not.
   synchronize: false,
   logger: new ParameterFreeLogger(),
@@ -43,31 +72,45 @@ export const getTypeOrmConfig = (settings: DbSettings = getDbSettings()): DataSo
   migrations: [],
 });
 
+/** Asks the database whether it answers, over a connection pool of its own. */
+export type DbPing = {
+  /** Resolves once the database answers a query, and rejects when it does not. */
+  ping: () => Promise<void>;
+  /** Closes the ping's connection pool. */
+  close: () => Promise<void>;
+};
+
 /**
  * Returns a ping that runs over a pool of its own with one connection. The server exits when pings
  * fail. In the request pool, a flood of requests would hold pings back and make a healthy server
  * exit. The timeouts end a dial to a database host that is gone and a query on a dropped
  * connection.
  */
-export const createDbPing = (settings: DbSettings = getDbSettings()) => {
+export const newDbPing = (settings: DbSettings): DbPing => {
   const dataSource = new DataSource({
-    type: "postgres",
-    ...settings,
+    ...connectionOptions(settings),
     connectTimeoutMS: 2_000,
     extra: { max: 1, query_timeout: 2_000 },
   });
 
-  return async () => {
-    if (!dataSource.isInitialized) {
-      await dataSource.initialize();
-    }
+  return {
+    ping: async () => {
+      if (!dataSource.isInitialized) {
+        await dataSource.initialize();
+      }
 
-    await dataSource.query("SELECT 1");
+      await dataSource.query("SELECT 1");
+    },
+    close: async () => {
+      if (dataSource.isInitialized) {
+        await dataSource.destroy();
+      }
+    },
   };
 };
 
 /** Connects to the database with the TypeORM settings the server queries through. */
-export async function openPostgres(settings: DbSettings = getDbSettings()): Promise<DataSource> {
+export async function openPostgres(settings: DbSettings): Promise<DataSource> {
   return new DataSource(getTypeOrmConfig(settings)).initialize();
 }
 

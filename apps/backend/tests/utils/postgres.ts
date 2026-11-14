@@ -1,4 +1,7 @@
 import { execFileSync } from "node:child_process";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 import { PostgreSqlContainer, StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 
@@ -21,17 +24,27 @@ function setUpDocker() {
   process.env.TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE ||= "/var/run/docker.sock";
 }
 
+/** Means a Postgres in Docker that a test connects to. */
+export type TestPostgres = {
+  container: StartedPostgreSqlContainer;
+  /** Names the database, with its password in a file, as the server reads it. */
+  settings: DbSettings;
+  /** Stops the container and removes the password file. */
+  stop(): Promise<void>;
+};
+
 /**
  * Starts an empty Postgres in Docker and returns it with the settings the backend connects with.
  * Locally it needs a running colima; in CI, the runner's Docker.
  */
-export async function startPostgres(): Promise<{
-  container: StartedPostgreSqlContainer;
-  settings: DbSettings;
-}> {
+export async function startPostgres(): Promise<TestPostgres> {
   setUpDocker();
 
   const container = await new PostgreSqlContainer(image).start();
+  const passwordDir = mkdtempSync(join(tmpdir(), "guessir-postgres-"));
+  const passwordFile = join(passwordDir, "password");
+
+  writeFileSync(passwordFile, container.getPassword());
 
   return {
     container,
@@ -39,8 +52,12 @@ export async function startPostgres(): Promise<{
       host: container.getHost(),
       port: container.getPort(),
       username: container.getUsername(),
-      password: container.getPassword(),
+      passwordFile,
       database: container.getDatabase(),
+    },
+    async stop() {
+      await container.stop();
+      rmSync(passwordDir, { recursive: true, force: true });
     },
   };
 }

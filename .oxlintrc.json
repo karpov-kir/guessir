@@ -8,7 +8,7 @@
     {
       // A Nest module is an empty class that its @Module decorator describes, and Nest accepts no other shape
       "files": [
-        "apps/backend/src/entrypoints/server/compositionRoot.ts",
+        "apps/backend/src/entrypoints/server/compose.ts",
         "apps/backend/src/entrypoints/server/http/QueryErrorFilter.test.ts"
       ],
       "rules": { "typescript/no-extraneous-class": ["error", { "allowWithDecorator": true }] }
