@@ -181,7 +181,7 @@ describe("the texts API over HTTP", () => {
     expect(response.statusCode).toBe(400);
     expect(response.json()).toEqual({
       message: [
-        "title: Too small: expected string to have >=1 characters",
+        "title: Invalid string: must not be blank",
         "text: Invalid input: expected string, received undefined",
         "allowShowingText: Invalid input: expected boolean, received string",
       ],
@@ -191,20 +191,22 @@ describe("the texts API over HTTP", () => {
   });
 
   it.each([
-    [null, "Invalid input: expected string, received null"],
-    ["", "Invalid string: must not be blank"],
-    ["  ", "Invalid string: must not be blank"],
-  ])("should refuse the description %j and store nothing", async (description, problem) => {
+    ["title", "  ", "Invalid string: must not be blank"],
+    ["text", "\n\t", "Invalid string: must not be blank"],
+    ["description", null, "Invalid input: expected string, received null"],
+    ["description", "", "Invalid string: must not be blank"],
+    ["description", "  ", "Invalid string: must not be blank"],
+  ])("should refuse the %s %j and store nothing", async (field, value, problem) => {
     textRows.insert.mockClear();
 
     const response = await request("POST", "/texts", {
       title: "Title",
-      description,
       text: "One two",
+      [field]: value,
     });
 
     expect(response.statusCode).toBe(400);
-    expect(response.json<{ message: string[] }>().message).toEqual([`description: ${problem}`]);
+    expect(response.json<{ message: string[] }>().message).toEqual([`${field}: ${problem}`]);
     expect(textRows.insert).not.toHaveBeenCalled();
   });
 

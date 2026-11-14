@@ -27,14 +27,18 @@ describe("createTextDtoSchema", () => {
     );
   });
 
-  it.each(["", "   ", "\n\t"])("should reject the blank description %j", (description) => {
-    expect(problems("description", description)).toEqual(["Invalid string: must not be blank"]);
+  it.each(
+    ["title", "description", "text"].flatMap((field) =>
+      ["", "   ", "\n\t", "\u00a0\u3000"].map((value) => [field, value]),
+    ),
+  )("should reject the blank %s %j", (field, value) => {
+    expect(problems(field, value)).toEqual(["Invalid string: must not be blank"]);
   });
 
-  it("should keep a description as sent", () => {
-    expect(createTextDtoSchema.parse({ ...validText, description: " About " }).description).toBe(
-      " About ",
-    );
+  it("should keep each field as sent", () => {
+    const padded = { title: " Title ", description: " About ", text: " One two " };
+
+    expect(createTextDtoSchema.parse(padded)).toMatchObject(padded);
   });
 
   it.each([
