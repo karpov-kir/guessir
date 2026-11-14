@@ -1,4 +1,7 @@
-import type { MigrationFn } from "../postgres.js";
+import type { MigrationFn, MigrationKind } from "../postgres.js";
+
+// It changes rows and no column: older code reads the texts that remain as it always did
+export const kind: MigrationKind = "expand";
 
 /**
  * Matches a value that is empty or holds only the characters `String.prototype.trim` strips, so

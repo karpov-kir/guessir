@@ -1,4 +1,7 @@
-import type { MigrationFn } from "../postgres.js";
+import type { MigrationFn, MigrationKind } from "../postgres.js";
+
+// It only creates the table and its index
+export const kind: MigrationKind = "expand";
 
 export const up: MigrationFn = async ({ context: { query } }) => {
   await query(`
