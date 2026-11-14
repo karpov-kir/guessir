@@ -52,6 +52,14 @@ describe("the texts table on Postgres", () => {
     expect(await db.texts.getById("unknown")).toBeUndefined();
   });
 
+  it("should give back a text stored without a description with no description", async () => {
+    const { description: _, ...withoutDescription } = { ...record, id: "cccccccccccccccccccc" };
+
+    await db.texts.insert(withoutDescription);
+
+    expect(await db.texts.getById(withoutDescription.id)).toEqual(withoutDescription);
+  });
+
   it("should refuse a second text with the same id", async () => {
     const id = "bbbbbbbbbbbbbbbbbbbb";
 

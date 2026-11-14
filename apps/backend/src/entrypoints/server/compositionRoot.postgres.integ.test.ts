@@ -48,4 +48,19 @@ describe("the server over Postgres", () => {
       ],
     });
   });
+
+  it("should answer a text stored without a description with no description key", async () => {
+    const created = await server.handle({
+      method: "POST",
+      url: "/texts",
+      payload: { title: "Title", text: "One two" },
+    });
+    const skeleton = await server.handle({
+      method: "GET",
+      url: `/texts/${created.json<{ id: string }>().id}`,
+    });
+
+    expect(skeleton.statusCode).toBe(200);
+    expect(skeleton.json()).not.toHaveProperty("description");
+  });
 });
