@@ -4,7 +4,7 @@
 
 import { Logger } from "@nestjs/common";
 
-import { errorText } from "../server/dbWatch.js";
+import { errorText } from "../../shared/errorText.js";
 import { compose } from "./compose.js";
 
 const logger = new Logger("migrate");

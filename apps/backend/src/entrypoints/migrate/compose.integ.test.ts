@@ -1,13 +1,10 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-
 import { DataSource } from "typeorm";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { startPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
 import { steppingClock } from "../../../tests/utils/steppingClock.js";
 import { testConfig } from "../../../tests/utils/testConfig.js";
+import { unreachableDbConfig } from "../../../tests/utils/unreachableDbConfig.js";
 import { openPostgres } from "../../infra/db/postgres.js";
 import { compose as composeServer, ServerHandle } from "../server/compose.js";
 import { compose } from "./compose.js";
@@ -16,7 +13,7 @@ describe("the migrate step", () => {
   let postgres: TestPostgres | undefined;
   let server: ServerHandle | undefined;
   let dataSource: DataSource | undefined;
-  let tempDir: string | undefined;
+  let unreachable: ReturnType<typeof unreachableDbConfig> | undefined;
 
   const serverOver = (settings: TestPostgres["settings"]) =>
     composeServer({ config: testConfig(settings), logger: false });
@@ -33,13 +30,11 @@ describe("the migrate step", () => {
     await server?.stop();
     await dataSource?.destroy();
     await postgres?.stop();
-    if (tempDir) {
-      rmSync(tempDir, { recursive: true, force: true });
-    }
+    unreachable?.remove();
     server = undefined;
     dataSource = undefined;
     postgres = undefined;
-    tempDir = undefined;
+    unreachable = undefined;
   });
 
   it("should migrate a new database, so the server, which refused it, then starts", async () => {
@@ -68,31 +63,26 @@ describe("the migrate step", () => {
     ]);
   }, 120_000);
 
-  it("should leave the server refusing a database that newer code migrated", async () => {
+  it("should refuse, as the server does, a database that newer code migrated", async () => {
     postgres = await startPostgres();
     await compose({ config: testConfig(postgres.settings) }).run();
-    await migrationNames(postgres.settings);
-    await dataSource?.query(
+    dataSource = await openPostgres(postgres.settings);
+    await dataSource.query(
       "INSERT INTO migrations (name) VALUES ('2099-01-01-from-newer-code.js')",
     );
 
-    await expect(serverOver(postgres.settings)).rejects.toThrow(
-      /^The database holds the migrations 2099-01-01-from-newer-code, which this code does not know: newer code migrated it$/,
+    const newerCode =
+      /^The database holds the migrations 2099-01-01-from-newer-code, which this code does not know: newer code migrated it$/;
+
+    await expect(compose({ config: testConfig(postgres.settings) }).run()).rejects.toThrow(
+      newerCode,
     );
+    await expect(serverOver(postgres.settings)).rejects.toThrow(newerCode);
   }, 120_000);
 
   it("should throw once the database has not answered for the startup wait", async () => {
-    tempDir = mkdtempSync(join(tmpdir(), "migrate-"));
-    const passwordFile = join(tempDir, "password");
-    writeFileSync(passwordFile, "password");
-    // Nothing listens on port 1, so every ping is refused
-    const config = testConfig({
-      host: "127.0.0.1",
-      port: 1,
-      username: "guessir",
-      passwordFile,
-      database: "guessir",
-    });
+    unreachable = unreachableDbConfig();
+    const { config } = unreachable;
 
     await expect(compose({ config, clock: steppingClock() }).run()).rejects.toThrow(
       /^DB did not answer for 60000ms: /,

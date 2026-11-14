@@ -1,6 +1,6 @@
 import { Logger } from "@nestjs/common";
 
-import { errorText } from "./dbWatch.js";
+import { errorText } from "../../shared/errorText.js";
 
 const logger = new Logger("server");
 

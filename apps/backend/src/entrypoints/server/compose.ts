@@ -11,7 +11,8 @@ import { systemIds } from "../../infra/systemIds.js";
 import type { Clock } from "../../shared/Clock.js";
 import type { IdGenerator } from "../../shared/IdGenerator.js";
 import { parseConfig, type ServerConfig } from "./config.js";
-import { errorText, pingEveryMs, startupWaitMs, waitForDb, watchDb } from "./dbWatch.js";
+import { pingEveryMs, waitForDbAtStart, watchDb } from "../../shared/dbWatch.js";
+import { errorText } from "../../shared/errorText.js";
 import { newApp } from "./http/newApp.js";
 
 // After `lostAfterMs` without the database, the server exits, so Swarm starts a new container with
@@ -76,8 +77,8 @@ const exitOnDbLost = (error: unknown) => {
 
 /**
  * Builds the HTTP server and the texts feature over the database, or over `overrides.textRows`.
- * Waits until the database answers, and throws when it stays silent or lacks a migration. Returns
- * the server's handle without listening.
+ * Waits until the database answers, and throws when it stays silent or has not run exactly this
+ * code's migrations. Returns the server's handle without listening.
  */
 export async function compose(overrides: ServerOverrides = {}): Promise<ServerHandle> {
   const config = overrides.config ?? parseConfig(readEnv());
@@ -96,14 +97,7 @@ export async function compose(overrides: ServerOverrides = {}): Promise<ServerHa
 
     if (!textRows) {
       dbPing = newDbPing(config.db);
-      await waitForDb({
-        ping: dbPing.ping,
-        clock,
-        limitMs: startupWaitMs,
-        intervalMs: pingEveryMs,
-      }).catch((error: unknown) => {
-        throw new Error(`DB did not answer for ${startupWaitMs}ms: ${errorText(error)}`);
-      });
+      await waitForDbAtStart({ ping: dbPing.ping, clock });
       db = await openDb(config.db);
       // The migrate step migrates the database. The server runs no migration and refuses a
       // database short of one.

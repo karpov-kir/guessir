@@ -5,7 +5,7 @@ import { readEnv } from "../../infra/env.js";
 import { systemClock } from "../../infra/systemClock.js";
 import type { Clock } from "../../shared/Clock.js";
 import { parseConfig, type ServerConfig } from "../server/config.js";
-import { errorText, pingEveryMs, startupWaitMs, waitForDb } from "../server/dbWatch.js";
+import { waitForDbAtStart } from "../../shared/dbWatch.js";
 
 const logger = new Logger("migrate");
 
@@ -33,14 +33,7 @@ export function compose(overrides: MigrateOverrides = {}): MigrateHandle {
       const dbPing = newDbPing(config.db);
 
       try {
-        await waitForDb({
-          ping: dbPing.ping,
-          clock,
-          limitMs: startupWaitMs,
-          intervalMs: pingEveryMs,
-        }).catch((error: unknown) => {
-          throw new Error(`DB did not answer for ${startupWaitMs}ms: ${errorText(error)}`);
-        });
+        await waitForDbAtStart({ ping: dbPing.ping, clock });
       } finally {
         await dbPing.close();
       }

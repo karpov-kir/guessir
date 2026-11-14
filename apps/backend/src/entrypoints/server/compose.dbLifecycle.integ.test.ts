@@ -1,43 +1,29 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-
 import { afterEach, describe, expect, it } from "vitest";
 
 import { startMigratedPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
 import { steppingClock } from "../../../tests/utils/steppingClock.js";
 import { testConfig } from "../../../tests/utils/testConfig.js";
+import { unreachableDbConfig } from "../../../tests/utils/unreachableDbConfig.js";
 import { systemClock } from "../../infra/systemClock.js";
 import { compose, ServerHandle } from "./compose.js";
 
 describe("the server's database lifecycle", () => {
   let postgres: TestPostgres | undefined;
   let server: ServerHandle | undefined;
-  let tempDir: string | undefined;
+  let unreachable: ReturnType<typeof unreachableDbConfig> | undefined;
 
   afterEach(async () => {
     await server?.stop();
     await postgres?.stop();
-    if (tempDir) {
-      rmSync(tempDir, { recursive: true, force: true });
-    }
+    unreachable?.remove();
     server = undefined;
     postgres = undefined;
-    tempDir = undefined;
+    unreachable = undefined;
   });
 
   it("should throw once the database has not answered for the startup wait", async () => {
-    tempDir = mkdtempSync(join(tmpdir(), "compose-"));
-    const passwordFile = join(tempDir, "password");
-    writeFileSync(passwordFile, "password");
-    // Nothing listens on port 1, so every ping is refused
-    const config = testConfig({
-      host: "127.0.0.1",
-      port: 1,
-      username: "guessir",
-      passwordFile,
-      database: "guessir",
-    });
+    unreachable = unreachableDbConfig();
+    const { config } = unreachable;
 
     await expect(compose({ config, clock: steppingClock(), logger: false })).rejects.toThrow(
       /^DB did not answer for 60000ms: /,

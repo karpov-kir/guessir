@@ -160,30 +160,8 @@ function newMigrator(dataSource: DataSource) {
 // image, so names compare without the extension
 const withoutExtension = (name: string) => name.replace(/\.(ts|js)$/, "");
 
-/**
- * Applies the migrations the database has not run yet, through `dataSource`. Two runs on one
- * database wait for each other on an advisory lock.
- */
-export async function applyDbMigrations(dataSource: DataSource) {
-  const lock = dataSource.createQueryRunner();
-
-  await lock.connect();
-
-  try {
-    await lock.query(`SELECT pg_advisory_lock(hashtext('${migrationTable}'))`);
-    await newMigrator(dataSource).up();
-  } finally {
-    await lock.query(`SELECT pg_advisory_unlock(hashtext('${migrationTable}'))`);
-    await lock.release();
-  }
-}
-
-/**
- * Throws unless the database has run exactly the migrations beside this file, and writes nothing.
- * A database short of a migration needs the migrate step first. One that holds a migration this
- * code does not know was migrated by newer code.
- */
-export async function checkDbMigrated(dataSource: DataSource) {
+/** Returns the migrations beside this file that the database lacks, and the ones it holds that this code does not know. */
+async function compareMigrations(dataSource: DataSource) {
   // The same files the migrator's glob takes
   const known = readdirSync(join(__dirname, "migrations"))
     .filter((name) => /\.(js|ts)$/.test(name))
@@ -196,8 +174,59 @@ export async function checkDbMigrated(dataSource: DataSource) {
         ({ name }) => withoutExtension(name),
       )
     : [];
-  const missing = known.filter((name) => !executed.includes(name));
-  const unknown = executed.filter((name) => !known.includes(name));
+
+  return {
+    missing: known.filter((name) => !executed.includes(name)),
+    unknown: executed.filter((name) => !known.includes(name)),
+  };
+}
+
+const newerCodeError = (unknown: string[]) =>
+  new Error(
+    `The database holds the migrations ${unknown.join(", ")}, which this code does not know: ` +
+      "newer code migrated it",
+  );
+
+/**
+ * Applies the migrations the database has not run yet, through `dataSource`. Two runs on one
+ * database wait for each other on an advisory lock. Throws, before it writes, on a database that
+ * newer code migrated, so a deploy of older code stops before the server rolls.
+ */
+export async function applyDbMigrations(dataSource: DataSource) {
+  const lock = dataSource.createQueryRunner();
+  let isLocked = false;
+
+  await lock.connect();
+
+  try {
+    await lock.query(`SELECT pg_advisory_lock(hashtext('${migrationTable}'))`);
+    isLocked = true;
+
+    const { unknown } = await compareMigrations(dataSource);
+
+    if (unknown.length > 0) {
+      throw newerCodeError(unknown);
+    }
+
+    await newMigrator(dataSource).up();
+  } finally {
+    try {
+      if (isLocked) {
+        await lock.query(`SELECT pg_advisory_unlock(hashtext('${migrationTable}'))`);
+      }
+    } finally {
+      await lock.release();
+    }
+  }
+}
+
+/**
+ * Throws unless the database has run exactly the migrations beside this file, and writes nothing.
+ * A database short of a migration needs the migrate step first. One that holds a migration this
+ * code does not know was migrated by newer code.
+ */
+export async function checkDbMigrated(dataSource: DataSource) {
+  const { missing, unknown } = await compareMigrations(dataSource);
 
   if (missing.length > 0) {
     throw new Error(
@@ -206,9 +235,6 @@ export async function checkDbMigrated(dataSource: DataSource) {
   }
 
   if (unknown.length > 0) {
-    throw new Error(
-      `The database holds the migrations ${unknown.join(", ")}, which this code does not know: ` +
-        "newer code migrated it",
-    );
+    throw newerCodeError(unknown);
   }
 }
