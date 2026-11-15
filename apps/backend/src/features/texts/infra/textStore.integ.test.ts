@@ -49,10 +49,9 @@ describe("the texts table on Postgres", () => {
     const id = "bbbbbbbbbbbbbbbbbbbb";
 
     await rows.insert({ ...text, id });
+    const error = await rows.insert({ ...text, id }).catch((thrown: unknown) => thrown);
 
-    await expect(rows.insert({ ...text, id })).rejects.toThrow(
-      expect.objectContaining({ name: "QueryError", code: "23505" }),
-    );
-    await expect(rows.insert({ ...text, id })).rejects.toBeInstanceOf(QueryError);
+    expect(error).toBeInstanceOf(QueryError);
+    expect(error).toMatchObject({ code: "23505" });
   });
 });

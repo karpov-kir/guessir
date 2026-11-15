@@ -14,6 +14,7 @@ import {
   withoutExtension,
 } from "./migrationFile.js";
 import { ParameterFreeLogger } from "./ParameterFreeLogger.js";
+import { queryOf, transactionOf } from "./query.js";
 
 interface MigrationLog {
   name: string;
@@ -60,7 +61,7 @@ export const getTypeOrmConfig = (settings: DbSettings): DataSourceOptions => ({
   // Umzug migrations in `applyDbMigrations` own the schema, so TypeORM must not.
   synchronize: false,
   logger: new ParameterFreeLogger(),
-  // The texts feature reads and writes its table in SQL, so TypeORM holds no entity
+  // Features read and write their tables in SQL through `Db.query`, so TypeORM holds no entity
   entities: [],
   subscribers: [],
   migrations: [],
@@ -116,11 +117,8 @@ function newMigrator(dataSource: DataSource) {
   // name, so older code can read it from the database.
   const kinds = new Map<string, MigrationKind>();
   const context: MigrationContext = {
-    query: (sql, parameters) => dataSource.query(sql, parameters),
-    transaction: (work) =>
-      dataSource.transaction((manager) =>
-        work((sql, parameters) => manager.query(sql, parameters)),
-      ),
+    query: queryOf(dataSource),
+    transaction: transactionOf(dataSource),
   };
 
   return new Umzug({

@@ -5,6 +5,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { startPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
 import { Db, openDb } from "./openDb.js";
 import { openPostgres } from "./postgres.js";
+import { QueryError } from "./QueryError.js";
 
 interface Row {
   id: string;
@@ -125,7 +126,11 @@ describe("the blank texts migration", () => {
     `);
 
     try {
-      await expect(runMigrationAgain()).rejects.toThrow("update refused");
+      const error: unknown = await runMigrationAgain().catch((thrown: unknown) => thrown);
+
+      // The migrator names the migration and keeps the database's refusal as the cause
+      expect(error instanceof Error && error.message).toMatch(/update refused/);
+      expect(error instanceof Error && error.cause).toBeInstanceOf(QueryError);
       expect(await storedRows()).toEqual(before);
     } finally {
       await dataSource.query(`

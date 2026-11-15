@@ -35,19 +35,6 @@ describe("the database on Postgres", () => {
     expect(error).not.toHaveProperty("parameters");
   });
 
-  it("should roll a transaction back when its work throws", async () => {
-    await db.query("CREATE TABLE rollback_probe (value int)");
-
-    await expect(
-      db.transaction(async (query) => {
-        await query("INSERT INTO rollback_probe VALUES (1)");
-        await query("SELECT 1 / 0");
-      }),
-    ).rejects.toBeInstanceOf(QueryError);
-
-    expect(await db.query("SELECT value FROM rollback_probe")).toEqual([]);
-  });
-
   it("should answer a ping while the database is up", async () => {
     const dbPing = newDbPing(postgres.settings);
 

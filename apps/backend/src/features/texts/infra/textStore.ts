@@ -11,7 +11,7 @@ type TextRow = {
   allowShowingText: boolean;
 };
 
-export type TextStoreOptions = {
+type TextStoreOptions = {
   /** The database whose `texts` table the store reads and adds to. */
   db: Pick<Db, "query">;
 };

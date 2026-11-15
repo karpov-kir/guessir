@@ -3,8 +3,8 @@ import type { FastifyReply } from "fastify";
 import { QueryError } from "../../../infra/db/exports.js";
 
 /**
- * Answers a failed query with the 500 of Nest's default handler, and logs the query without its
- * parameters. The parameters carry the stored texts, which are the answers to the games.
+ * Answers a failed query with the 500 of Nest's default handler, and logs one line with the
+ * query's SQL and SQLSTATE code.
  */
 @Catch(QueryError)
 export class QueryErrorFilter implements ExceptionFilter<QueryError> {

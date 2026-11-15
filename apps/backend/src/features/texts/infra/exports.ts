@@ -1,1 +1,1 @@
-export { newTextStore, type TextStoreOptions } from "./textStore.js";
+export { newTextStore } from "./textStore.js";
