@@ -14,10 +14,11 @@ const PUNCTUATION_CHARACTERS = new Set([",", ".", "!", "?", ";"]);
 /**
  * Splits the trimmed text into normalized lexemes, and a contraction such as `I'm` into its
  * words. Keeps at most one space and two new lines in a row, drops a space before punctuation or
- * a new line, and starts at a word or letter.
+ * a new line, and starts at a word or letter. Composes the text (NFC) first, so a letter typed as
+ * a base and a combining mark is the one letter a guess types.
  */
 export function analyze(rawText: string): LexemeAnalysis {
-  const text = rawText.trim();
+  const text = rawText.normalize("NFC").trim();
   const lexemeAnalyzerStore = new LexemeAnalyzerStore();
   let buffer = LexemeAnalyzerUtils.createEmptyBuffer();
   let startIndex = 0;

@@ -65,13 +65,47 @@ describe(TextGame, () => {
   });
 });
 
-describe("a text with a character whose lower case is two characters", () => {
-  it("should keep the character as an other-character lexeme", () => {
-    expect(new TextGame("To İstanbul").lexemes()).toEqual([
+describe("an English text with words from other languages", () => {
+  /** Returns the words of `text` and what each guess finds. */
+  const play = (text: string, guesses: string[]) => {
+    const game = new TextGame(text);
+
+    return {
+      words: game.words().map(({ word }) => word),
+      found: guesses.map((guess) => game.guess(guess).map(({ word }) => word)),
+    };
+  };
+
+  it("should keep a word with accented letters whole", () => {
+    expect(play("A naïve café résumé", ["naïve", "CAFÉ", "résumé"])).toEqual({
+      words: ["A", "naïve", "café", "résumé"],
+      found: [["naïve"], ["café"], ["résumé"]],
+    });
+  });
+
+  it("should read a letter typed as a base and a combining mark as the one letter a guess types", () => {
+    const game = new TextGame("A cafe\u0301 here");
+
+    expect(game.lexemes()).toEqual(new TextGame("A café here").lexemes());
+    expect(game.guess("café")).toEqual([{ index: 2, word: "café" }]);
+    expect(game.guess("cafe\u0301")).toEqual([{ index: 2, word: "café" }]);
+  });
+
+  it("should keep İ in its word, and find İstanbul's by its base word", () => {
+    expect(play("To İstanbul's port", ["İstanbul", "İstanbul's"])).toEqual({
+      words: ["To", "İstanbul's", "port"],
+      found: [["İstanbul's"], ["İstanbul's"]],
+    });
+  });
+
+  it("should leave digits out of words, as before", () => {
+    expect(new TextGame("In 2026").lexemes()).toEqual([
       { index: 0, length: 2 },
       { index: 1, character: " " },
-      { index: 2, character: "İ" },
-      { index: 3, length: 7 },
+      { index: 2, character: "2" },
+      { index: 3, character: "0" },
+      { index: 4, character: "2" },
+      { index: 5, character: "6" },
     ]);
   });
 });

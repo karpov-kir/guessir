@@ -17,7 +17,9 @@ const CHARACTERS_TO_NORMALIZED_CHARACTERS = new Map([
 const NORMALIZED_WORDS_TO_NORMALIZED_WORDS = new Map([[asNormalized("i"), asNormalized("I")]]);
 const NORMALIZED_CONTRACTION_CHARACTERS = new Set([asNormalized("'")]);
 const NORMALIZED_WORD_SEPARATION_CHARACTERS = new Set([asNormalized("-")]);
-const LETTER_RE = /^[A-Za-z]$/;
+// A letter of any script, or a mark that joins one, so a word from another language inside an
+// English text, such as Café or İstanbul, stays whole
+const LETTER_RE = /^[\p{L}\p{M}]$/u;
 
 const NORMALIZED_CONTRACTION_TO_NORMALIZED_NORMAL = new Map<
   string,
@@ -171,16 +173,15 @@ export function getLexemeType(baseLexeme: BaseLexeme) {
 export function getGroupingWords(
   normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal,
 ): GroupWordLikeNominal[] {
-  const length = normalizedPrimitiveLexeme.length;
   const groupWordLikeNominal = asGroupWordLike(normalizedPrimitiveLexeme.toLowerCase());
 
   // This check adds the base word of a word that ends in `'s` or `'d`. The ending can mean is or
   // has, would or had, so the uncontraction table cannot expand it. The check skips a bare `'s`,
-  // which has no base word.
+  // which has no base word. It reads the lower-cased word, which can be longer: `İ` lower-cases to
+  // two characters.
   if (
-    length > 2 &&
-    ["s", "d"].includes(groupWordLikeNominal[length - 1]) &&
-    groupWordLikeNominal[length - 2] === "'"
+    groupWordLikeNominal.length > 2 &&
+    (groupWordLikeNominal.endsWith("'s") || groupWordLikeNominal.endsWith("'d"))
   ) {
     return [asGroupWordLike(groupWordLikeNominal.slice(0, -2)), groupWordLikeNominal];
   }
