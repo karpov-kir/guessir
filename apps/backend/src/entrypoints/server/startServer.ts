@@ -2,13 +2,12 @@
 // tests cover the server, and dbWatch's tests cover the waiting.
 /* v8 ignore start */
 
-import { Logger } from "@nestjs/common";
-
 import { errorText } from "../../shared/errorText.js";
+import { Logger } from "../../shared/Logger.js";
 import { compose, type ServerHandle } from "./compose.js";
 import { stopOnSignals } from "./stopOnSignals.js";
 
-const logger = new Logger("server");
+const logger = Logger.root.scope("server");
 
 /**
  * Builds the server from the environment and starts it once the database answers. Exits the

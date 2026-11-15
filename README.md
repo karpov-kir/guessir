@@ -11,3 +11,7 @@ Raise `version` in `apps/backend/package.json` or `apps/web/package.json`. CI on
 ## Database migrations
 
 The server runs no migration, and it refuses to start on a database short of one, or on one that holds a contract migration from newer code. The migrate step applies them: `npm run migrate -w @guessir/backend` after a build, or `node apps/backend/dist/entrypoints/migrate/start.js` in the backend image, which a deploy runs as a one-off job before the server rolls. `npm run start:dev -w @guessir/backend` runs it on the local database first.
+
+## Logs
+
+The server and the migrate step log each record as it happens. `LOG_FORMAT` picks the shape: `pretty` by default, for a person, with warnings and errors on standard error, or `json`, one line per record on standard output, for a log collector. `LOG_LEVEL` drops the records below it: `debug`, `info` by default, `warn`, `error` or `silent`.

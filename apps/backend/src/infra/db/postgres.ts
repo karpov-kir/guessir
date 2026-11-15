@@ -1,7 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { Logger } from "@nestjs/common";
 import { DataSource, DataSourceOptions } from "typeorm";
 import { RunnableMigration, Umzug } from "umzug";
 
@@ -15,6 +14,7 @@ import {
 } from "./migrationFile.js";
 import { ParameterFreeLogger } from "./ParameterFreeLogger.js";
 import { queryOf, transactionOf } from "./query.js";
+import { Logger } from "../../shared/Logger.js";
 
 interface MigrationLog {
   name: string;
@@ -109,7 +109,7 @@ export async function openPostgres(settings: DbSettings): Promise<DataSource> {
   return new DataSource(getTypeOrmConfig(settings)).initialize();
 }
 
-const logger = new Logger("postgres");
+const logger = Logger.root.scope("postgres");
 
 /** Returns the migrator of the database behind `dataSource`, over the migration files beside this file. */
 function newMigrator(dataSource: DataSource) {
@@ -156,7 +156,7 @@ function newMigrator(dataSource: DataSource) {
       },
     },
     logger: {
-      info: (message) => logger.log(message),
+      info: (message) => logger.info(message),
       warn: (message) => logger.warn(message),
       error: (message) => logger.error(message),
       debug: (message) => logger.debug(message),

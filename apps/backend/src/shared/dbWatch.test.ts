@@ -1,11 +1,7 @@
-import { Logger } from "@nestjs/common";
 import { describe, expect, it } from "vitest";
 
 import type { Clock } from "./Clock.js";
 import { waitForDb, watchDb } from "./dbWatch.js";
-
-// Silences Nest's logger: these tests make the database fail on purpose.
-Logger.overrideLogger(false);
 
 const down = new Error("getaddrinfo ENOTFOUND guessir_database");
 

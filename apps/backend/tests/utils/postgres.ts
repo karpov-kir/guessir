@@ -7,6 +7,7 @@ import { PostgreSqlContainer } from "@testcontainers/postgresql";
 
 import { compose as composeMigrate } from "../../src/entrypoints/migrate/compose.js";
 import { DbSettings } from "../../src/infra/db/exports.js";
+import { silentSink } from "./collectLogs.js";
 import { testConfig } from "./testConfig.js";
 
 // The same Postgres major as the server's stack
@@ -66,7 +67,7 @@ export async function startPostgres(): Promise<TestPostgres> {
 export async function startMigratedPostgres(): Promise<TestPostgres> {
   const postgres = await startPostgres();
 
-  await composeMigrate({ config: testConfig(postgres.settings) }).run();
+  await composeMigrate({ config: testConfig(postgres.settings), logSink: silentSink }).run();
 
   return postgres;
 }

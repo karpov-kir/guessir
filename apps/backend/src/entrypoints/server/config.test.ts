@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { LogFormat } from "../../infra/logger/exports.js";
+import { LogLevel } from "../../shared/Logger.js";
 import { parseConfig } from "./config.js";
 
 const env = {
@@ -10,7 +12,7 @@ const env = {
 };
 
 describe(parseConfig, () => {
-  it("should read the database settings and default the ports and the host", () => {
+  it("should read the database settings and default the ports, the host and the log", () => {
     expect(parseConfig(env)).toEqual({
       host: "0.0.0.0",
       port: 3020,
@@ -21,7 +23,22 @@ describe(parseConfig, () => {
         passwordFile: "/run/secrets/database-password",
         database: "guessir-production",
       },
+      log: { format: LogFormat.Pretty, level: LogLevel.Info },
     });
+  });
+
+  it("should take LOG_FORMAT and LOG_LEVEL when set", () => {
+    expect(parseConfig({ ...env, LOG_FORMAT: "json", LOG_LEVEL: "debug" })).toMatchObject({
+      log: { format: LogFormat.Json, level: LogLevel.Debug },
+    });
+    expect(parseConfig({ ...env, LOG_LEVEL: "silent" }).log.level).toBe(LogLevel.Silent);
+  });
+
+  it.each([
+    ["LOG_FORMAT", "text"],
+    ["LOG_LEVEL", "verbose"],
+  ])("should throw on the %s %j", (name, value) => {
+    expect(() => parseConfig({ ...env, [name]: value })).toThrow(name);
   });
 
   it("should take HOST, PORT and DATABASE_PORT when set", () => {
@@ -31,10 +48,13 @@ describe(parseConfig, () => {
   });
 
   it("should read a variable that is empty or only whitespace as unset", () => {
-    expect(parseConfig({ ...env, HOST: "", PORT: "  ", DATABASE_PORT: "\t" })).toMatchObject({
+    expect(
+      parseConfig({ ...env, HOST: "", PORT: "  ", DATABASE_PORT: "\t", LOG_LEVEL: " " }),
+    ).toMatchObject({
       host: "0.0.0.0",
       port: 3020,
       db: { port: 5432 },
+      log: { level: LogLevel.Info },
     });
   });
 

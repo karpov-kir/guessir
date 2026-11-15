@@ -1,18 +1,23 @@
-import { Logger } from "@nestjs/common";
-
 import { newDbPing, openDb } from "../../infra/db/exports.js";
 import { readEnv } from "../../infra/env.js";
+import { newConsoleSink, newLogSink } from "../../infra/logger/exports.js";
 import { systemClock } from "../../infra/systemClock.js";
 import type { Clock } from "../../shared/Clock.js";
+import { Logger, LogLevel, type LogSink } from "../../shared/Logger.js";
 import { parseConfig, type ServerConfig } from "../server/config.js";
 import { waitForDbAtStart } from "../../shared/dbWatch.js";
 
-const logger = new Logger("migrate");
+const logger = Logger.root.scope("migrate");
 
 export type MigrateOverrides = {
   /** Stands in for the config the environment holds. */
   config?: ServerConfig;
   clock?: Clock;
+  /**
+   * Takes the log records in place of both sinks that `compose` installs, so a test can read or
+   * drop them.
+   */
+  logSink?: LogSink;
 };
 
 export type MigrateHandle = {
@@ -24,10 +29,18 @@ export type MigrateHandle = {
   run(): Promise<void>;
 };
 
-/** Builds the step that migrates the server's database, from the same config as the server. */
+/**
+ * Builds the step that migrates the server's database, from the same config as the server. Installs
+ * the log sinks and parses the config at once, so an invalid config throws here.
+ */
 export function compose(overrides: MigrateOverrides = {}): MigrateHandle {
-  const config = overrides.config ?? parseConfig(readEnv());
   const clock = overrides.clock ?? systemClock;
+
+  // This call installs a console sink before the config is parsed, so a parse error still reaches a
+  // log. The second call reads the format from the config.
+  Logger.install(overrides.logSink ?? newConsoleSink({ clock }), LogLevel.Info);
+  const config = overrides.config ?? parseConfig(readEnv());
+  Logger.install(overrides.logSink ?? newLogSink(config.log.format, { clock }), config.log.level);
 
   return {
     async run() {
@@ -42,9 +55,9 @@ export function compose(overrides: MigrateOverrides = {}): MigrateHandle {
       const db = await openDb(config.db);
 
       try {
-        logger.log(`Applying DB migrations to ${config.db.database} on ${config.db.host}`);
+        logger.info(`Applying DB migrations to ${config.db.database} on ${config.db.host}`);
         await db.migrate();
-        logger.log("DB is migrated");
+        logger.info("DB is migrated");
       } finally {
         await db.close();
       }

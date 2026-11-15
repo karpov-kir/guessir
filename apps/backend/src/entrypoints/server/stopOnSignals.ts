@@ -1,8 +1,7 @@
-import { Logger } from "@nestjs/common";
-
 import { errorText } from "../../shared/errorText.js";
+import { Logger } from "../../shared/Logger.js";
 
-const logger = new Logger("server");
+const logger = Logger.root.scope("server");
 
 /** The part of `process` that stopping on a signal needs, so a test can stand in for it. */
 export type SignalledProcess = {
@@ -30,7 +29,7 @@ export function stopOnSignals({
     }
 
     isStopping = true;
-    logger.log(`${signal} received, stopping`);
+    logger.info(`${signal} received, stopping`);
     stop().then(
       () => signalled.exit(0),
       (error: unknown) => {

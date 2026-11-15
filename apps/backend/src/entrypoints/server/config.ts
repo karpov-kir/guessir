@@ -1,13 +1,15 @@
 import { z } from "zod";
 
 import type { DbSettings } from "../../infra/db/exports.js";
+import { LogFormat } from "../../infra/logger/exports.js";
+import { LogLevel } from "../../shared/Logger.js";
 
-/** Means the server's settings, which the composition root reads from the environment. */
 export type ServerConfig = {
   /** The address the server listens on. */
   host: string;
   port: number;
   db: DbSettings;
+  log: { format: LogFormat; level: LogLevel };
 };
 
 // A variable that is empty or only whitespace counts as unset, so a default or the "required" error
@@ -20,6 +22,16 @@ const required = z.preprocess(unsetIfBlank, z.string({ error: "must be set" }));
 const portNumber = (fallback: number) =>
   z.preprocess(unsetIfBlank, z.coerce.number().int().min(0).max(65_535).default(fallback));
 
+const logLevelNames = ["debug", "info", "warn", "error", "silent"] as const;
+
+const logLevels: Record<(typeof logLevelNames)[number], LogLevel> = {
+  debug: LogLevel.Debug,
+  info: LogLevel.Info,
+  warn: LogLevel.Warn,
+  error: LogLevel.Error,
+  silent: LogLevel.Silent,
+};
+
 const envSchema = z.object({
   HOST: z.preprocess(unsetIfBlank, z.string().default("0.0.0.0")),
   PORT: portNumber(3020),
@@ -30,6 +42,8 @@ const envSchema = z.object({
   // `env/database-password.development` locally
   DATABASE_PASSWORD_FILE: required,
   DATABASE_NAME: required,
+  LOG_FORMAT: z.preprocess(unsetIfBlank, z.enum(LogFormat).default(LogFormat.Pretty)),
+  LOG_LEVEL: z.preprocess(unsetIfBlank, z.enum(logLevelNames).default("info")),
 });
 
 /** Reads the server's config from `env`, and throws with every problem when a variable is wrong. */
@@ -48,6 +62,8 @@ export function parseConfig(env: Readonly<Record<string, string | undefined>>): 
     DATABASE_USER,
     DATABASE_PASSWORD_FILE,
     DATABASE_NAME,
+    LOG_FORMAT,
+    LOG_LEVEL,
   } = parsed.data;
 
   return {
@@ -60,5 +76,6 @@ export function parseConfig(env: Readonly<Record<string, string | undefined>>): 
       passwordFile: DATABASE_PASSWORD_FILE,
       database: DATABASE_NAME,
     },
+    log: { format: LOG_FORMAT, level: logLevels[LOG_LEVEL] },
   };
 }

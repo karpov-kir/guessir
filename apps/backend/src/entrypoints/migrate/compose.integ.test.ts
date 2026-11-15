@@ -1,12 +1,13 @@
-import { Logger } from "@nestjs/common";
 import { DataSource } from "typeorm";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
+import { collectLogs, silentSink } from "../../../tests/utils/collectLogs.js";
 import { startPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
 import { steppingClock } from "../../../tests/utils/steppingClock.js";
 import { testConfig } from "../../../tests/utils/testConfig.js";
 import { unreachableDbConfig } from "../../../tests/utils/unreachableDbConfig.js";
 import { openPostgres } from "../../infra/db/postgres.js";
+import { LogLevel, type LogSink } from "../../shared/Logger.js";
 import { compose as composeServer, ServerHandle } from "../server/compose.js";
 import { compose } from "./compose.js";
 
@@ -16,8 +17,10 @@ describe("the migrate step", () => {
   let dataSource: DataSource | undefined;
   let unreachable: ReturnType<typeof unreachableDbConfig> | undefined;
 
-  const serverOver = (settings: TestPostgres["settings"]) =>
-    composeServer({ config: testConfig(settings), logger: false });
+  const serverOver = (settings: TestPostgres["settings"], logSink: LogSink = silentSink) =>
+    composeServer({ config: testConfig(settings), logSink });
+  const migrateStep = (settings: TestPostgres["settings"], logSink: LogSink = silentSink) =>
+    compose({ config: testConfig(settings), logSink });
 
   /** Returns the migrations the database has run, without their extensions, with their kinds. */
   const migrationRows = async (settings: TestPostgres["settings"]) => {
@@ -39,7 +42,6 @@ describe("the migrate step", () => {
   };
 
   afterEach(async () => {
-    vi.restoreAllMocks();
     await server?.stop();
     await dataSource?.destroy();
     await postgres?.stop();
@@ -57,7 +59,7 @@ describe("the migrate step", () => {
       /^The database lacks the migrations 2022-03-23-initial, 2026-11-14-blank-texts: run the migrate step first$/,
     );
 
-    await compose({ config: testConfig(postgres.settings) }).run();
+    await migrateStep(postgres.settings).run();
     server = await serverOver(postgres.settings);
 
     expect((await server.handle({ method: "GET", url: "/texts/unknown" })).statusCode).toBe(404);
@@ -65,7 +67,7 @@ describe("the migrate step", () => {
 
   it("should apply each migration once and record its kind, even with two steps at once", async () => {
     postgres = await startPostgres();
-    const step = compose({ config: testConfig(postgres.settings) });
+    const step = migrateStep(postgres.settings);
 
     await Promise.all([step.run(), step.run()]);
     await step.run();
@@ -80,14 +82,12 @@ describe("the migrate step", () => {
     "should refuse, as the server does, a database with a newer migration of kind %s",
     async (kind) => {
       postgres = await startPostgres();
-      await compose({ config: testConfig(postgres.settings) }).run();
+      await migrateStep(postgres.settings).run();
       await recordNewerMigration(postgres.settings, kind);
       const newerContract =
         /^The database holds the migrations 2099-01-01-from-newer-code, which this code does not know and which are contracts or record no kind: newer code changed it in a way this code cannot run on$/;
 
-      await expect(compose({ config: testConfig(postgres.settings) }).run()).rejects.toThrow(
-        newerContract,
-      );
+      await expect(migrateStep(postgres.settings).run()).rejects.toThrow(newerContract);
       await expect(serverOver(postgres.settings)).rejects.toThrow(newerContract);
     },
     120_000,
@@ -95,27 +95,27 @@ describe("the migrate step", () => {
 
   it("should run on, with a warning, a database with a newer expand migration", async () => {
     postgres = await startPostgres();
-    await compose({ config: testConfig(postgres.settings) }).run();
+    await migrateStep(postgres.settings).run();
     await recordNewerMigration(postgres.settings, "expand");
-    const warn = vi.spyOn(Logger.prototype, "warn");
+    const logs = collectLogs();
     const newerExpand =
       /^The database holds the expand migrations 2099-01-01-from-newer-code, which this code does not know: newer code migrated it, and this code runs on/;
 
-    await compose({ config: testConfig(postgres.settings) }).run();
-    server = await serverOver(postgres.settings);
+    await migrateStep(postgres.settings, logs.sink).run();
+    server = await serverOver(postgres.settings, logs.sink);
 
     expect((await server.handle({ method: "GET", url: "/texts/unknown" })).statusCode).toBe(404);
     // The migrate step and the server each warn once
     expect(
-      warn.mock.calls.filter(
-        ([message]) => typeof message === "string" && newerExpand.test(message),
-      ),
+      logs
+        .lines(LogLevel.Warn)
+        .filter(({ args: [message] }) => typeof message === "string" && newerExpand.test(message)),
     ).toHaveLength(2);
   }, 120_000);
 
   it("should take a database that a release before migrations recorded a kind migrated", async () => {
     postgres = await startPostgres();
-    await compose({ config: testConfig(postgres.settings) }).run();
+    await migrateStep(postgres.settings).run();
     // Such a release made the table without the kind column
     dataSource = await openPostgres(postgres.settings);
     await dataSource.query("ALTER TABLE migrations DROP COLUMN kind");
@@ -123,7 +123,7 @@ describe("the migrate step", () => {
     server = await serverOver(postgres.settings);
     await server.stop();
     server = undefined;
-    await compose({ config: testConfig(postgres.settings) }).run();
+    await migrateStep(postgres.settings).run();
 
     expect(await migrationRows(postgres.settings)).toEqual([
       { name: "2022-03-23-initial", kind: null },
@@ -135,8 +135,8 @@ describe("the migrate step", () => {
     unreachable = unreachableDbConfig();
     const { config } = unreachable;
 
-    await expect(compose({ config, clock: steppingClock() }).run()).rejects.toThrow(
-      /^DB did not answer for 60000ms: /,
-    );
+    await expect(
+      compose({ config, clock: steppingClock(), logSink: silentSink }).run(),
+    ).rejects.toThrow(/^DB did not answer for 60000ms: /);
   });
 });
