@@ -14,7 +14,7 @@
   color: var(--ink);
   font-size: inherit;
   font-weight: inherit;
-  line-height: 1.3;
+  line-height: var(--lh-tile);
   vertical-align: baseline;
 
   /*
@@ -29,7 +29,7 @@
   position: absolute;
   inset: 0 calc(-1 * var(--tile-bleed));
   z-index: -1;
-  border-radius: 9px;
+  border-radius: var(--radius-tile);
   background: var(--tile);
   box-shadow: inset 0 -3px 0 var(--tile-border);
 }
@@ -69,7 +69,7 @@
   left: 0;
   visibility: hidden;
   color: var(--link);
-  font-weight: 800;
+  font-weight: var(--fw-heavy);
 }
 
 .lexeme-container.show {
@@ -108,7 +108,7 @@
  */
 .lexeme-container.fresh {
   color: var(--on-yellow);
-  font-weight: 800;
+  font-weight: var(--fw-heavy);
 }
 
 .lexeme-container.fresh::before {

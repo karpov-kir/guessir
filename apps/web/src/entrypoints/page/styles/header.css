@@ -13,8 +13,8 @@
   gap: 10px;
   margin-right: auto;
   color: var(--ink);
-  font-size: 26px;
-  font-weight: 800;
+  font-size: var(--text-logo);
+  font-weight: var(--fw-heavy);
   letter-spacing: -0.03em;
   text-decoration: none;
 }
@@ -31,7 +31,7 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  border-radius: 12px;
+  border-radius: var(--radius-mark);
   background: var(--accent);
   color: var(--on-accent);
   font-size: var(--text-3xl);
@@ -64,13 +64,13 @@
   display: block;
 }
 
-@media (width <= 640px) {
+@container (width <= 640px) {
   #site-header {
     padding: 12px 16px;
   }
 
   #logo {
-    font-size: 22px;
+    font-size: var(--text-logo-sm);
   }
 
   #logo-mark {
