@@ -1,6 +1,6 @@
 {
   "name": "@guessir/backend",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "type": "module",
   "scripts": {
     "build": "npm run clean && tsc -b tsconfig.build.json",
@@ -22,6 +22,7 @@
     "@nestjs/platform-fastify": "^12.3.2",
     "nanoid": "^6.0.2",
     "pg": "^8.23.1",
+    "pino": "^10.4.0",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^1.1.2",
     "umzug": "^3.8.3",

@@ -1,9 +1,12 @@
 import type { ServerConfig } from "../../src/entrypoints/server/config.js";
 import type { DbSettings } from "../../src/infra/db/exports.js";
+import { LogFormat } from "../../src/infra/logger/exports.js";
+import { LogLevel } from "../../src/shared/Logger.js";
 
 /**
- * Returns a server config for a test. The server listens on a free local port. Its database is
- * `db`, or else one no test reaches, for a server built over fake text rows.
+ * Returns a server config for a test, with the server on a free local port. The database is `db`,
+ * or else a placeholder that no test connects to, for a test whose server never reaches its
+ * database.
  */
 export function testConfig(db?: DbSettings): ServerConfig {
   return {
@@ -16,5 +19,6 @@ export function testConfig(db?: DbSettings): ServerConfig {
       passwordFile: "/unused",
       database: "unused",
     },
+    log: { format: LogFormat.Pretty, level: LogLevel.Info },
   };
 }

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 
+import { silentSink } from "../../../tests/utils/collectLogs.js";
 import { startMigratedPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
 import { steppingClock } from "../../../tests/utils/steppingClock.js";
 import { testConfig } from "../../../tests/utils/testConfig.js";
@@ -25,7 +26,7 @@ describe("the server's database lifecycle", () => {
     unreachable = unreachableDbConfig();
     const { config } = unreachable;
 
-    await expect(compose({ config, clock: steppingClock(), logger: false })).rejects.toThrow(
+    await expect(compose({ config, clock: steppingClock(), logSink: silentSink })).rejects.toThrow(
       /^DB did not answer for 60000ms: /,
     );
   });
@@ -41,7 +42,7 @@ describe("the server's database lifecycle", () => {
       config: testConfig(postgres.settings),
       clock: steppingClock(),
       onDbLost: reportLost,
-      logger: false,
+      logSink: silentSink,
     });
     await server.start();
 
@@ -65,7 +66,7 @@ describe("the server's database lifecycle", () => {
       onDbLost: () => {
         lostCount += 1;
       },
-      logger: false,
+      logSink: silentSink,
     });
     await server.start();
 

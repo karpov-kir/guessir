@@ -6,6 +6,11 @@
   ],
   "overrides": [
     {
+      // The console sink, vendored from kk-flavor, is the one module that writes to the console
+      "files": ["apps/backend/src/infra/logger/consoleSink.ts"],
+      "rules": { "no-console": "off" }
+    },
+    {
       // A Nest module is an empty class that its @Module decorator describes, and Nest accepts no other shape
       "files": [
         "apps/backend/src/entrypoints/server/compose.ts",

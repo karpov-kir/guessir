@@ -1,9 +1,12 @@
-import { Controller, Get, Logger, Module } from "@nestjs/common";
+import { Controller, Get, Module } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { FastifyAdapter, NestFastifyApplication } from "@nestjs/platform-fastify";
-import { QueryError } from "../../../infra/db/exports.js";
-import { afterAll, beforeAll, beforeEach, describe, expect, it, MockInstance, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
+import { collectLogs } from "../../../../tests/utils/collectLogs.js";
+import { QueryError } from "../../../infra/db/exports.js";
+import { Logger, LogLevel } from "../../../shared/Logger.js";
+import { nestLogger } from "./nestLogger.js";
 import { QueryErrorFilter } from "./QueryErrorFilter.js";
 
 const insertQuery = 'INSERT INTO "texts"("title", "text") VALUES ($1, $2)';
@@ -31,11 +34,11 @@ class FailingModule {}
 
 describe(QueryErrorFilter, () => {
   let app: NestFastifyApplication;
-  let logError: MockInstance<Logger["error"]>;
+  let logs: ReturnType<typeof collectLogs>;
 
   beforeAll(async () => {
     app = await NestFactory.create<NestFastifyApplication>(FailingModule, new FastifyAdapter(), {
-      logger: false,
+      logger: nestLogger,
     });
     app.useGlobalFilters(new QueryErrorFilter());
     await app.init();
@@ -47,8 +50,8 @@ describe(QueryErrorFilter, () => {
   });
 
   beforeEach(() => {
-    vi.restoreAllMocks();
-    logError = vi.spyOn(Logger.prototype, "error").mockImplementation(() => undefined);
+    logs = collectLogs();
+    Logger.install(logs.sink, LogLevel.Info);
   });
 
   it("should answer a failed query with Nest's own 500 and log its SQL and code", async () => {
@@ -56,10 +59,16 @@ describe(QueryErrorFilter, () => {
 
     expect(response.statusCode).toBe(500);
     expect(response.json()).toEqual({ statusCode: 500, message: "Internal server error" });
-    expect(logError).toHaveBeenCalledTimes(1);
-    expect(logError).toHaveBeenCalledWith(
-      `Query failed: QueryError: value too long for type character varying(4000); ${insertQuery}; code 22001`,
-    );
+    expect(logs.lines(LogLevel.Error)).toEqual([
+      {
+        kind: "line",
+        level: LogLevel.Error,
+        scope: ["ExceptionsHandler"],
+        args: [
+          `Query failed: QueryError: value too long for type character varying(4000); ${insertQuery}; code 22001`,
+        ],
+      },
+    ]);
   });
 
   it("should leave every other error to Nest's default handler", async () => {
@@ -67,6 +76,8 @@ describe(QueryErrorFilter, () => {
 
     expect(response.statusCode).toBe(500);
     expect(response.json()).toEqual({ statusCode: 500, message: "Internal server error" });
-    expect(logError).toHaveBeenCalledWith(otherError);
+    expect(logs.lines(LogLevel.Error)).toEqual([
+      { kind: "line", level: LogLevel.Error, scope: ["ExceptionsHandler"], args: [otherError] },
+    ]);
   });
 });

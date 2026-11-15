@@ -1,9 +1,8 @@
-import { Logger } from "@nestjs/common";
-
 import type { Clock } from "./Clock.js";
 import { errorText } from "./errorText.js";
+import { Logger } from "./Logger.js";
 
-const logger = new Logger("dbWatch");
+const logger = Logger.root.scope("dbWatch");
 
 /**
  * How long the server's start and the migrate step wait for the database. A deploy of a Postgres

@@ -1,11 +1,8 @@
 import { EventEmitter } from "node:events";
 
-import { Logger } from "@nestjs/common";
 import { describe, expect, it, vi } from "vitest";
 
 import { SignalledProcess, stopOnSignals } from "./stopOnSignals.js";
-
-Logger.overrideLogger(false);
 
 const newProcess = () => {
   const events = new EventEmitter();

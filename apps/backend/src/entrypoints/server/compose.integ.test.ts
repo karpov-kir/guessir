@@ -1,11 +1,12 @@
-import { Logger } from "@nestjs/common";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
+import { collectLogs } from "../../../tests/utils/collectLogs.js";
 import { fakeTextRows } from "../../../tests/utils/fakeTextRows.js";
 import { testConfig } from "../../../tests/utils/testConfig.js";
 import { Text } from "../../features/texts/exports.js";
 import { QueryError } from "../../infra/db/exports.js";
 import { version } from "../../infra/version.js";
+import { LogLevel } from "../../shared/Logger.js";
 import { compose, ServerHandle } from "./compose.js";
 
 const text: Text = {
@@ -16,6 +17,7 @@ const text: Text = {
   allowShowingText: true,
 };
 let textRows: ReturnType<typeof fakeTextRows>;
+let logs: ReturnType<typeof collectLogs>;
 
 describe("the texts API over HTTP", () => {
   let server: ServerHandle;
@@ -28,7 +30,8 @@ describe("the texts API over HTTP", () => {
 
   beforeAll(async () => {
     textRows = fakeTextRows([text, { ...text, id: "locked", allowShowingText: false }]);
-    server = await compose({ textRows, config: testConfig(), logger: false });
+    logs = collectLogs();
+    server = await compose({ textRows, config: testConfig(), logSink: logs.sink });
   });
 
   afterAll(() => server.stop());
@@ -94,8 +97,6 @@ describe("the texts API over HTTP", () => {
   });
 
   it("should answer and log a failed query without the text it carried", async () => {
-    const errorLog = vi.spyOn(Logger.prototype, "error");
-
     textRows.insert.mockRejectedValueOnce(
       new QueryError({ message: "value too long", query: 'INSERT INTO "texts"' }),
     );
@@ -109,8 +110,24 @@ describe("the texts API over HTTP", () => {
 
     expect(response.statusCode).toBe(500);
     expect(response.json()).toEqual({ statusCode: 500, message: "Internal server error" });
-    expect(errorLog).toHaveBeenCalled();
-    expect(JSON.stringify(errorLog.mock.calls)).not.toContain("One two");
+    expect(logs.lines(LogLevel.Error)).not.toEqual([]);
+    expect(JSON.stringify(logs.lines())).not.toContain("One two");
+  });
+
+  it("should log the config and each request through the sink it was given", async () => {
+    await request("GET", "/health");
+
+    const infoLines = logs.lines(LogLevel.Info);
+
+    expect(infoLines).toContainEqual(
+      expect.objectContaining({ scope: ["server"], args: [expect.stringMatching(/^Config: /)] }),
+    );
+    expect(infoLines).toContainEqual(
+      expect.objectContaining({
+        scope: ["http"],
+        args: [expect.stringMatching(/^GET \/health 200 in \d+ms$/)],
+      }),
+    );
   });
 
   it("should answer the running version on /health", async () => {
@@ -220,5 +237,21 @@ describe("the texts API over HTTP", () => {
       allowShowingFirstLetters: false,
       allowShowingText: false,
     });
+  });
+});
+
+describe("the server's log", () => {
+  it("should drop the records below the config's level", async () => {
+    const logs = collectLogs();
+    const server = await compose({
+      textRows: fakeTextRows([]),
+      config: { ...testConfig(), log: { ...testConfig().log, level: LogLevel.Warn } },
+      logSink: logs.sink,
+    });
+
+    await server.handle({ method: "GET", url: "/health" });
+    await server.stop();
+
+    expect(logs.lines()).toEqual([]);
   });
 });

@@ -1,4 +1,4 @@
-import { Logger, Module } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import type { InjectOptions, LightMyRequestResponse } from "fastify";
 
 import { HealthController } from "./http/HealthController.js";
@@ -7,10 +7,12 @@ import { Texts, type TextRows } from "../../features/texts/exports.js";
 import { newTextStore } from "../../features/texts/infra/exports.js";
 import { type Db, type DbPing, newDbPing, openDb } from "../../infra/db/exports.js";
 import { readEnv } from "../../infra/env.js";
+import { newConsoleSink, newLogSink } from "../../infra/logger/exports.js";
 import { systemClock } from "../../infra/systemClock.js";
 import { systemIds } from "../../infra/systemIds.js";
 import type { Clock } from "../../shared/Clock.js";
 import type { IdGenerator } from "../../shared/IdGenerator.js";
+import { Logger, LogLevel, type LogSink } from "../../shared/Logger.js";
 import { parseConfig, type ServerConfig } from "./config.js";
 import { pingEveryMs, waitForDbAtStart, watchDb } from "../../shared/dbWatch.js";
 import { errorText } from "../../shared/errorText.js";
@@ -20,7 +22,7 @@ import { newApp } from "./http/newApp.js";
 // fresh connections and name lookups.
 const lostAfterMs = 30_000;
 
-const logger = new Logger("server");
+const logger = Logger.root.scope("server");
 
 export type ServerOverrides = {
   /**
@@ -34,8 +36,11 @@ export type ServerOverrides = {
   ids?: IdGenerator;
   /** Runs once the database has been lost for good. By default it exits the process with 1. */
   onDbLost?: (error: unknown) => void;
-  /** Turns Fastify's request log and Nest's log off, for tests. */
-  logger?: boolean;
+  /**
+   * Takes the log records in place of both sinks that `compose` installs, so a test can read or
+   * drop them.
+   */
+  logSink?: LogSink;
 };
 
 export type ServerHandle = {
@@ -78,17 +83,23 @@ const exitOnDbLost = (error: unknown) => {
 
 /**
  * Builds the HTTP server and the texts feature over the database, or over `overrides.textRows`.
- * Waits until the database answers. Throws when it stays silent, lacks a migration, or holds a
- * contract migration this code does not know. Returns the server's handle without listening.
+ * Waits until the database answers. Throws when the database stays silent, lacks a migration, or
+ * holds a contract migration that the server does not know. Returns the handle without listening.
  */
 export async function compose(overrides: ServerOverrides = {}): Promise<ServerHandle> {
-  const config = overrides.config ?? parseConfig(readEnv());
   const clock = overrides.clock ?? systemClock;
+
+  // The console sink takes the records until the config parses, so a config error is logged. The
+  // configured sink needs the parsed config.
+  Logger.install(overrides.logSink ?? newConsoleSink({ clock }), LogLevel.Info);
+  const config = overrides.config ?? parseConfig(readEnv());
+  Logger.install(overrides.logSink ?? newLogSink(config.log.format, { clock }), config.log.level);
+
   const onDbLost = overrides.onDbLost ?? exitOnDbLost;
   let dbPing: DbPing | undefined;
   let db: Db | undefined;
 
-  logger.log(
+  logger.info(
     `Config: listens on ${config.host}:${config.port}, ` +
       `DB ${config.db.username}@${config.db.host}:${config.db.port}/${config.db.database}`,
   );
@@ -114,7 +125,7 @@ export async function compose(overrides: ServerOverrides = {}): Promise<ServerHa
     })
     class ServerModule {}
 
-    const app = await newApp({ module: ServerModule, logger: overrides.logger ?? true });
+    const app = await newApp({ module: ServerModule });
     const watch = new AbortController();
 
     await app.init();

@@ -2,12 +2,11 @@
 // tests cover the migration.
 /* v8 ignore start */
 
-import { Logger } from "@nestjs/common";
-
 import { errorText } from "../../shared/errorText.js";
+import { Logger } from "../../shared/Logger.js";
 import { compose } from "./compose.js";
 
-const logger = new Logger("migrate");
+const logger = Logger.root.scope("migrate");
 
 /**
  * Migrates the database the environment names, then lets the process end. Exits the process with 1

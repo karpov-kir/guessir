@@ -1,6 +1,8 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, Logger } from "@nestjs/common";
+import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from "@nestjs/common";
 import type { FastifyReply } from "fastify";
+
 import { QueryError } from "../../../infra/db/exports.js";
+import { Logger } from "../../../shared/Logger.js";
 
 /**
  * Answers a failed query with the 500 of Nest's default handler, and logs one line with the
@@ -8,7 +10,9 @@ import { QueryError } from "../../../infra/db/exports.js";
  */
 @Catch(QueryError)
 export class QueryErrorFilter implements ExceptionFilter<QueryError> {
-  private static readonly logger = new Logger("ExceptionsHandler");
+  // The logger takes the scope of Nest's own exception handler. A failed query then logs under the
+  // same scope as any other unhandled error.
+  private static readonly logger = Logger.root.scope("ExceptionsHandler");
 
   catch(error: QueryError, host: ArgumentsHost) {
     QueryErrorFilter.logger.error(
