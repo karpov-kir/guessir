@@ -98,6 +98,11 @@ describe("an English text with words from other languages", () => {
     });
   });
 
+  it("should keep an emoji's variation selector and keycap mark out of words, as before", () => {
+    expect(new TextGame("I ❤️ NY").words().map(({ word }) => word)).toEqual(["I", "Ny"]);
+    expect(new TextGame("Press 1️⃣ now").words().map(({ word }) => word)).toEqual(["Press", "now"]);
+  });
+
   it("should leave digits out of words, as before", () => {
     expect(new TextGame("In 2026").lexemes()).toEqual([
       { index: 0, length: 2 },

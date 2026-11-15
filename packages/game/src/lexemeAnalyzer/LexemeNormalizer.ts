@@ -17,9 +17,11 @@ const CHARACTERS_TO_NORMALIZED_CHARACTERS = new Map([
 const NORMALIZED_WORDS_TO_NORMALIZED_WORDS = new Map([[asNormalized("i"), asNormalized("I")]]);
 const NORMALIZED_CONTRACTION_CHARACTERS = new Set([asNormalized("'")]);
 const NORMALIZED_WORD_SEPARATION_CHARACTERS = new Set([asNormalized("-")]);
-// A letter of any script, or a mark that joins one, so a word from another language inside an
-// English text, such as Café or İstanbul, stays whole
-const LETTER_RE = /^[\p{L}\p{M}]$/u;
+// A letter of any script in the basic plane, or a mark that joins one, so a word from another
+// language inside an English text, such as Café or İstanbul, stays whole
+const LETTER_RE = /^[\p{L}\p{Mn}\p{Mc}]$/u;
+// The variation selectors are marks too, but they only pick how an emoji such as ❤️ looks
+const VARIATION_SELECTOR_RE = /^[\uFE00-\uFE0F]$/u;
 
 const NORMALIZED_CONTRACTION_TO_NORMALIZED_NORMAL = new Map<
   string,
@@ -109,8 +111,7 @@ export function normalizeCharacter(character: string) {
 /**
  * Returns the lower case of `character`, or `character` unchanged when its lower case is longer
  * than one character, such as `İ`, whose lower case is `i̇`. `isWordCharacter` throws on more
- * than one character, so `İ` stays itself and becomes an other-character lexeme, and the analysis
- * goes on.
+ * than one character, so `İ` stays itself, a letter of its word, and the analysis goes on.
  */
 function toLowerCaseCharacter(character: string) {
   const lowerCasedCharacter = character.toLowerCase();
@@ -141,7 +142,10 @@ export function isWordCharacter(normalizedPrimitiveLexeme: NormalizedPrimitiveLe
 }
 
 export function isLetter(normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal) {
-  return LETTER_RE.test(normalizedPrimitiveLexeme);
+  return (
+    LETTER_RE.test(normalizedPrimitiveLexeme) &&
+    !VARIATION_SELECTOR_RE.test(normalizedPrimitiveLexeme)
+  );
 }
 
 export function isWordHelpingCharacter(
