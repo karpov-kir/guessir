@@ -4,21 +4,23 @@ import urlJoin from "url-join";
 import { GameApi } from "./GameApi";
 import { Game } from "../../entities/game/exports";
 
+export type RemoteGameOptions = { api: GameApi; textPath: string; skeleton: TextSkeleton };
+
 /** Plays a stored text, asking the server for every word a move opens. */
 export class RemoteGame implements Game {
   public readonly skeleton: TextSkeleton;
-  private readonly api: GameApi;
+  private readonly deps: Omit<RemoteGameOptions, "textPath" | "skeleton">;
   private readonly textPath: string;
   private readonly wordReads = new Map<string, Promise<RevealedWord[]>>();
 
-  constructor(options: { api: GameApi; textPath: string; skeleton: TextSkeleton }) {
-    this.api = options.api;
-    this.textPath = options.textPath;
-    this.skeleton = options.skeleton;
+  constructor({ textPath, skeleton, ...deps }: RemoteGameOptions) {
+    this.deps = deps;
+    this.textPath = textPath;
+    this.skeleton = skeleton;
   }
 
   async guess(word: string): Promise<RevealedWord[]> {
-    const { words } = await this.api.post(
+    const { words } = await this.deps.api.post(
       urlJoin(this.textPath, "guesses"),
       { word },
       revealedWordsSchema,
@@ -28,7 +30,7 @@ export class RemoteGame implements Game {
   }
 
   async reveal(index: number): Promise<RevealedWord> {
-    return this.api.post(urlJoin(this.textPath, "reveals"), { index }, revealedWordSchema);
+    return this.deps.api.post(urlJoin(this.textPath, "reveals"), { index }, revealedWordSchema);
   }
 
   async firstLetters(): Promise<RevealedWord[]> {
@@ -48,7 +50,7 @@ export class RemoteGame implements Game {
     let read = this.wordReads.get(route);
 
     if (!read) {
-      read = this.api.get(urlJoin(this.textPath, route), revealedWordsSchema).then(
+      read = this.deps.api.get(urlJoin(this.textPath, route), revealedWordsSchema).then(
         ({ words }) => words,
         (error: unknown) => {
           this.wordReads.delete(route);

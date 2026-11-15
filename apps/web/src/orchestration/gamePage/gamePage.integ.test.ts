@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { getElementText } from "../../../tests/utils/dom";
+import { newManualClock } from "../../../tests/utils/manualClock";
 import { newTextSkeleton } from "../../../tests/utils/textSkeleton";
 import { CreateTextApi } from "../../features/createText/exports";
 import { GameApi } from "../../features/gameLoading/exports";
@@ -18,6 +19,7 @@ describe(mountGamePage, () => {
       api: mock<GameApi & CreateTextApi>(),
       location: { origin: "https://guessir.test", search: "" },
       clipboard,
+      clock: newManualClock().clock,
     });
 
     const mainElement = container.querySelector("main#guessir");
@@ -37,6 +39,7 @@ describe(mountGamePage, () => {
       api,
       location: { origin: "https://guessir.test", search: "?textId=text-id" },
       clipboard,
+      clock: newManualClock().clock,
     });
 
     expect(api.get).toHaveBeenCalledWith("texts/text-id", textSkeletonSchema);

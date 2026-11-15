@@ -6,19 +6,25 @@ import { onChangeAndEnter, requireElement } from "../../shared/dom";
 import { icon } from "../../shared/icon";
 import { textUrl } from "../../entities/textLink/exports";
 import { CreateTextApi, createText } from "./createTextApi";
+import type { Clock } from "../../shared/Clock";
 import { Logger } from "@guessir/logger";
 
 const logger = Logger.root.scope("CreateTextRenderer");
 
-interface CreateTextRendererOptions {
+export type CreateTextRendererOptions = {
   api: CreateTextApi;
   /** The page origin the link to a created text starts with. */
   origin: string;
   clipboard: Pick<Clipboard, "writeText">;
+  /** Hides the alert that a link was copied once its time passes. */
+  clock: Pick<Clock, "schedule">;
   maxTitleLength?: number;
   maxDescriptionLength?: number;
   maxTextLength?: number;
-}
+};
+
+/** How long the alert that a link was copied stays on the copy button. */
+const copiedAlertMs = 5_000;
 
 /**
  * Returns the markup of a labelled form field. The limit counter sits in the control's direct
@@ -53,21 +59,24 @@ export class CreateTextRenderer {
   private readonly maxTitleLength: number;
   private readonly maxDescriptionLength: number;
   private readonly maxTextLength: number;
-  private readonly api: CreateTextApi;
+  private readonly deps: Pick<CreateTextRendererOptions, "api" | "clipboard" | "clock">;
   private readonly origin: string;
-  private readonly clipboard: Pick<Clipboard, "writeText">;
 
-  constructor(options: CreateTextRendererOptions) {
+  constructor({
+    origin,
+    maxTitleLength,
+    maxDescriptionLength,
+    maxTextLength,
+    ...deps
+  }: CreateTextRendererOptions) {
     this.containerElement = document.createElement("div");
     this.containerElement.id = "utils-container";
 
-    this.api = options.api;
-    this.origin = options.origin;
-    this.clipboard = options.clipboard;
-
-    this.maxTitleLength = options.maxTitleLength ?? createTextLimits.title;
-    this.maxDescriptionLength = options.maxDescriptionLength ?? createTextLimits.description;
-    this.maxTextLength = options.maxTextLength ?? createTextLimits.text;
+    this.deps = deps;
+    this.origin = origin;
+    this.maxTitleLength = maxTitleLength ?? createTextLimits.title;
+    this.maxDescriptionLength = maxDescriptionLength ?? createTextLimits.description;
+    this.maxTextLength = maxTextLength ?? createTextLimits.text;
 
     this.copiedAlertElement.textContent = "(copied)";
 
@@ -303,7 +312,7 @@ export class CreateTextRenderer {
       this.blockForm(true);
       generatedUrlContainerElement.classList.add("hide");
 
-      createText(this.api, this.getValues())
+      createText(this.deps.api, this.getValues())
         .then((apiText) => {
           this.cleanForm();
 
@@ -336,19 +345,16 @@ export class CreateTextRenderer {
 
   private attachCopyGeneratedUrlHandler() {
     const { copyGeneratedUrlButtonElement } = this.getElements();
-    let changeTextTimeoutId: ReturnType<typeof setTimeout> | undefined;
+    let cancelAlertTimer: (() => void) | undefined;
 
     copyGeneratedUrlButtonElement.addEventListener("click", () => {
-      void this.clipboard.writeText(this.generatedUrl);
+      void this.deps.clipboard.writeText(this.generatedUrl);
       copyGeneratedUrlButtonElement.appendChild(this.copiedAlertElement);
 
-      if (changeTextTimeoutId) {
-        clearTimeout(changeTextTimeoutId);
-      }
-
-      changeTextTimeoutId = setTimeout(() => {
+      cancelAlertTimer?.();
+      cancelAlertTimer = this.deps.clock.schedule(() => {
         this.removeCopyAlert();
-      }, 5000);
+      }, copiedAlertMs);
     });
   }
 }
