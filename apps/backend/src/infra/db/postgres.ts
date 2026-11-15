@@ -111,6 +111,20 @@ export async function openPostgres(settings: DbSettings): Promise<DataSource> {
 
 const logger = Logger.root.scope("postgres");
 
+/**
+ * Returns one line of text for a record of the migrator, such as `migrated 2022-03-23-initial.js in
+ * 0.02s`, so a pretty log keeps one line per record and a JSON log keeps the text in `msg`.
+ */
+function migrationLine({ event, name, durationSeconds }: Record<string, unknown>) {
+  const parts = [event, name].filter((part) => typeof part === "string");
+
+  if (typeof durationSeconds === "number") {
+    parts.push(`in ${durationSeconds}s`);
+  }
+
+  return parts.join(" ");
+}
+
 /** Returns the migrator of the database behind `dataSource`, over the migration files beside this file. */
 function newMigrator(dataSource: DataSource) {
   // Each migration declares its kind in its file. The migrator writes it beside the migration's
@@ -156,10 +170,10 @@ function newMigrator(dataSource: DataSource) {
       },
     },
     logger: {
-      info: (message) => logger.info(message),
-      warn: (message) => logger.warn(message),
-      error: (message) => logger.error(message),
-      debug: (message) => logger.debug(message),
+      info: (record) => logger.info(migrationLine(record)),
+      warn: (record) => logger.warn(migrationLine(record)),
+      error: (record) => logger.error(migrationLine(record)),
+      debug: (record) => logger.debug(migrationLine(record)),
     },
   });
 }
