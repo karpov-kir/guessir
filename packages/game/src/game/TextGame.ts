@@ -33,10 +33,10 @@ export class TextGame {
 
   /**
    * Returns every word that matches the guess, ignoring case and surrounding spaces, or an empty
-   * array for a miss.
+   * array for a miss. The guess is composed (NFC), as the text is.
    */
   public guess(word: string): RevealedWord[] {
-    const lexemes = this.lexemesByWordLike.get(word.trim().toLowerCase()) ?? [];
+    const lexemes = this.lexemesByWordLike.get(word.normalize("NFC").trim().toLowerCase()) ?? [];
 
     return Array.from(lexemes, ([index, lexeme]) => ({ index, word: lexeme.normalized }));
   }
