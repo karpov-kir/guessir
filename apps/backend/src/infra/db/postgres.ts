@@ -183,11 +183,10 @@ async function compareMigrations(dataSource: DataSource) {
            AND NOT attisdropped) AS "hasKind"`,
   );
   // Releases before migrations recorded a kind made the table without the column
+  const kindColumn = hasKind ? "kind" : "NULL AS kind";
   const executed = hasTable
     ? (
-        await dataSource.query<MigrationLog[]>(
-          `SELECT name, ${hasKind ? "kind" : "NULL AS kind"} FROM ${migrationTable}`,
-        )
+        await dataSource.query<MigrationLog[]>(`SELECT name, ${kindColumn} FROM ${migrationTable}`)
       ).map(({ name, kind }) => ({ name: withoutExtension(name), kind }))
     : [];
   const unknown = executed.filter(({ name }) => !known.includes(name));

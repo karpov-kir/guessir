@@ -52,7 +52,8 @@ export const withoutExtension = (fileName: string) => fileName.replace(extension
 export const migrationFileNames = () =>
   readdirSync(migrationsDir)
     .filter((fileName) => extension.test(fileName))
-    .toSorted();
+    // By code point, so the order is the same on every machine
+    .toSorted((a, b) => (a < b ? -1 : 1));
 
 /** Loads the migration file at `path`, and throws when it declares no valid kind or no `up`. */
 export async function loadMigration(path: string) {
