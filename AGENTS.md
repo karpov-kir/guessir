@@ -1,5 +1,9 @@
 # guessir
 
+## Product
+
+The game is for English texts. It expands English contractions, such as `don't` into `do not`, and it plays other languages only as far as their words appear in an English text. Such a word still reads whole: `Café`, `naïve` or `İstanbul` is one word to guess.
+
 ## Database migrations
 
 A migration is a file in `apps/backend/src/infra/db/migrations/` that exports `up` and `kind`. A migration without a valid `kind` fails to load and fails the tests.
