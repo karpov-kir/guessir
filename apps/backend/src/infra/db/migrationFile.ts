@@ -5,16 +5,15 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import type { MigrationFn as UmzugMigrationFn } from "umzug";
 import { z } from "zod";
 
+import type { Query, Transaction } from "./query.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-type Query = <T = unknown>(sql: string, parameters?: unknown[]) => Promise<T>;
 
 /** Holds what a migration reaches the database through. */
 export interface MigrationContext {
   query: Query;
-  /** Runs `work` in one transaction, which rolls back if `work` throws. */
-  transaction: (work: (query: Query) => Promise<void>) => Promise<void>;
+  transaction: Transaction;
 }
 
 export type MigrationFn = UmzugMigrationFn<MigrationContext>;

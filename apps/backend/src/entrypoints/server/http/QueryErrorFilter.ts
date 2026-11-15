@@ -1,25 +1,18 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, Logger } from "@nestjs/common";
 import type { FastifyReply } from "fastify";
-import { QueryFailedError } from "typeorm";
+import { QueryError } from "../../../infra/db/exports.js";
 
 /**
- * Answers a failed query with the 500 of Nest's default handler, and logs the query without its
- * parameters. The default handler logs the whole error, and its `parameters` and
- * `driverError.detail` carry the stored texts. These texts are the answers to the games.
+ * Answers a failed query with the 500 of Nest's default handler, and logs one line with the
+ * query's SQL and SQLSTATE code.
  */
-@Catch(QueryFailedError)
-export class QueryErrorFilter implements ExceptionFilter<QueryFailedError> {
+@Catch(QueryError)
+export class QueryErrorFilter implements ExceptionFilter<QueryError> {
   private static readonly logger = new Logger("ExceptionsHandler");
 
-  catch(error: QueryFailedError, host: ArgumentsHost) {
-    // pg gives the SQLSTATE in `code` as a string
-    const code =
-      "code" in error.driverError && typeof error.driverError.code === "string"
-        ? error.driverError.code
-        : undefined;
-
+  catch(error: QueryError, host: ArgumentsHost) {
     QueryErrorFilter.logger.error(
-      `Query failed: ${error.name}: ${error.message}; ${error.query}; code ${code}`,
+      `Query failed: ${error.name}: ${error.message}; ${error.query}; code ${error.code}`,
     );
     host
       .switchToHttp()

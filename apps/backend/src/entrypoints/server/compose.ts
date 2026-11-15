@@ -4,6 +4,7 @@ import type { InjectOptions, LightMyRequestResponse } from "fastify";
 import { HealthController } from "./http/HealthController.js";
 import { TextsController } from "./http/TextsController.js";
 import { Texts, type TextRows } from "../../features/texts/exports.js";
+import { newTextStore } from "../../features/texts/infra/exports.js";
 import { type Db, type DbPing, newDbPing, openDb } from "../../infra/db/exports.js";
 import { readEnv } from "../../infra/env.js";
 import { systemClock } from "../../infra/systemClock.js";
@@ -102,7 +103,7 @@ export async function compose(overrides: ServerOverrides = {}): Promise<ServerHa
       // The migrate step migrates the database. The server runs no migration and refuses a
       // database short of one.
       await db.checkMigrated();
-      textRows = db.texts;
+      textRows = newTextStore({ db });
     }
 
     const texts = new Texts({ rows: textRows, ids: overrides.ids ?? systemIds });
