@@ -1,12 +1,12 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
-import { collectLogs } from "../../../tests/utils/collectLogs.js";
+import { collectLogs } from "@guessir/logger/testing";
 import { fakeTextRows } from "../../../tests/utils/fakeTextRows.js";
 import { testConfig } from "../../../tests/utils/testConfig.js";
 import { Text } from "../../features/texts/exports.js";
 import { QueryError } from "../../infra/db/exports.js";
 import { version } from "../../infra/version.js";
-import { LogLevel } from "../../shared/Logger.js";
+import { LogLevel } from "@guessir/logger";
 import { compose, ServerHandle } from "./compose.js";
 
 const text: Text = {

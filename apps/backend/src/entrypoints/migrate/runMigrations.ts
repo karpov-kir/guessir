@@ -3,7 +3,7 @@
 /* v8 ignore start */
 
 import { errorText } from "../../shared/errorText.js";
-import { Logger } from "../../shared/Logger.js";
+import { Logger } from "@guessir/logger";
 import { compose } from "./compose.js";
 
 const logger = Logger.root.scope("migrate");

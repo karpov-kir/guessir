@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { LogLevel } from "../../shared/Logger.js";
+import { LogLevel } from "@guessir/logger";
 import { newJsonSink } from "./jsonSink.js";
 
 const clock = { now: () => Date.parse("2026-11-15T12:00:00.000Z") };

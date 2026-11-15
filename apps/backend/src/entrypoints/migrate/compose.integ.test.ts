@@ -1,13 +1,13 @@
 import { DataSource } from "typeorm";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { collectLogs, silentSink } from "../../../tests/utils/collectLogs.js";
+import { collectLogs, silentSink } from "@guessir/logger/testing";
 import { startPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
 import { steppingClock } from "../../../tests/utils/steppingClock.js";
 import { testConfig } from "../../../tests/utils/testConfig.js";
 import { unreachableDbConfig } from "../../../tests/utils/unreachableDbConfig.js";
 import { openPostgres } from "../../infra/db/postgres.js";
-import { LogLevel, type LogSink } from "../../shared/Logger.js";
+import { LogLevel, type LogSink } from "@guessir/logger";
 import { compose as composeServer, ServerHandle } from "../server/compose.js";
 import { compose } from "./compose.js";
 

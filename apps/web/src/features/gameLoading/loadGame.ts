@@ -2,7 +2,7 @@ import { CreateTextDto } from "@guessir/game";
 
 import { Game, LocalGame } from "../../entities/game/exports";
 import { parseTextId } from "../../entities/textLink/exports";
-import { Logger } from "../../shared/Logger";
+import { Logger } from "@guessir/logger";
 import { GameApi } from "./GameApi";
 import { loadRemoteGame } from "./loadRemoteGame";
 

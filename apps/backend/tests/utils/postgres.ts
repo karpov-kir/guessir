@@ -7,7 +7,7 @@ import { PostgreSqlContainer } from "@testcontainers/postgresql";
 
 import { compose as composeMigrate } from "../../src/entrypoints/migrate/compose.js";
 import { DbSettings } from "../../src/infra/db/exports.js";
-import { silentSink } from "./collectLogs.js";
+import { silentSink } from "@guessir/logger/testing";
 import { testConfig } from "./testConfig.js";
 
 // The same Postgres major as the server's stack

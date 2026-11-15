@@ -1,9 +1,7 @@
 import type { Clock } from "../../shared/Clock.js";
-import type { LogSink } from "../../shared/Logger.js";
-import { newConsoleSink } from "./consoleSink.js";
-import { newJsonSink } from "./jsonSink.js";
+import { type LogSink, newConsoleSink } from "@guessir/logger";
 
-export { newConsoleSink } from "./consoleSink.js";
+import { newJsonSink } from "./jsonSink.js";
 
 /** Names the shape of the log lines: `pretty` for a person, `json` for a log collector. */
 export enum LogFormat {

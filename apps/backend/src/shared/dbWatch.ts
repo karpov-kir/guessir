@@ -1,6 +1,6 @@
 import type { Clock } from "./Clock.js";
 import { errorText } from "./errorText.js";
-import { Logger } from "./Logger.js";
+import { Logger } from "@guessir/logger";
 
 const logger = Logger.root.scope("dbWatch");
 

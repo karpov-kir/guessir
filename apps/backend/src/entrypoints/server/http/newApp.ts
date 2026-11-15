@@ -3,7 +3,7 @@ import { NotAcceptableException } from "@nestjs/common";
 import { IEntryNestModule, NestFactory } from "@nestjs/core";
 import { FastifyAdapter, NestFastifyApplication } from "@nestjs/platform-fastify";
 
-import { Logger } from "../../../shared/Logger.js";
+import { Logger } from "@guessir/logger";
 import { nestLogger } from "./nestLogger.js";
 import { TextErrorFilter } from "./TextErrorFilter.js";
 import { QueryErrorFilter } from "./QueryErrorFilter.js";

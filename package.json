@@ -13,7 +13,7 @@
     "lint:oxlint:fix": "oxlint --fix",
     "lint:format": "oxfmt --check",
     "lint:format:fix": "oxfmt",
-    "lint:tsc": "tsc -p apps/backend/tsconfig.json && tsc -p packages/game/tsconfig.json && tsc -p apps/web/tsconfig.json",
+    "lint:tsc": "tsc -p apps/backend/tsconfig.json && tsc -p packages/game/tsconfig.json && tsc -p packages/logger/tsconfig.json && tsc -p apps/web/tsconfig.json",
     "lint:stylelint": "stylelint \"{apps,packages}/*/src/**/*.css\"",
     "lint:stylelint:fix": "npm run lint:stylelint -- --fix",
     "lint": "run-p -c lint:oxlint lint:format lint:tsc lint:stylelint",

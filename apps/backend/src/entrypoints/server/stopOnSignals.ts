@@ -1,5 +1,5 @@
 import { errorText } from "../../shared/errorText.js";
-import { Logger } from "../../shared/Logger.js";
+import { Logger } from "@guessir/logger";
 
 const logger = Logger.root.scope("server");
 

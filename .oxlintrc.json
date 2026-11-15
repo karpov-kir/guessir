@@ -7,7 +7,7 @@
   "overrides": [
     {
       // The console sink, vendored from kk-flavor, is the one module that writes to the console
-      "files": ["apps/backend/src/infra/logger/consoleSink.ts"],
+      "files": ["packages/logger/src/consoleSink.ts"],
       "rules": { "no-console": "off" }
     },
     {

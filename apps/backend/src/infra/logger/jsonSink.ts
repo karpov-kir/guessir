@@ -3,7 +3,7 @@ import { inspect } from "node:util";
 import { type DestinationStream, destination as fileDestination, pino } from "pino";
 
 import type { Clock } from "../../shared/Clock.js";
-import { LogLevel, type LogRecord, type LogSink } from "../../shared/Logger.js";
+import { LogLevel, type LogRecord, type LogSink } from "@guessir/logger";
 
 type JsonSinkOptions = {
   clock: Pick<Clock, "now">;
@@ -33,8 +33,9 @@ export function newJsonSink({ clock, destination }: JsonSinkOptions): LogSink {
       base: undefined,
       timestamp: () => `,"time":"${new Date(clock.now()).toISOString()}"`,
       formatters: { level: (label) => ({ level: label }) },
-      // The serializer writes only an error's type, message and stack, as `consoleSink.ts` does:
-      // another of the error's fields, such as a query's parameters, can carry a stored text
+      // The serializer writes only an error's type, message and stack, as the console sink of
+      // `@guessir/logger` does. Another field of the error, such as a query's parameters, can carry
+      // a stored text, and that text must stay out of the log.
       serializers: {
         err: (error: Error) => ({ type: error.name, message: error.message, stack: error.stack }),
       },

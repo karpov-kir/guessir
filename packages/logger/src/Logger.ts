@@ -1,4 +1,5 @@
-// Vendored from karpov-kir/configs, ai/kk-flavor/standards/architecture/Logger.ts at 574bbce
+// Vendored from karpov-kir/configs, ai/kk-flavor/standards/architecture/Logger.ts at 574bbce.
+// Changed here: the comments name this package, which both apps import, as the home of the sink.
 
 /**
  * Log levels (lower number = more verbose). `Silent` is highest, so it drops every record.
@@ -22,7 +23,7 @@ export type LogRecord =
   | { kind: "group"; collapsed: boolean; scope: readonly string[]; label: string }
   | { kind: "groupEnd" };
 
-/** Writes records out. Its implementations live in `infra`, the one layer that writes log output. */
+/** Writes records out. The console sink of this package and an app's `infra` implement it. */
 export type LogSink = (record: LogRecord) => void;
 
 /**

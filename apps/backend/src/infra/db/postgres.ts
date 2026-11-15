@@ -14,7 +14,7 @@ import {
 } from "./migrationFile.js";
 import { ParameterFreeLogger } from "./ParameterFreeLogger.js";
 import { queryOf, transactionOf } from "./query.js";
-import { Logger } from "../../shared/Logger.js";
+import { Logger } from "@guessir/logger";
 
 interface MigrationLog {
   name: string;

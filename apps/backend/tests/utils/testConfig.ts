@@ -1,7 +1,7 @@
 import type { ServerConfig } from "../../src/entrypoints/server/config.js";
 import type { DbSettings } from "../../src/infra/db/exports.js";
 import { LogFormat } from "../../src/infra/logger/exports.js";
-import { LogLevel } from "../../src/shared/Logger.js";
+import { LogLevel } from "@guessir/logger";
 
 /**
  * Returns a server config for a test, with the server on a free local port. The database is `db`,
