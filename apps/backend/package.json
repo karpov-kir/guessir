@@ -1,13 +1,15 @@
 {
   "name": "@guessir/backend",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "type": "module",
   "scripts": {
     "build": "npm run clean && tsc -b tsconfig.build.json",
     "clean": "del-cli ./dist ./tsconfig.build.tsbuildinfo",
     "start": "node ./dist/entrypoints/server/start.js",
-    "start:dev": "docker compose up -d --wait && npm run build && run-p dev:compile dev:run",
-    "start:dev:debug": "docker compose up -d --wait && npm run build && node --env-file=env/.env.development --inspect-brk ./dist/entrypoints/server/start.js",
+    "migrate": "node ./dist/entrypoints/migrate/start.js",
+    "start:dev": "docker compose up -d --wait && npm run build && npm run dev:migrate && run-p dev:compile dev:run",
+    "start:dev:debug": "docker compose up -d --wait && npm run build && npm run dev:migrate && node --env-file=env/.env.development --inspect-brk ./dist/entrypoints/server/start.js",
+    "dev:migrate": "node --env-file=env/.env.development ./dist/entrypoints/migrate/start.js",
     "build:docker": "docker build --platform=linux/amd64 -t guessir-backend -f ./Dockerfile ../..",
     "dev:compile": "tsc -b tsconfig.build.json --watch --preserveWatchOutput",
     "dev:run": "node --watch --env-file=env/.env.development ./dist/entrypoints/server/start.js"

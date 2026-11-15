@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { startPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
+import { startMigratedPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
 import { testConfig } from "../../../tests/utils/testConfig.js";
 import { compose, ServerHandle } from "./compose.js";
 
@@ -9,10 +9,9 @@ describe("the server over Postgres", () => {
   let server: ServerHandle;
 
   beforeAll(async () => {
-    postgres = await startPostgres();
+    postgres = await startMigratedPostgres();
     server = await compose({ config: testConfig(postgres.settings), logger: false });
-    // The test config's port 0 lets the system pick a free port; start() applies the migrations
-    // first
+    // The test config's port 0 lets the system pick a free port
     await server.start();
   }, 120_000);
 

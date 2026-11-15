@@ -1,4 +1,4 @@
-import { applyDbMigrations, DbSettings, openPostgres } from "./postgres.js";
+import { applyDbMigrations, checkDbMigrated, DbSettings, openPostgres } from "./postgres.js";
 import { newTextStore, TextRecord } from "./textStore.js";
 
 /** Means an open connection pool to the server's database. */
@@ -11,6 +11,11 @@ export type Db = {
   };
   /** Applies the migrations the database has not run yet. */
   migrate(): Promise<void>;
+  /**
+   * Throws unless the database has run every migration of this code and no contract migration
+   * this code does not know, and writes nothing.
+   */
+  checkMigrated(): Promise<void>;
   /** Closes the connection pool. */
   close(): Promise<void>;
 };
@@ -22,6 +27,7 @@ export async function openDb(settings: DbSettings): Promise<Db> {
   return {
     texts: newTextStore(dataSource),
     migrate: () => applyDbMigrations(dataSource),
+    checkMigrated: () => checkDbMigrated(dataSource),
     close: () => dataSource.destroy(),
   };
 }

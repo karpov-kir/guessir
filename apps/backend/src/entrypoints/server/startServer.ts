@@ -4,7 +4,7 @@
 
 import { Logger } from "@nestjs/common";
 
-import { errorText } from "./dbWatch.js";
+import { errorText } from "../../shared/errorText.js";
 import { compose, type ServerHandle } from "./compose.js";
 import { stopOnSignals } from "./stopOnSignals.js";
 
