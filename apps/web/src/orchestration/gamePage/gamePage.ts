@@ -2,11 +2,13 @@ import "./gamePage.css";
 import { mountPlay } from "../../features/play/exports";
 import { CreateTextApi, mountCreateText } from "../../features/createText/exports";
 import { GameApi, loadGame } from "../../features/gameLoading/exports";
+import type { Clock } from "../../shared/Clock";
 
 export type GamePageDependencies = {
   api: GameApi & CreateTextApi;
   location: Pick<Location, "origin" | "search">;
   clipboard: Pick<Clipboard, "writeText">;
+  clock: Pick<Clock, "schedule">;
 };
 
 /**
@@ -15,7 +17,7 @@ export type GamePageDependencies = {
  */
 export async function mountGamePage(
   container: HTMLElement,
-  { api, location, clipboard }: GamePageDependencies,
+  { api, location, clipboard, clock }: GamePageDependencies,
 ) {
   const game = await loadGame({ api, search: location.search });
   const mainElement = document.createElement("main");
@@ -23,5 +25,5 @@ export async function mountGamePage(
   mainElement.id = "guessir";
   container.appendChild(mainElement);
   mainElement.appendChild(mountPlay(game));
-  mainElement.appendChild(mountCreateText({ api, origin: location.origin, clipboard }));
+  mainElement.appendChild(mountCreateText({ api, origin: location.origin, clipboard, clock }));
 }

@@ -1,24 +1,35 @@
-// Coverage skips the page's entry: it hands the real document to compose(),
-// whose tests cover the rest
+// Coverage skips this entry. The entry hands the real document to `compose`, and the tests of
+// `compose` cover the rest.
 /* v8 ignore start */
 
+import { Logger } from "@guessir/logger";
+
 import "./styles/page.css";
-import { compose } from "./compositionRoot";
-// The page imports the utilities after the modules that `./compositionRoot` pulls in. So a utility
+import { compose } from "./compose";
+// The page imports the utilities after the modules that `./compose` pulls in. So a utility
 // class wins a tie of equal specificity against the styles of every module.
 import "./styles/utilities.css";
 import { requireElement } from "../../shared/dom";
 
-/** Renders the page into the document that index.html loads. */
-export function mountPage() {
-  void compose().mount({
-    body: document.body,
-    themeButton: requireElement({
-      root: document,
-      selector: "#theme-toggle",
-      type: HTMLButtonElement,
-    }),
-  });
+const logger = Logger.root.scope("page");
+
+/**
+ * Renders the page into the document that index.html loads. Logs the failure when the build's
+ * environment is invalid or the page fails to render.
+ */
+export async function mountPage() {
+  try {
+    await compose().mount({
+      body: document.body,
+      themeButton: requireElement({
+        root: document,
+        selector: "#theme-toggle",
+        type: HTMLButtonElement,
+      }),
+    });
+  } catch (error) {
+    logger.error("Failed to render the page", error);
+  }
 }
 
 /* v8 ignore stop */

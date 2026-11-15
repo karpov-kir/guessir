@@ -2,6 +2,7 @@ import { CreateTextDtoResponse, createTextDtoResponseSchema } from "@guessir/gam
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mock, MockProxy } from "vitest-mock-extended";
 
+import { newManualClock } from "../../../tests/utils/manualClock";
 import { CreateTextApi } from "./createTextApi";
 import { CreateTextRenderer, getElements } from "./CreateTextRenderer";
 
@@ -11,6 +12,7 @@ const mockedText = {
 let api: MockProxy<CreateTextApi>;
 const clipboard = { writeText: vi.fn<(text: string) => Promise<void>>() };
 let createTextRenderer: CreateTextRenderer;
+let time: ReturnType<typeof newManualClock>;
 
 const createText = async () => {
   const {
@@ -40,14 +42,14 @@ const createText = async () => {
 
 describe(CreateTextRenderer, () => {
   beforeEach(() => {
-    vi.useRealTimers();
-
     api = mock<CreateTextApi>();
+    time = newManualClock();
     clipboard.writeText.mockReset();
     createTextRenderer = new CreateTextRenderer({
       api,
       origin: "http://localhost:3000",
       clipboard,
+      clock: time.clock,
       maxTitleLength: 2,
       maxDescriptionLength: 2,
       maxTextLength: 2,
@@ -244,18 +246,20 @@ describe(CreateTextRenderer, () => {
     expect(clipboard.writeText).toHaveBeenCalledWith("http://localhost:3000?textId=mocked-id");
   });
 
-  it("should hide the alert that a generated URL was copied on a timeout", async () => {
+  it("should hide the alert that a generated URL was copied 5 seconds after the last copy", async () => {
     const { copyGeneratedUrlButtonElement } = getElements(createTextRenderer.getElement());
-
-    vi.useFakeTimers();
+    const alert = () => copyGeneratedUrlButtonElement.querySelector("div")?.textContent;
 
     await createText();
     copyGeneratedUrlButtonElement.click();
+    time.advance(4_000);
+    copyGeneratedUrlButtonElement.click();
+    time.advance(4_999);
 
-    expect(copyGeneratedUrlButtonElement.querySelector("div")?.textContent).toBe("(copied)");
+    expect(alert()).toBe("(copied)");
 
-    vi.runAllTimers();
+    time.advance(1);
 
-    expect(copyGeneratedUrlButtonElement.querySelector("div")).toBe(null);
+    expect(alert()).toBeUndefined();
   });
 });

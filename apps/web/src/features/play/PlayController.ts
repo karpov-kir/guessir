@@ -14,7 +14,7 @@ export type PlayControllerOptions = {
 };
 
 export class PlayController {
-  private readonly game: Game;
+  private readonly deps: PlayControllerOptions;
 
   private readonly textRenderer: TextRenderer;
   private readonly controlsRenderer: ControlsRenderer;
@@ -24,10 +24,10 @@ export class PlayController {
   /** The hint the user turned on last, which turns on once its letters load. */
   private wantedHint = WordHint.None;
 
-  constructor(options: PlayControllerOptions) {
-    const { skeleton } = options.game;
+  constructor({ ...deps }: PlayControllerOptions) {
+    const { skeleton } = deps.game;
 
-    this.game = options.game;
+    this.deps = deps;
     this.textRenderer = new TextRenderer({
       lexemes: skeleton.lexemes,
       title: skeleton.title,
@@ -76,7 +76,7 @@ export class PlayController {
     let revealedWord: RevealedWord;
 
     try {
-      revealedWord = await this.game.reveal(index);
+      revealedWord = await this.deps.game.reveal(index);
     } catch (error) {
       logger.error("Failed to reveal the word", { index }, error);
       this.controlsRenderer.announce("Could not open this word");
@@ -92,7 +92,7 @@ export class PlayController {
     let guessedWords: RevealedWord[];
 
     try {
-      guessedWords = await this.game.guess(word);
+      guessedWords = await this.deps.game.guess(word);
     } catch (error) {
       logger.error("Failed to check the guess", { word }, error);
       this.controlsRenderer.returnGuess(word);
@@ -116,7 +116,7 @@ export class PlayController {
     await this.switchHint({
       hint: WordHint.Text,
       isShown: isTextShown,
-      load: async () => this.textRenderer.fillWords(await this.game.words()),
+      load: async () => this.textRenderer.fillWords(await this.deps.game.words()),
       uncheck: () => this.controlsRenderer.uncheckText(),
       failureStatus: "Could not load the text",
     });
@@ -126,7 +126,7 @@ export class PlayController {
     await this.switchHint({
       hint: WordHint.FirstLetters,
       isShown: isFirstLettersShown,
-      load: async () => this.textRenderer.fillFirstLetters(await this.game.firstLetters()),
+      load: async () => this.textRenderer.fillFirstLetters(await this.deps.game.firstLetters()),
       uncheck: () => this.controlsRenderer.uncheckFirstLetters(),
       failureStatus: "Could not load first letters",
     });

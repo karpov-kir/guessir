@@ -17,7 +17,7 @@ export class TextRenderer implements ChildRenderer {
   private readonly lexemes: SkeletonLexeme[];
   private readonly title?: string;
   private readonly description?: string;
-  private readonly onRevealRequest: (index: number) => void;
+  private readonly deps: Pick<TextRendererOptions, "onRevealRequest">;
   private readonly wordRenderers = new Map<
     // Lexeme index
     number,
@@ -26,11 +26,11 @@ export class TextRenderer implements ChildRenderer {
   /** Holds the words of the last successful guess, which the renderer highlights for the player. */
   private freshWordRenderers: WordRenderer[] = [];
 
-  constructor(options: TextRendererOptions) {
-    this.onRevealRequest = options.onRevealRequest;
-    this.lexemes = options.lexemes;
-    this.title = options.title;
-    this.description = options.description;
+  constructor({ lexemes, title, description, ...deps }: TextRendererOptions) {
+    this.deps = deps;
+    this.lexemes = lexemes;
+    this.title = title;
+    this.description = description;
     this.containerElement = document.createElement("article");
     this.containerElement.id = "text-container";
 
@@ -150,7 +150,7 @@ export class TextRenderer implements ChildRenderer {
         const wordRenderer = new WordRenderer({
           index: lexeme.index,
           length: lexeme.length,
-          onRevealRequest: this.onRevealRequest,
+          onRevealRequest: this.deps.onRevealRequest,
         });
 
         this.wordRenderers.set(lexeme.index, wordRenderer);

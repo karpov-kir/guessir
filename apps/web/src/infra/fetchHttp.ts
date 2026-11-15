@@ -1,12 +1,21 @@
 import urlJoin from "url-join";
 import type { ZodType } from "zod";
 
+export type FetchHttpClientOptions = {
+  /** The URL that every request's path is joined to. */
+  baseUrl: string;
+};
+
 /**
  * Sends HTTP requests to paths under the API's base URL and returns the JSON body as `schema` reads
  * it. Rejects when the response status is not 2xx or the body does not fit `schema`.
  */
 export class FetchHttpClient {
-  constructor(private readonly baseUrl: string) {}
+  private readonly baseUrl: string;
+
+  constructor({ baseUrl }: FetchHttpClientOptions) {
+    this.baseUrl = baseUrl;
+  }
 
   async post<T>(path: string, payload: unknown, schema: ZodType<T>): Promise<T> {
     return this.request(path, schema, {

@@ -5,7 +5,7 @@ import { FetchHttpClient } from "./fetchHttp";
 
 const idSchema = z.object({ id: z.string() });
 const wordsSchema = z.object({ words: z.array(z.string()) });
-const newClient = () => new FetchHttpClient("https://api.test/");
+const newClient = () => new FetchHttpClient({ baseUrl: "https://api.test/" });
 
 describe(FetchHttpClient, () => {
   afterEach(() => {

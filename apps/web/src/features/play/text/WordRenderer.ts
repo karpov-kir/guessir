@@ -19,17 +19,17 @@ export class WordRenderer implements ChildRenderer {
   private readonly containerElement: HTMLElement;
   private readonly lexemeElement: HTMLElement;
   private readonly firstLetterElement: HTMLElement;
-  private readonly onRevealRequest: (index: number) => void;
+  private readonly deps: Pick<WordRendererOptions, "onRevealRequest">;
 
   private hint = WordHint.None;
   private firstLetter?: string;
 
   public isShown = false;
 
-  constructor(options: WordRendererOptions) {
-    this.index = options.index;
-    this.length = options.length;
-    this.onRevealRequest = options.onRevealRequest;
+  constructor({ index, length, ...deps }: WordRendererOptions) {
+    this.deps = deps;
+    this.index = index;
+    this.length = length;
     this.containerElement = document.createElement("button");
     this.containerElement.classList.add("lexeme-container");
     this.lexemeElement = document.createElement("span");
@@ -104,7 +104,7 @@ export class WordRenderer implements ChildRenderer {
 
     this.containerElement.addEventListener("click", () => {
       if (!this.isShown) {
-        this.onRevealRequest(this.index);
+        this.deps.onRevealRequest(this.index);
       }
     });
   }

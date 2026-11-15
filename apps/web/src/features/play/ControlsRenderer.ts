@@ -13,9 +13,10 @@ type ControlsRendererOptions = {
 
 export class ControlsRenderer implements ChildRenderer {
   private readonly containerElement: HTMLElement;
-  private readonly onGuess: (word: string) => void;
-  private readonly onShowFirstLetters: (isShown: boolean) => void;
-  private readonly onShowText: (isShown: boolean) => void;
+  private readonly deps: Pick<
+    ControlsRendererOptions,
+    "onGuess" | "onShowFirstLetters" | "onShowText"
+  >;
   private isTextShown = false;
   private isFirstLettersShown = false;
   /**
@@ -25,14 +26,11 @@ export class ControlsRenderer implements ChildRenderer {
    */
   private readonly statusesByCheckedWord = new Map<string, string>();
 
-  constructor(options: ControlsRendererOptions) {
-    this.onGuess = options.onGuess;
-    this.onShowFirstLetters = options.onShowFirstLetters;
-    this.onShowText = options.onShowText;
-
+  constructor({ allowShowingText, allowShowingFirstLetters, ...deps }: ControlsRendererOptions) {
+    this.deps = deps;
     this.containerElement = document.createElement("div");
     this.containerElement.id = "controls-container";
-    this.initElement(options.allowShowingText, options.allowShowingFirstLetters);
+    this.initElement(allowShowingText, allowShowingFirstLetters);
   }
 
   public getElement(): HTMLElement {
@@ -195,13 +193,17 @@ export class ControlsRenderer implements ChildRenderer {
       this.statusesByCheckedWord.set(word, statusElement.textContent ?? "");
       this.renderGuessButton();
       guessInputElement.focus();
-      this.onGuess(word);
+      this.deps.onGuess(word);
     };
 
     guessButtonElement.addEventListener("click", guessHandler);
     onEnter(guessInputElement, guessHandler);
   }
 
+  /**
+   * Toggles the text hint on change or Enter. It first turns off a shown first letters hint, with
+   * its callback, so at most one hint shows at a time.
+   */
   private attachShowTextHandler() {
     const { showTextCheckboxElement, showFirstLettersCheckboxElement } = this.getElements();
 
@@ -212,10 +214,14 @@ export class ControlsRenderer implements ChildRenderer {
 
       this.isTextShown = !this.isTextShown;
       showTextCheckboxElement.checked = this.isTextShown;
-      this.onShowText(this.isTextShown);
+      this.deps.onShowText(this.isTextShown);
     });
   }
 
+  /**
+   * Toggles the first letters hint on change or Enter. It first turns off a shown text hint, with
+   * its callback, so at most one hint shows at a time.
+   */
   private attachShowFirstLettersHandler() {
     const { showTextCheckboxElement, showFirstLettersCheckboxElement } = this.getElements();
 
@@ -226,7 +232,7 @@ export class ControlsRenderer implements ChildRenderer {
 
       this.isFirstLettersShown = !this.isFirstLettersShown;
       showFirstLettersCheckboxElement.checked = this.isFirstLettersShown;
-      this.onShowFirstLetters(this.isFirstLettersShown);
+      this.deps.onShowFirstLetters(this.isFirstLettersShown);
     });
   }
 }
