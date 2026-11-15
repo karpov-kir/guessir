@@ -8,10 +8,10 @@ import {
 
 import { LruCache } from "../../shared/LruCache.js";
 import { createText } from "./createText.js";
+import type { Text } from "./port.js";
 import {
   HintNotAllowedError,
   NewText,
-  Text,
   TextNotFoundError,
   TextsOptions,
   WordNotFoundError,

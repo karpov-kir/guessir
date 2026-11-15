@@ -1,14 +1,11 @@
-import { inspect } from "node:util";
-
 import { Controller, Get, Logger, Module } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { FastifyAdapter, NestFastifyApplication } from "@nestjs/platform-fastify";
-import { QueryFailedError } from "typeorm";
+import { QueryError } from "../../../infra/db/exports.js";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, MockInstance, vi } from "vitest";
 
 import { QueryErrorFilter } from "./QueryErrorFilter.js";
 
-const secretText = "the whole hidden text of a game";
 const insertQuery = 'INSERT INTO "texts"("title", "text") VALUES ($1, $2)';
 const otherError = new Error("not a query");
 
@@ -16,15 +13,11 @@ const otherError = new Error("not a query");
 class FailingController {
   @Get("query")
   failQuery(): never {
-    const driverError = Object.assign(
-      new Error("value too long for type character varying(4000)"),
-      {
-        code: "22001",
-        detail: `Failing row contains (${secretText}).`,
-      },
-    );
-
-    throw new QueryFailedError(insertQuery, ["Title", secretText], driverError);
+    throw new QueryError({
+      message: "value too long for type character varying(4000)",
+      query: insertQuery,
+      code: "22001",
+    });
   }
 
   @Get("other")
@@ -58,15 +51,14 @@ describe(QueryErrorFilter, () => {
     logError = vi.spyOn(Logger.prototype, "error").mockImplementation(() => undefined);
   });
 
-  it("should answer a failed query with Nest's own 500 and log it without the text", async () => {
+  it("should answer a failed query with Nest's own 500 and log its SQL and code", async () => {
     const response = await app.inject({ method: "GET", url: "/query" });
 
     expect(response.statusCode).toBe(500);
     expect(response.json()).toEqual({ statusCode: 500, message: "Internal server error" });
     expect(logError).toHaveBeenCalledTimes(1);
-    expect(inspect(logError.mock.calls, { depth: Infinity })).not.toContain(secretText);
     expect(logError).toHaveBeenCalledWith(
-      `Query failed: QueryFailedError: value too long for type character varying(4000); ${insertQuery}; code 22001`,
+      `Query failed: QueryError: value too long for type character varying(4000); ${insertQuery}; code 22001`,
     );
   });
 

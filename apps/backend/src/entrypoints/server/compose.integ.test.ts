@@ -1,10 +1,10 @@
 import { Logger } from "@nestjs/common";
-import { QueryFailedError } from "typeorm";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { fakeTextRows } from "../../../tests/utils/fakeTextRows.js";
 import { testConfig } from "../../../tests/utils/testConfig.js";
 import { Text } from "../../features/texts/exports.js";
+import { QueryError } from "../../infra/db/exports.js";
 import { version } from "../../infra/version.js";
 import { compose, ServerHandle } from "./compose.js";
 
@@ -97,7 +97,7 @@ describe("the texts API over HTTP", () => {
     const errorLog = vi.spyOn(Logger.prototype, "error");
 
     textRows.insert.mockRejectedValueOnce(
-      new QueryFailedError('INSERT INTO "texts"', ["One two"], new Error("value too long")),
+      new QueryError({ message: "value too long", query: 'INSERT INTO "texts"' }),
     );
 
     const response = await request("POST", "/texts", {

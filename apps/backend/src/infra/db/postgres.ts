@@ -13,7 +13,6 @@ import {
   migrationsDir,
   withoutExtension,
 } from "./migrationFile.js";
-import { TextRow } from "./TextRow.js";
 import { ParameterFreeLogger } from "./ParameterFreeLogger.js";
 
 interface MigrationLog {
@@ -23,8 +22,6 @@ interface MigrationLog {
 }
 
 const migrationTable = "migrations";
-
-const entities = [TextRow];
 
 /**
  * Names the database to connect to. The password always comes from a file: a Docker secret on the
@@ -63,7 +60,8 @@ export const getTypeOrmConfig = (settings: DbSettings): DataSourceOptions => ({
   // Umzug migrations in `applyDbMigrations` own the schema, so TypeORM must not.
   synchronize: false,
   logger: new ParameterFreeLogger(),
-  entities,
+  // The texts feature reads and writes its table in SQL, so TypeORM holds no entity
+  entities: [],
   subscribers: [],
   migrations: [],
 });
