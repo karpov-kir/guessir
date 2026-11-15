@@ -3,9 +3,9 @@ import { NestFactory } from "@nestjs/core";
 import { FastifyAdapter, NestFastifyApplication } from "@nestjs/platform-fastify";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import { collectLogs } from "../../../../tests/utils/collectLogs.js";
+import { collectLogs } from "@guessir/logger/testing";
 import { QueryError } from "../../../infra/db/exports.js";
-import { Logger, LogLevel } from "../../../shared/Logger.js";
+import { Logger, LogLevel } from "@guessir/logger";
 import { nestLogger } from "./nestLogger.js";
 import { QueryErrorFilter } from "./QueryErrorFilter.js";
 

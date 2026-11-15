@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { collectLogs } from "../../tests/utils/collectLogs.js";
+import { collectLogs } from "./testing.js";
 import { Logger, LogLevel } from "./Logger.js";
 
 const logger = Logger.root.scope("Test");

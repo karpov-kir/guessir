@@ -1,6 +1,6 @@
 {
   "name": "@guessir/backend",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "type": "module",
   "scripts": {
     "build": "npm run clean && tsc -b tsconfig.build.json",
@@ -17,6 +17,7 @@
   "dependencies": {
     "@fastify/helmet": "^13.2.0",
     "@guessir/game": "^1.0.0",
+    "@guessir/logger": "^1.0.0",
     "@nestjs/common": "^12.3.2",
     "@nestjs/core": "^12.3.2",
     "@nestjs/platform-fastify": "^12.3.2",

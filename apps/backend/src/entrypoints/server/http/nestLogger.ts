@@ -1,6 +1,6 @@
 import type { LoggerService } from "@nestjs/common";
 
-import { Logger } from "../../../shared/Logger.js";
+import { Logger } from "@guessir/logger";
 
 /**
  * Returns the app's logger scoped by Nest's context, and the other arguments. Nest passes the

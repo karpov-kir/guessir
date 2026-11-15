@@ -5,7 +5,7 @@ import { ControlsRenderer } from "./ControlsRenderer";
 import { ScoreRenderer } from "./ScoreRenderer";
 import { TextRenderer } from "./text/TextRenderer";
 import { WordHint } from "./text/WordRenderer";
-import { Logger } from "../../shared/Logger";
+import { Logger } from "@guessir/logger";
 
 const logger = Logger.root.scope("PlayController");
 

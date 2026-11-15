@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { collectLogs } from "../../../../tests/utils/collectLogs.js";
-import { Logger, LogLevel } from "../../../shared/Logger.js";
+import { collectLogs } from "@guessir/logger/testing";
+import { Logger, LogLevel } from "@guessir/logger";
 import { nestLogger } from "./nestLogger.js";
 
 let logs: ReturnType<typeof collectLogs>;

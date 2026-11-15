@@ -2,7 +2,7 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from "@nestjs/commo
 import type { FastifyReply } from "fastify";
 
 import { QueryError } from "../../../infra/db/exports.js";
-import { Logger } from "../../../shared/Logger.js";
+import { Logger } from "@guessir/logger";
 
 /**
  * Answers a failed query with the 500 of Nest's default handler, and logs one line with the

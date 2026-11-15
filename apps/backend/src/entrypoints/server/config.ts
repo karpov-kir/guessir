@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import type { DbSettings } from "../../infra/db/exports.js";
 import { LogFormat } from "../../infra/logger/exports.js";
-import { LogLevel } from "../../shared/Logger.js";
+import { LogLevel } from "@guessir/logger";
 
 export type ServerConfig = {
   /** The address the server listens on. */

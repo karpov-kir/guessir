@@ -1,9 +1,9 @@
 import { newDbPing, openDb } from "../../infra/db/exports.js";
 import { readEnv } from "../../infra/env.js";
-import { newConsoleSink, newLogSink } from "../../infra/logger/exports.js";
+import { newLogSink } from "../../infra/logger/exports.js";
 import { systemClock } from "../../infra/systemClock.js";
 import type { Clock } from "../../shared/Clock.js";
-import { Logger, LogLevel, type LogSink } from "../../shared/Logger.js";
+import { Logger, LogLevel, type LogSink, newConsoleSink } from "@guessir/logger";
 import { parseConfig, type ServerConfig } from "../server/config.js";
 import { waitForDbAtStart } from "../../shared/dbWatch.js";
 

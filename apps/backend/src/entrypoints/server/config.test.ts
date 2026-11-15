@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { LogFormat } from "../../infra/logger/exports.js";
-import { LogLevel } from "../../shared/Logger.js";
+import { LogLevel } from "@guessir/logger";
 import { parseConfig } from "./config.js";
 
 const env = {

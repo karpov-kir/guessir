@@ -11,9 +11,10 @@ RUN npm run build -w @guessir/backend
 
 FROM base AS deps
 
-# The backend's production dependencies need only the root, game and backend manifests
+# The backend's production dependencies need only the root, packages' and backend manifests
 COPY package.json package-lock.json .npmrc ./
 COPY packages/game/package.json packages/game/
+COPY packages/logger/package.json packages/logger/
 COPY apps/backend/package.json apps/backend/
 
 RUN npm ci --omit=dev -w @guessir/backend
@@ -23,6 +24,7 @@ FROM base AS runner
 # Only what the backend runs: no sources, no dev dependencies, no env files
 COPY --from=deps /app .
 COPY --from=build /app/packages/game/dist packages/game/dist
+COPY --from=build /app/packages/logger/dist packages/logger/dist
 COPY --from=build /app/apps/backend/dist apps/backend/dist
 
 USER node

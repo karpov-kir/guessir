@@ -2,11 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LocalGame } from "../../entities/game/exports";
 import { PlayController } from "./PlayController";
-import { Logger, LogLevel } from "../../shared/Logger";
 import { requireElement } from "../../shared/dom";
-
-// Silences the logger: these tests make the game fail to answer on purpose.
-Logger.root.setLevel(LogLevel.Silent);
 
 let game: LocalGame;
 let gameElement: HTMLElement;

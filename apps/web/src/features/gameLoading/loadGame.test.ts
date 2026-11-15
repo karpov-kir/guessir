@@ -4,13 +4,9 @@ import { mock, MockProxy } from "vitest-mock-extended";
 
 import { newTextSkeleton } from "../../../tests/utils/textSkeleton";
 import { LocalGame } from "../../entities/game/exports";
-import { Logger, LogLevel } from "../../shared/Logger";
 import { GameApi } from "./GameApi";
 import { loadGame } from "./loadGame";
 import { RemoteGame } from "./RemoteGame";
-
-// Silences the logger: these tests make loading fail on purpose.
-Logger.root.setLevel(LogLevel.Silent);
 
 const skeleton = newTextSkeleton();
 let api: MockProxy<GameApi>;

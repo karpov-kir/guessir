@@ -8,6 +8,9 @@
   "references": [
     {
       "path": "../../packages/game/tsconfig.build.json"
+    },
+    {
+      "path": "../../packages/logger/tsconfig.build.json"
     }
   ]
 }

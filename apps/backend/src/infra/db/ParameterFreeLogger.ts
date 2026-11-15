@@ -2,7 +2,7 @@ import { inspect } from "node:util";
 
 import { Logger } from "typeorm";
 
-import { Logger as AppLogger } from "../../shared/Logger.js";
+import { Logger as AppLogger } from "@guessir/logger";
 
 /**
  * Logs TypeORM's failed queries, warnings, schema builds and migrations. The logger never writes a

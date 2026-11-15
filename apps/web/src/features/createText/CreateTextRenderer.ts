@@ -6,7 +6,7 @@ import { onChangeAndEnter, requireElement } from "../../shared/dom";
 import { icon } from "../../shared/icon";
 import { textUrl } from "../../entities/textLink/exports";
 import { CreateTextApi, createText } from "./createTextApi";
-import { Logger } from "../../shared/Logger";
+import { Logger } from "@guessir/logger";
 
 const logger = Logger.root.scope("CreateTextRenderer");
 
