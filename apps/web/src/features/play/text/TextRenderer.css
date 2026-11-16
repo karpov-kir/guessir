@@ -4,9 +4,9 @@
 
 #title {
   margin-bottom: 8px;
-  font-size: 42px;
-  font-weight: 800;
-  line-height: 1.05;
+  font-size: var(--text-title);
+  font-weight: var(--fw-heavy);
+  line-height: var(--lh-title);
   letter-spacing: -0.02em;
 }
 
@@ -17,8 +17,8 @@
 }
 
 #lexemes {
-  font-size: 21px;
-  line-height: 2.05;
+  font-size: var(--text-lexemes);
+  line-height: var(--lh-lexemes);
   overflow-wrap: anywhere;
 
   /* Leaves a gap between two tiles, which bleed over the spaces */
@@ -38,7 +38,7 @@
   white-space: nowrap;
 }
 
-@media (width <= 640px) {
+@container (width <= 640px) {
   #text-container {
     order: 1;
     padding: 22px 18px;
@@ -55,6 +55,6 @@
 
   #lexemes {
     font-size: var(--text-xl);
-    line-height: 2;
+    line-height: var(--lh-lexemes-sm);
   }
 }

@@ -11,20 +11,20 @@
   justify-content: center;
   width: 76px;
   height: 76px;
-  border-radius: 22px;
+  border-radius: var(--radius-badge);
   background: var(--yellow);
   color: var(--on-yellow);
   line-height: 1;
 }
 
 #current-score {
-  font-size: 32px;
-  font-weight: 800;
+  font-size: var(--text-score);
+  font-weight: var(--fw-heavy);
 }
 
 #score-total {
   font-size: var(--text-2xs);
-  font-weight: 600;
+  font-weight: var(--fw-strong);
 }
 
 #score-details {
@@ -35,7 +35,7 @@
 
 #score-label {
   font-size: var(--text-2xl);
-  font-weight: 800;
+  font-weight: var(--fw-heavy);
 }
 
 #score-progress {
@@ -58,7 +58,7 @@
   }
 }
 
-@media (width <= 640px) {
+@container (width <= 640px) {
   #score-badge {
     width: 56px;
     height: 56px;
