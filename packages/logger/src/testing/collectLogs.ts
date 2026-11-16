@@ -1,4 +1,4 @@
-import { type LogLevel, type LogRecord, type LogSink } from "./shared/Logger.js";
+import { type LogLevel, type LogRecord, type LogSink } from "../shared/Logger.js";
 
 type LogLine = Extract<LogRecord, { kind: "line" }>;
 
@@ -15,6 +15,3 @@ export function collectLogs(): { sink: LogSink; lines(level?: LogLevel): LogLine
       ),
   };
 }
-
-/** Takes the records and drops them, for a test that reads no log. */
-export const silentSink: LogSink = () => undefined;
