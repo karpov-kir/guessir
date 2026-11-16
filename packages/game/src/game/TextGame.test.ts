@@ -17,6 +17,52 @@ describe(TextGame, () => {
     ]);
   });
 
+  it("should keep at most two line breaks and one space in a row, and no space before a break", () => {
+    expect(new TextGame("One  \n\n\n\ntwo   three").lexemes()).toEqual([
+      { index: 0, length: 3 },
+      { index: 1, character: "\n" },
+      { index: 2, character: "\n" },
+      { index: 3, length: 3 },
+      { index: 4, character: " " },
+      { index: 5, length: 5 },
+    ]);
+  });
+
+  it("should start the text at its first word and drop the space before punctuation and at the end", () => {
+    expect(new TextGame("  ^One , two .\n ").lexemes()).toEqual([
+      { index: 0, length: 3 },
+      { index: 1, character: "," },
+      { index: 2, character: " " },
+      { index: 3, length: 3 },
+      { index: 4, character: "." },
+    ]);
+  });
+
+  it("should read an em dash inside a word as a hyphen and a lone i as I", () => {
+    expect(new TextGame("re—g i").words()).toEqual([
+      { index: 0, word: "re-g" },
+      { index: 2, word: "I" },
+    ]);
+  });
+
+  it("should split a contraction into its words with a space, and keep a lone hyphen out of the words", () => {
+    expect(new TextGame("So don't - go").lexemes()).toEqual([
+      { index: 0, length: 2 },
+      { index: 1, character: " " },
+      { index: 2, length: 2 },
+      { index: 3, character: " " },
+      { index: 4, length: 3 },
+      { index: 5, character: " " },
+      { index: 6, character: "-" },
+      { index: 7, character: " " },
+      { index: 8, length: 2 },
+    ]);
+  });
+
+  it("should reveal a contraction with 'd by its first word", () => {
+    expect(new TextGame("So she'd go").guess("she")).toEqual([{ index: 2, word: "she'd" }]);
+  });
+
   it("should count the words", () => {
     expect(textGame.wordCount).toBe(3);
   });

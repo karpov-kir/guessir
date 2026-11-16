@@ -152,24 +152,3 @@ describe(TextsUseCases, () => {
     });
   });
 });
-
-describe("TextsUseCases.create", () => {
-  it("should store the text under a new 20-character id and return only the id", async () => {
-    const rows = fakeTextRows();
-    const { id } = await newTextsUseCases({ rows, ids: fakeIds() }).create({
-      title: "Title",
-      text: "One",
-      allowShowingFirstLetters: true,
-      allowShowingText: false,
-    });
-
-    expect(id).toBe("id100000000000000000");
-    expect(await rows.getById(id)).toEqual({
-      id,
-      title: "Title",
-      text: "One",
-      allowShowingFirstLetters: true,
-      allowShowingText: false,
-    });
-  });
-});

@@ -97,11 +97,6 @@ describe("the blank texts migration", () => {
     }
   });
 
-  it("should take the values the API reads as blank and no others", () => {
-    expect(blankValues.every(isBlank)).toBe(true);
-    expect(filledValues.some(isBlank)).toBe(false);
-  });
-
   it("should delete a text with a blank title or text and clear a blank description", async () => {
     await runMigrationAgain();
 

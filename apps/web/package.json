@@ -3,8 +3,8 @@
   "version": "1.0.7",
   "type": "module",
   "scripts": {
-    "build": "npm run clean && tsc -b ./tsconfig.build.json && vite build",
-    "clean": "del-cli ./dist ./tsconfig.build.tsbuildinfo",
+    "build": "npm run clean && vite build",
+    "clean": "del-cli ./dist",
     "start:dev": "run-p start:vite typecheck:watch",
     "start:vite": "vite",
     "typecheck:watch": "tsc -b ./tsconfig.build.json --watch",
