@@ -1,4 +1,4 @@
-// Vendored from karpov-kir/configs, ai/kk-flavor/standards/architecture/Logger.ts at 574bbce.
+// Vendored from karpov-kir/configs, ai/kk-flavor/standards/architecture/Logger.ts at 468d7c1c.
 // Changed here: the comments name this package, which both apps import, as the home of the sink.
 
 /**
@@ -46,8 +46,8 @@ export class Logger {
   static readonly root = new Logger([]);
 
   /**
-   * Sets the sink and the level for every logger. The composition root calls it on its first line, and again once the
-   * config parses.
+   * Sets the sink and the level for every logger. The composition root calls it right after it reads the environment,
+   * with the sink `LOG_FORMAT` names, and again once the config parses.
    */
   static install(sink: LogSink, level: LogLevel): void {
     Logger.sink = sink;

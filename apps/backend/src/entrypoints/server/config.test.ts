@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { LogFormat } from "../../infra/logger/exports.js";
 import { LogLevel } from "@guessir/logger";
-import { parseConfig } from "./config.js";
+import { logFormatOf, parseConfig } from "./config.js";
 
 const env = {
   DATABASE_HOST: "guessir_database",
@@ -76,5 +76,17 @@ describe(parseConfig, () => {
     expect(() => parseConfig({ PORT: "port" })).toThrow(
       /PORT[\s\S]*DATABASE_HOST[\s\S]*DATABASE_USER[\s\S]*DATABASE_PASSWORD_FILE[\s\S]*DATABASE_NAME/,
     );
+  });
+});
+
+describe(logFormatOf, () => {
+  it.each([
+    [{ LOG_FORMAT: "json" }, LogFormat.Json],
+    [{ LOG_FORMAT: " " }, LogFormat.Pretty],
+    [{ LOG_FORMAT: "pretty" }, LogFormat.Pretty],
+    [{ LOG_FORMAT: "xml" }, LogFormat.Pretty],
+    [{}, LogFormat.Pretty],
+  ])("should read %j as the format %s", (env, format) => {
+    expect(logFormatOf(env)).toBe(format);
   });
 });

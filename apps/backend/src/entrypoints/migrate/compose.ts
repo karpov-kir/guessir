@@ -1,10 +1,10 @@
 import { newDbPing, openDb } from "../../infra/db/exports.js";
 import { readEnv } from "../../infra/env.js";
-import { newLogSink } from "../../infra/logger/exports.js";
+import { LogFormat, newLogSink } from "../../infra/logger/exports.js";
 import { systemClock } from "../../infra/systemClock.js";
 import type { Clock } from "../../shared/Clock.js";
-import { Logger, LogLevel, type LogSink, newConsoleSink } from "@guessir/logger";
-import { parseConfig, type ServerConfig } from "../server/config.js";
+import { Logger, LogLevel, type LogSink } from "@guessir/logger";
+import { logFormatOf, parseConfig, type ServerConfig } from "../server/config.js";
 import { waitForDbAtStart } from "../../shared/dbWatch.js";
 
 const logger = Logger.root.scope("migrate");
@@ -18,6 +18,8 @@ export type MigrateOverrides = {
    * drop them.
    */
   logSink?: LogSink;
+  /** Stands in for the sink of a log format, so a test can read which format a record took. */
+  logSinks?: Partial<Record<LogFormat, LogSink>>;
 };
 
 export type MigrateHandle = {
@@ -36,11 +38,14 @@ export type MigrateHandle = {
 export function compose(overrides: MigrateOverrides = {}): MigrateHandle {
   const clock = overrides.clock ?? systemClock;
 
-  // This call installs a console sink before the config is parsed, so a parse error still reaches a
-  // log. The second call reads the format from the config.
-  Logger.install(overrides.logSink ?? newConsoleSink({ clock }), LogLevel.Info);
-  const config = overrides.config ?? parseConfig(readEnv());
-  Logger.install(overrides.logSink ?? newLogSink(config.log.format, { clock }), config.log.level);
+  const sinkOf = (format: LogFormat) =>
+    overrides.logSink ?? overrides.logSinks?.[format] ?? newLogSink(format, { clock });
+  const env = readEnv();
+
+  // The first sink takes the records until the config parses, so a config error is logged
+  Logger.install(sinkOf(logFormatOf(env)), LogLevel.Info);
+  const config = overrides.config ?? parseConfig(env);
+  Logger.install(sinkOf(config.log.format), config.log.level);
 
   return {
     async run() {

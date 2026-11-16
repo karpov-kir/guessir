@@ -32,6 +32,10 @@ const logLevels: Record<(typeof logLevelNames)[number], LogLevel> = {
   silent: LogLevel.Silent,
 };
 
+const defaultLogFormat = LogFormat.Pretty;
+
+const logFormat = z.preprocess(unsetIfBlank, z.enum(LogFormat).default(defaultLogFormat));
+
 const envSchema = z.object({
   HOST: z.preprocess(unsetIfBlank, z.string().default("0.0.0.0")),
   PORT: portNumber(3020),
@@ -42,9 +46,16 @@ const envSchema = z.object({
   // `env/database-password.development` locally
   DATABASE_PASSWORD_FILE: required,
   DATABASE_NAME: required,
-  LOG_FORMAT: z.preprocess(unsetIfBlank, z.enum(LogFormat).default(LogFormat.Pretty)),
+  LOG_FORMAT: logFormat,
   LOG_LEVEL: z.preprocess(unsetIfBlank, z.enum(logLevelNames).default("info")),
 });
+
+/**
+ * Returns the log format `env` names, or `defaultLogFormat` when LOG_FORMAT is unset or invalid.
+ * The caller logs a config that fails to parse in that format, so a log collector reads the error.
+ */
+export const logFormatOf = (env: Readonly<Record<string, string | undefined>>): LogFormat =>
+  logFormat.safeParse(env.LOG_FORMAT).data ?? defaultLogFormat;
 
 /** Reads the server's config from `env`, and throws with every problem when a variable is wrong. */
 export function parseConfig(env: Readonly<Record<string, string | undefined>>): ServerConfig {

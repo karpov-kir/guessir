@@ -7,13 +7,13 @@ import { Texts, type TextRows } from "../../features/texts/exports.js";
 import { newTextStore } from "../../features/texts/infra/exports.js";
 import { type Db, type DbPing, newDbPing, openDb } from "../../infra/db/exports.js";
 import { readEnv } from "../../infra/env.js";
-import { newLogSink } from "../../infra/logger/exports.js";
+import { LogFormat, newLogSink } from "../../infra/logger/exports.js";
 import { systemClock } from "../../infra/systemClock.js";
 import { systemIds } from "../../infra/systemIds.js";
 import type { Clock } from "../../shared/Clock.js";
 import type { IdGenerator } from "../../shared/IdGenerator.js";
-import { Logger, LogLevel, type LogSink, newConsoleSink } from "@guessir/logger";
-import { parseConfig, type ServerConfig } from "./config.js";
+import { Logger, LogLevel, type LogSink } from "@guessir/logger";
+import { logFormatOf, parseConfig, type ServerConfig } from "./config.js";
 import { pingEveryMs, waitForDbAtStart, watchDb } from "../../shared/dbWatch.js";
 import { errorText } from "../../shared/errorText.js";
 import { newApp } from "./http/newApp.js";
@@ -41,6 +41,8 @@ export type ServerOverrides = {
    * drop them.
    */
   logSink?: LogSink;
+  /** Stands in for the sink of a log format, so a test can read which format a record took. */
+  logSinks?: Partial<Record<LogFormat, LogSink>>;
 };
 
 export type ServerHandle = {
@@ -89,11 +91,14 @@ const exitOnDbLost = (error: unknown) => {
 export async function compose(overrides: ServerOverrides = {}): Promise<ServerHandle> {
   const clock = overrides.clock ?? systemClock;
 
-  // The console sink takes the records until the config parses, so a config error is logged. The
-  // configured sink needs the parsed config.
-  Logger.install(overrides.logSink ?? newConsoleSink({ clock }), LogLevel.Info);
-  const config = overrides.config ?? parseConfig(readEnv());
-  Logger.install(overrides.logSink ?? newLogSink(config.log.format, { clock }), config.log.level);
+  const sinkOf = (format: LogFormat) =>
+    overrides.logSink ?? overrides.logSinks?.[format] ?? newLogSink(format, { clock });
+  const env = readEnv();
+
+  // The first sink takes the records until the config parses, so a config error is logged
+  Logger.install(sinkOf(logFormatOf(env)), LogLevel.Info);
+  const config = overrides.config ?? parseConfig(env);
+  Logger.install(sinkOf(config.log.format), config.log.level);
 
   const onDbLost = overrides.onDbLost ?? exitOnDbLost;
   let dbPing: DbPing | undefined;

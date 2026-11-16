@@ -65,6 +65,25 @@ describe("the migrate step", () => {
     expect((await server.handle({ method: "GET", url: "/texts/unknown" })).statusCode).toBe(404);
   }, 120_000);
 
+  it("should log each migration it applies as one line of text", async () => {
+    postgres = await startPostgres();
+    const logs = collectLogs();
+
+    await migrateStep(postgres.settings, logs.sink).run();
+
+    expect(
+      logs
+        .lines(LogLevel.Info)
+        .filter(({ scope }) => scope[0] === "postgres")
+        .map(({ args }) => args),
+    ).toEqual([
+      ["migrating 2022-03-23-initial.ts"],
+      [expect.stringMatching(/^migrated 2022-03-23-initial\.ts in \d+(\.\d+)?s$/)],
+      ["migrating 2026-11-14-blank-texts.ts"],
+      [expect.stringMatching(/^migrated 2026-11-14-blank-texts\.ts in \d+(\.\d+)?s$/)],
+    ]);
+  }, 120_000);
+
   it("should apply each migration once and record its kind, even with two steps at once", async () => {
     postgres = await startPostgres();
     const step = migrateStep(postgres.settings);
