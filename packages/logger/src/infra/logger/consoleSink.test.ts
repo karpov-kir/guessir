@@ -62,13 +62,19 @@ describe(newConsoleSink, () => {
     ]);
   });
 
-  it("should leave the arguments as they are when told not to stringify objects", () => {
-    const sink = newConsoleSink({ clock, stringifyObjects: false });
-    const value = { a: 1 };
+  it("should hand the console an error whose stack throws, and not throw itself", () => {
+    const sink = newConsoleSink({ clock });
+    const error = new Error("boom");
 
-    sink({ kind: "line", level: LogLevel.Info, scope: [], args: [value] });
+    Object.defineProperty(error, "stack", {
+      get() {
+        throw new Error("stack unavailable");
+      },
+    });
 
-    expect(calls("log")).toEqual([["[12:00:00.000] [INFO]", value]]);
+    sink({ kind: "line", level: LogLevel.Error, scope: [], args: [error] });
+
+    expect(calls("error")).toEqual([["[12:00:00.000] [ERROR]", error]]);
   });
 
   it("should open groups on the console with their scope, and end them", () => {
