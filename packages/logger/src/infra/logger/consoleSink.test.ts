@@ -77,15 +77,6 @@ describe(newConsoleSink, () => {
     expect(calls("error")).toEqual([["[12:00:00.000] [ERROR]", error]]);
   });
 
-  it("should leave the arguments as they are when told not to stringify objects", () => {
-    const sink = newConsoleSink({ clock, stringifyObjects: false });
-    const value = { a: 1 };
-
-    sink({ kind: "line", level: LogLevel.Info, scope: [], args: [value] });
-
-    expect(calls("log")).toEqual([["[12:00:00.000] [INFO]", value]]);
-  });
-
   it("should open groups on the console with their scope, and end them", () => {
     const sink = newConsoleSink({ clock });
 

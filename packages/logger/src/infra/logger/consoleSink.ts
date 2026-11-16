@@ -1,4 +1,4 @@
-// Vendored from karpov-kir/configs, ai/kk-flavor/standards/architecture/consoleSink.ts at b4d234a9.
+// Vendored from karpov-kir/configs, ai/kk-flavor/standards/architecture/consoleSink.ts at 69d65f06.
 // Changed here: the sink declares its own `Clock`, whose `now` returns milliseconds, because a
 // package imports no app.
 
@@ -12,8 +12,6 @@ interface ConsoleSinkOptions {
   clock: Clock;
   /** Opens every line, such as the app's short name. */
   name?: string;
-  /** Turns objects and errors into JSON, so a console that shows only text still shows their fields. */
-  stringifyObjects?: boolean;
 }
 
 const isErrorLike = (
@@ -67,11 +65,7 @@ const levelNames: Record<Exclude<LogLevel, LogLevel.Silent>, string> = {
  *   Logger.install(newConsoleSink({ clock: systemClock, name: 'CS' }), config.logLevel);
  *   // Logger.root.scope('Editor').info('ready') → [CS 12:00:00.000] [INFO] [Editor] ready
  */
-export function newConsoleSink({
-  clock,
-  name,
-  stringifyObjects = true,
-}: ConsoleSinkOptions): LogSink {
+export function newConsoleSink({ clock, name }: ConsoleSinkOptions): LogSink {
   return (record: LogRecord) => {
     if (record.kind === "groupEnd") {
       console.groupEnd();
@@ -85,7 +79,7 @@ export function newConsoleSink({
       return;
     }
     const time = new Date(clock.now()).toISOString().split("T")[1]?.replace("Z", "");
-    const args = stringifyObjects ? record.args.map(stringifyArg) : record.args;
+    const args = record.args.map(stringifyArg);
     const stamp = name === undefined ? time : `${name} ${time}`;
     const line = [`[${stamp}] [${levelNames[record.level]}]${labels}`, ...args];
     if (record.level >= LogLevel.Error) {
