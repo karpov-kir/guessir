@@ -11,7 +11,7 @@ import { silentSink } from "@guessir/logger/testing";
 import { testConfig } from "./testConfig.js";
 
 // The same Postgres major as the server's stack
-const image = "postgres:17";
+const image = "postgres:18";
 
 /**
  * Points Testcontainers at the Docker this machine runs. Testcontainers does not read the Docker
