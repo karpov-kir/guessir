@@ -17,7 +17,7 @@ class FailingController {
   @Get("query")
   failQuery(): never {
     throw new QueryError({
-      message: "value too long for type character varying(4000)",
+      message: "SQLSTATE 22001",
       query: insertQuery,
       code: "22001",
     });
@@ -64,9 +64,7 @@ describe(QueryErrorFilter, () => {
         kind: "line",
         level: LogLevel.Error,
         scope: ["ExceptionsHandler"],
-        args: [
-          `Query failed: QueryError: value too long for type character varying(4000); ${insertQuery}; code 22001`,
-        ],
+        args: [`Query failed: QueryError: SQLSTATE 22001; ${insertQuery}; code 22001`],
       },
     ]);
   });

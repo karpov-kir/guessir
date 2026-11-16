@@ -1,7 +1,6 @@
-// Vendored from karpov-kir/configs, ai/kk-flavor/standards/architecture/consoleSink.ts at 574bbce.
+// Vendored from karpov-kir/configs, ai/kk-flavor/standards/architecture/consoleSink.ts at d1277011.
 // Changed here: the sink declares its own `Clock`, whose `now` returns milliseconds, because a
-// package imports no app. An object that JSON cannot hold goes to the console as it is, not as a
-// string. The comments name this package, which both apps import.
+// package imports no app.
 
 import { LogLevel, type LogRecord, type LogSink } from "../../shared/Logger.js";
 
@@ -30,6 +29,7 @@ const isErrorLike = (
   );
 };
 
+/** Returns an object or error as JSON text, or the argument itself when it is a primitive or JSON cannot hold it. */
 const stringifyArg = (arg: unknown): unknown => {
   if (arg === null || arg === undefined) {
     return arg;
@@ -48,7 +48,8 @@ const stringifyArg = (arg: unknown): unknown => {
         2,
       );
     } catch {
-      // The console shows an object that JSON cannot hold, such as one with a cycle, by itself
+      // The catch hands the object itself to the console, which shows its structure. JSON throws on a cycle or a BigInt,
+      // and `String` would print only "[object Object]".
       return arg;
     }
   }
@@ -64,7 +65,7 @@ const levelNames: Record<Exclude<LogLevel, LogLevel.Silent>, string> = {
 
 /**
  * Returns the sink that writes records to the console, each line opened by the name, if any, the time and the level, then its
- * scope labels. Both apps import it from this package. This file is the one module that calls the console:
+ * scope labels. The project vendors it into `infra/logger`, inside `infra`, the one layer that calls the console:
  *
  *   Logger.install(newConsoleSink({ clock: systemClock, name: 'CS' }), config.logLevel);
  *   // Logger.root.scope('Editor').info('ready') → [CS 12:00:00.000] [INFO] [Editor] ready

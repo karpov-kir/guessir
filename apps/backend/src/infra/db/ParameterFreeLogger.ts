@@ -2,6 +2,8 @@ import { inspect } from "node:util";
 
 import { Logger } from "typeorm";
 
+import { databaseErrorText } from "./databaseErrorText.js";
+
 import { Logger as AppLogger } from "@guessir/logger";
 
 /**
@@ -16,7 +18,7 @@ export class ParameterFreeLogger implements Logger {
   }
 
   logQueryError(error: string | Error, query: string) {
-    this.logger.error(`Query failed: ${String(error)}; ${query}`);
+    this.logger.error(`Query failed: ${databaseErrorText(error) ?? String(error)}; ${query}`);
   }
 
   logQuerySlow() {
