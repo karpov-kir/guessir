@@ -33,6 +33,21 @@ describe(ParameterFreeLogger, () => {
     ]);
   });
 
+  it("should log a refused query by its SQLSTATE, since the message can quote a stored text", () => {
+    const refusal = Object.assign(
+      new Error(`invalid input syntax for type integer: "${secretText}"`),
+      {
+        code: "22P02",
+      },
+    );
+
+    parameterFreeLogger.logQueryError(refusal, insertQuery, [secretText]);
+
+    expect(logs.lines(LogLevel.Error).map(({ args }) => args)).toEqual([
+      ["Query failed: SQLSTATE 22P02; INSERT INTO texts VALUES ($1)"],
+    ]);
+  });
+
   it("should not log successful or slow queries, whose parameters carry the texts", () => {
     parameterFreeLogger.logQuery(insertQuery, [secretText]);
     parameterFreeLogger.logQuerySlow(5_000, insertQuery, [secretText]);

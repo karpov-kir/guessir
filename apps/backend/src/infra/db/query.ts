@@ -1,5 +1,6 @@
 import { DataSource, QueryFailedError } from "typeorm";
 
+import { databaseErrorText } from "./databaseErrorText.js";
 import { QueryError } from "./QueryError.js";
 
 /**
@@ -11,7 +12,10 @@ export type Query = <T = unknown>(sql: string, parameters?: unknown[]) => Promis
 /** Runs `work` in one transaction, which rolls back if `work` throws. */
 export type Transaction = (work: (query: Query) => Promise<void>) => Promise<void>;
 
-/** Turns TypeORM's refusal of a query into a `QueryError`, which keeps TypeORM in this folder. */
+/**
+ * Returns a `QueryError` for TypeORM's refusal of a query, and returns any other error unchanged.
+ * Callers outside this folder then never see a TypeORM error.
+ */
 const toQueryError = (error: unknown) => {
   if (!(error instanceof QueryFailedError)) {
     return error;
@@ -27,7 +31,11 @@ const toQueryError = (error: unknown) => {
       ? driverError.code
       : undefined;
 
-  return new QueryError({ message: error.message, query: error.query, code });
+  return new QueryError({
+    message: databaseErrorText(driverError) ?? error.message,
+    query: error.query,
+    code,
+  });
 };
 
 /** Returns a query over `run` that throws a `QueryError` where TypeORM throws its own error. */

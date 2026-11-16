@@ -5,6 +5,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { startPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
 import { Db, openDb } from "./openDb.js";
 import { openPostgres } from "./postgres.js";
+import { errorText } from "../../shared/errorText.js";
 import { QueryError } from "./QueryError.js";
 
 interface Row {
@@ -116,20 +117,23 @@ describe("the blank texts migration", () => {
     expect(await storedRows()).toEqual(once);
   });
 
-  it("should leave every row as it was when a statement fails", async () => {
+  it("should leave every row as it was when a statement fails, and keep its text out of the error", async () => {
     const before = await storedRows();
 
     await dataSource.query(`
       CREATE FUNCTION refuse_update() RETURNS trigger LANGUAGE plpgsql AS $$
-      BEGIN RAISE EXCEPTION 'update refused'; END $$;
-      CREATE TRIGGER refuse_update BEFORE UPDATE ON texts EXECUTE FUNCTION refuse_update();
+      BEGIN RAISE EXCEPTION 'update refused for %', NEW.text; END $$;
+      CREATE TRIGGER refuse_update BEFORE UPDATE ON texts FOR EACH ROW EXECUTE FUNCTION refuse_update();
     `);
 
     try {
       const error: unknown = await runMigrationAgain().catch((thrown: unknown) => thrown);
 
-      // The migrator names the migration and keeps the database's refusal as the cause
-      expect(error instanceof Error && error.message).toMatch(/update refused/);
+      // The migrate step logs this error text. The checks require the migration name and the
+      // SQLSTATE, and refuse the database's message. That message quotes the row's text here, and
+      // the log must not hold a text's content.
+      expect(errorText(error)).toMatch(/2026-11-14-blank-texts.*SQLSTATE P0001/);
+      expect(errorText(error)).not.toContain("One two");
       expect(error instanceof Error && error.cause).toBeInstanceOf(QueryError);
       expect(await storedRows()).toEqual(before);
     } finally {

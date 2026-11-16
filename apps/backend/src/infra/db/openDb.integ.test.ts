@@ -1,7 +1,12 @@
+import { Logger, LogLevel } from "@guessir/logger";
+import { collectLogs } from "@guessir/logger/testing";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { startMigratedPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
 import { Db, newDbPing, openDb, QueryError } from "./exports.js";
+
+const hiddenTitle = "the hidden text";
+const hiddenTextId = "hidden".padEnd(20, "x");
 
 describe("the database on Postgres", () => {
   let postgres: TestPostgres;
@@ -28,11 +33,36 @@ describe("the database on Postgres", () => {
 
     expect(error).toBeInstanceOf(QueryError);
     expect(error).toMatchObject({
-      message: "division by zero",
+      message: "SQLSTATE 22012",
       query: "SELECT 1 / $1::int",
       code: "22012",
     });
     expect(error).not.toHaveProperty("parameters");
+  });
+
+  it.each([
+    ["a parameter cast to a number", "SELECT $1::int", [hiddenTitle]],
+    [
+      "a stored text cast to a number",
+      "SELECT title::int FROM texts WHERE id = $1",
+      [hiddenTextId],
+    ],
+  ])("should keep the value out of the error and the log on %s", async (_, sql, parameters) => {
+    const logs = collectLogs();
+
+    Logger.install(logs.sink, LogLevel.Debug);
+    await db.query(
+      `INSERT INTO texts (id, title, text, "allowShowingFirstLetters", "allowShowingText")
+       VALUES ($1, $2, 'One two', true, true) ON CONFLICT DO NOTHING`,
+      [hiddenTextId, hiddenTitle],
+    );
+
+    const error = await db.query(sql, parameters).catch((thrown: unknown) => thrown);
+
+    expect(error).toMatchObject({ code: "22P02" });
+    expect(String(error)).not.toContain(hiddenTitle);
+    expect(JSON.stringify(logs.lines())).not.toContain(hiddenTitle);
+    expect(logs.lines(LogLevel.Error)).not.toEqual([]);
   });
 
   it("should answer a ping while the database is up", async () => {
