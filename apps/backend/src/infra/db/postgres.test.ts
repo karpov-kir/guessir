@@ -28,7 +28,7 @@ describe(getTypeOrmConfig, () => {
     rmSync(tempDir, { recursive: true, force: true });
   });
 
-  it("should connect with the trimmed password from its file", () => {
+  it("should connect with the trimmed password from its file and log through ParameterFreeLogger", () => {
     expect(getTypeOrmConfig(settings)).toMatchObject({
       type: "postgres",
       host: "guessir_database",
@@ -37,6 +37,7 @@ describe(getTypeOrmConfig, () => {
       password: "file-password",
       database: "guessir-production",
     });
+    expect(getTypeOrmConfig(settings).logger).toBeInstanceOf(ParameterFreeLogger);
   });
 
   it("should throw when the password file cannot be read", () => {
@@ -45,9 +46,5 @@ describe(getTypeOrmConfig, () => {
     expect(() => getTypeOrmConfig({ ...settings, passwordFile })).toThrow(
       `Failed to read the database password file (${passwordFile})`,
     );
-  });
-
-  it("should log queries only through the logger that drops their parameters", () => {
-    expect(getTypeOrmConfig(settings).logger).toBeInstanceOf(ParameterFreeLogger);
   });
 });

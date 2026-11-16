@@ -165,30 +165,18 @@ describe(CreateTextUseCases, () => {
     expect(api.post).not.toHaveBeenCalled();
   });
 
-  it("should initialize inputs without validation classes", () => {
-    const { textInputElement, titleInputElement } = getElements(useCases.getElement());
-
-    expect(titleInputElement.classList).not.toContain("invalid");
-    expect(textInputElement.classList).not.toContain("invalid");
-  });
-
-  it("should validate inputs on submit", () => {
+  it("should mark empty required fields invalid on submit, for screen readers too", () => {
     const { textInputElement, titleInputElement, generateUrlButtonElement } = getElements(
       useCases.getElement(),
     );
+
+    expect(titleInputElement.classList).not.toContain("invalid");
+    expect(textInputElement.classList).not.toContain("invalid");
 
     generateUrlButtonElement.click();
 
     expect(titleInputElement.classList).toContain("invalid");
     expect(textInputElement.classList).toContain("invalid");
-  });
-
-  it("should mark empty required fields invalid for screen readers too", () => {
-    const { textInputElement, titleInputElement, generateUrlButtonElement } = getElements(
-      useCases.getElement(),
-    );
-
-    generateUrlButtonElement.click();
 
     expect(titleInputElement.getAttribute("aria-invalid")).toBe("true");
     expect(textInputElement.getAttribute("aria-invalid")).toBe("true");

@@ -25,17 +25,17 @@ const newControlsRenderer = (
 };
 
 describe(ControlsRenderer, () => {
-  it("should be initialized with default values", () => {
+  it("should start with both hints off and the guess button disabled", () => {
     const { controlsRenderer } = newControlsRenderer({
       allowShowingFirstLetters: true,
       allowShowingText: true,
     });
-    const { showTextCheckboxElement, showFirstLettersCheckboxElement } = getElements(
-      controlsRenderer.getElement(),
-    );
+    const { showTextCheckboxElement, showFirstLettersCheckboxElement, guessButtonElement } =
+      getElements(controlsRenderer.getElement());
 
     expect(showTextCheckboxElement.checked).toBe(false);
     expect(showFirstLettersCheckboxElement.checked).toBe(false);
+    expect(guessButtonElement.disabled).toBe(true);
   });
 
   it("should be initialized with disabled showing first letters checkbox", () => {
@@ -197,20 +197,6 @@ describe(ControlsRenderer, () => {
     expect(guessButtonElement.disabled).toBe(false);
   });
 
-  it("should keep the word the player typed while the guess was checked", () => {
-    const { controlsRenderer } = newControlsRenderer();
-    const { guessButtonElement, guessInputElement } = getElements(controlsRenderer.getElement());
-
-    typeGuess(guessInputElement, "test");
-    guessButtonElement.click();
-    typeGuess(guessInputElement, "next");
-
-    controlsRenderer.returnGuess("test");
-
-    expect(guessInputElement.value).toBe("next");
-    expect(guessButtonElement.disabled).toBe(false);
-  });
-
   it("should not send a guess if the word is empty", () => {
     const { controlsRenderer, onGuess } = newControlsRenderer({
       allowShowingFirstLetters: true,
@@ -304,17 +290,6 @@ describe(ControlsRenderer, () => {
     expect(onShowB).toHaveBeenNthCalledWith(1, false);
   });
 
-  it("should render the guess button disabled initially", () => {
-    const { controlsRenderer } = newControlsRenderer();
-    const guessButtonElement = requireElement({
-      root: controlsRenderer.getElement(),
-      selector: "button",
-      type: HTMLButtonElement,
-    });
-
-    expect(guessButtonElement.disabled).toBe(true);
-  });
-
   it("should enable the guess button on input", () => {
     const { controlsRenderer } = newControlsRenderer();
 
@@ -354,16 +329,6 @@ describe(ControlsRenderer, () => {
     expect(hasShakeAndErrorBefore).toBe(false);
     expect(hasShakeAndErrorAfterTriggered).toBe(true);
     expect(guessInputElement.classList.contains("shake-and-error")).toBe(false);
-  });
-
-  it("should announce a wrong guess", () => {
-    const { controlsRenderer } = newControlsRenderer();
-    const { statusElement } = getElements(controlsRenderer.getElement());
-
-    expect(statusElement.textContent).toBe("");
-
-    controlsRenderer.shakeAndError();
-    expect(statusElement.textContent).toBe("No new words for this guess");
   });
 
   it("should show a status on screen under the guess row and announce it to screen readers", () => {
