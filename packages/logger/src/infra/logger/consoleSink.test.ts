@@ -62,6 +62,21 @@ describe(newConsoleSink, () => {
     ]);
   });
 
+  it("should hand the console an error whose stack throws, and not throw itself", () => {
+    const sink = newConsoleSink({ clock });
+    const error = new Error("boom");
+
+    Object.defineProperty(error, "stack", {
+      get() {
+        throw new Error("stack unavailable");
+      },
+    });
+
+    sink({ kind: "line", level: LogLevel.Error, scope: [], args: [error] });
+
+    expect(calls("error")).toEqual([["[12:00:00.000] [ERROR]", error]]);
+  });
+
   it("should leave the arguments as they are when told not to stringify objects", () => {
     const sink = newConsoleSink({ clock, stringifyObjects: false });
     const value = { a: 1 };

@@ -1,4 +1,4 @@
-// Vendored from karpov-kir/configs, ai/kk-flavor/standards/architecture/Logger.ts at d1277011.
+// Vendored from karpov-kir/configs, ai/kk-flavor/standards/architecture/Logger.ts at b4d234a9.
 
 /**
  * Log levels (lower number = more verbose). `Silent` is highest, so it drops every record.

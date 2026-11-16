@@ -1,4 +1,4 @@
-// Vendored from karpov-kir/configs, ai/kk-flavor/standards/architecture/consoleSink.ts at d1277011.
+// Vendored from karpov-kir/configs, ai/kk-flavor/standards/architecture/consoleSink.ts at b4d234a9.
 // Changed here: the sink declares its own `Clock`, whose `now` returns milliseconds, because a
 // package imports no app.
 
@@ -31,29 +31,26 @@ const isErrorLike = (
 
 /** Returns an object or error as JSON text, or the argument itself when it is a primitive or JSON cannot hold it. */
 const stringifyArg = (arg: unknown): unknown => {
-  if (arg === null || arg === undefined) {
+  if (typeof arg !== "object" || arg === null) {
     return arg;
   }
-  if (isErrorLike(arg)) {
-    return JSON.stringify({ name: arg.name, message: arg.message, stack: arg.stack });
-  }
-  if (typeof arg === "object") {
-    try {
-      return JSON.stringify(
-        arg,
-        (_key, value: unknown) =>
-          isErrorLike(value)
-            ? { name: value.name, message: value.message, stack: value.stack }
-            : value,
-        2,
-      );
-    } catch {
-      // The catch hands the object itself to the console, which shows its structure. JSON throws on a cycle or a BigInt,
-      // and `String` would print only "[object Object]".
-      return arg;
+  try {
+    if (isErrorLike(arg)) {
+      return JSON.stringify({ name: arg.name, message: arg.message, stack: arg.stack });
     }
+    return JSON.stringify(
+      arg,
+      (_key, value: unknown) =>
+        isErrorLike(value)
+          ? { name: value.name, message: value.message, stack: value.stack }
+          : value,
+      2,
+    );
+  } catch {
+    // The catch hands the object itself to the console, which shows its structure. JSON throws on a cycle or a BigInt,
+    // a getter such as an error's `stack` may throw, and `String` would print only "[object Object]".
+    return arg;
   }
-  return arg;
 };
 
 const levelNames: Record<Exclude<LogLevel, LogLevel.Silent>, string> = {
