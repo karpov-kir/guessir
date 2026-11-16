@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LocalGame } from "../../entities/game/exports";
-import { PlayController } from "./PlayController";
+import { newPlayUseCases, PlayUseCases } from "./playUseCases";
 import { requireElement } from "../../shared/dom";
 
 let game: LocalGame;
@@ -40,7 +40,7 @@ const getWordTexts = () =>
     (element) => element.textContent,
   );
 
-describe(PlayController, () => {
+describe(PlayUseCases, () => {
   beforeEach(() => {
     game = new LocalGame({
       title: "Title",
@@ -49,7 +49,7 @@ describe(PlayController, () => {
       allowShowingText: true,
     });
 
-    gameElement = new PlayController({ game }).getElement();
+    gameElement = newPlayUseCases({ game }).getElement();
   });
 
   it("should render the skeleton of the game into the game element", () => {

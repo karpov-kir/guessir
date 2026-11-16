@@ -2,16 +2,17 @@ import { createTextLimits } from "@guessir/game";
 
 import "./CreateTextRenderer.css";
 import copyIcon from "./copyIcon.svg?raw";
-import { onChangeAndEnter, requireElement } from "../../shared/dom";
+import { newElement, onChangeAndEnter } from "../../shared/dom";
 import { icon } from "../../shared/icon";
 import { textUrl } from "../../entities/textLink/exports";
 import { CreateTextApi, createText } from "./createTextApi";
+import { getElements } from "./formElements";
 import type { Clock } from "../../shared/Clock";
 import { Logger } from "@guessir/logger";
 
-const logger = Logger.root.scope("CreateTextRenderer");
+const logger = Logger.root.scope("createText");
 
-export type CreateTextRendererOptions = {
+export type CreateTextUseCasesOptions = {
   api: CreateTextApi;
   /** The page origin the link to a created text starts with. */
   origin: string;
@@ -27,10 +28,10 @@ export type CreateTextRendererOptions = {
 const copiedAlertMs = 5_000;
 
 /**
- * Returns the markup of a labelled form field. The limit counter sits in the control's direct
+ * Returns a labelled form field around `control`. The limit counter sits in the control's direct
  * parent, where `limitInputsLength` looks for it.
  */
-function renderField({
+function newField({
   id,
   label,
   hint,
@@ -39,27 +40,35 @@ function renderField({
   id: string;
   label: string;
   hint: string;
-  control: string;
+  control: HTMLElement;
 }) {
-  return `
-    <div class="field">
-      <div class="field-header"><label for="${id}">${label}</label><span class="field-hint">${hint}</span></div>
-      <div class="field-control">
-        ${control}
-        <div class="limit-text">0/0</div>
-      </div>
-    </div>
-  `;
+  return newElement(
+    "div",
+    { class: "field" },
+    newElement(
+      "div",
+      { class: "field-header" },
+      newElement("label", { for: id }, label),
+      newElement("span", { class: "field-hint" }, hint),
+    ),
+    newElement(
+      "div",
+      { class: "field-control" },
+      control,
+      newElement("div", { class: "limit-text" }, "0/0"),
+    ),
+  );
 }
 
-export class CreateTextRenderer {
+/** Shows the form that stores a new text and gives its link. */
+export class CreateTextUseCases {
   private readonly containerElement: HTMLElement;
   private generatedUrl = "";
   private readonly copiedAlertElement = document.createElement("div");
   private readonly maxTitleLength: number;
   private readonly maxDescriptionLength: number;
   private readonly maxTextLength: number;
-  private readonly deps: Pick<CreateTextRendererOptions, "api" | "clipboard" | "clock">;
+  private readonly deps: Pick<CreateTextUseCasesOptions, "api" | "clipboard" | "clock">;
   private readonly origin: string;
 
   constructor({
@@ -68,7 +77,7 @@ export class CreateTextRenderer {
     maxDescriptionLength,
     maxTextLength,
     ...deps
-  }: CreateTextRendererOptions) {
+  }: CreateTextUseCasesOptions) {
     this.containerElement = document.createElement("div");
     this.containerElement.id = "utils-container";
 
@@ -83,47 +92,90 @@ export class CreateTextRenderer {
     this.initElement();
   }
 
+  /** Returns the form, ready to place in the page. */
   getElement(): HTMLElement {
     return this.containerElement;
   }
 
   private initElement() {
-    this.containerElement.innerHTML = `
-      <details>
-        <summary>
-          <span class="summary-title">Make your own game</span>
-          <span class="summary-text">Paste any English text, share the link and race your friends.</span>
-        </summary>
-        <div id="create-form">
-          ${renderField({ id: "title-input", label: "Title", hint: "required", control: '<input id="title-input" type="text">' })}
-          ${renderField({
+    this.containerElement.replaceChildren(
+      newElement(
+        "details",
+        {},
+        newElement(
+          "summary",
+          {},
+          newElement("span", { class: "summary-title" }, "Make your own game"),
+          newElement(
+            "span",
+            { class: "summary-text" },
+            "Paste any English text, share the link and race your friends.",
+          ),
+        ),
+        newElement(
+          "div",
+          { id: "create-form" },
+          newField({
+            id: "title-input",
+            label: "Title",
+            hint: "required",
+            control: newElement("input", { id: "title-input", type: "text" }),
+          }),
+          newField({
             id: "description-input",
             label: "Description",
             hint: "optional",
-            control: '<textarea rows="2" id="description-input"></textarea>',
-          })}
-          ${renderField({ id: "text-input", label: "Text", hint: "required", control: '<textarea rows="6" id="text-input"></textarea>' })}
-          <div class="chips">
-            <label class="chip">
-              <input checked type="checkbox" id="allow-showing-first-letters-checkbox">Allow first-letter hints
-            </label>
-            <label class="chip">
-              <input checked type="checkbox" id="allow-showing-text-checkbox">Allow peeking at the text
-            </label>
-          </div>
-          <div id="generate-url-button-container">
-            <button id="generate-url-button" type="button">Create game</button>
-            <div class="hide" id="generated-url-container">
-              <a href="#" id="generated-url" target="_blank">#</a>
-              <button id="copy-generated-url-button" type="button" aria-label="Copy link">
-                ${icon(copyIcon)}
-              </button>
-            </div>
-          </div>
-          <div id="generate-url-error" class="error hide" role="alert"></div>
-        </div>
-      </details>
-    `;
+            control: newElement("textarea", { rows: 2, id: "description-input" }),
+          }),
+          newField({
+            id: "text-input",
+            label: "Text",
+            hint: "required",
+            control: newElement("textarea", { rows: 6, id: "text-input" }),
+          }),
+          newElement(
+            "div",
+            { class: "chips" },
+            newElement(
+              "label",
+              { class: "chip" },
+              newElement("input", {
+                checked: true,
+                type: "checkbox",
+                id: "allow-showing-first-letters-checkbox",
+              }),
+              "Allow first-letter hints",
+            ),
+            newElement(
+              "label",
+              { class: "chip" },
+              newElement("input", {
+                checked: true,
+                type: "checkbox",
+                id: "allow-showing-text-checkbox",
+              }),
+              "Allow peeking at the text",
+            ),
+          ),
+          newElement(
+            "div",
+            { id: "generate-url-button-container" },
+            newElement("button", { id: "generate-url-button", type: "button" }, "Create game"),
+            newElement(
+              "div",
+              { class: "hide", id: "generated-url-container" },
+              newElement("a", { href: "#", id: "generated-url", target: "_blank" }, "#"),
+              newElement(
+                "button",
+                { id: "copy-generated-url-button", type: "button", "aria-label": "Copy link" },
+                icon(copyIcon),
+              ),
+            ),
+          ),
+          newElement("div", { id: "generate-url-error", class: "error hide", role: "alert" }),
+        ),
+      ),
+    );
 
     this.attachInputHandlers();
     this.attachGenerateUrlHandler();
@@ -184,9 +236,8 @@ export class CreateTextRenderer {
   }
 
   /**
-   * Returns whether the title and the text are both filled in. When the caller gives
-   * `limitToElement`, the check marks only that field. A user who is typing then sees no error on
-   * other fields yet.
+   * Returns whether the title and the text are both filled in. Given `limitToElement`, the check
+   * marks only that field, so a user who is typing sees no error on other fields yet.
    */
   private validateForm(limitToElement?: HTMLElement) {
     const { titleInputElement, textInputElement } = this.getElements();
@@ -359,68 +410,7 @@ export class CreateTextRenderer {
   }
 }
 
-export function getElements(containerElement: HTMLElement) {
-  const titleInputElement = requireElement({
-    root: containerElement,
-    selector: "#title-input",
-    type: HTMLInputElement,
-  });
-  const descriptionInputElement = requireElement({
-    root: containerElement,
-    selector: "#description-input",
-    type: HTMLTextAreaElement,
-  });
-  const textInputElement = requireElement({
-    root: containerElement,
-    selector: "#text-input",
-    type: HTMLTextAreaElement,
-  });
-  const allowShowingFirstLettersCheckboxElement = requireElement({
-    root: containerElement,
-    selector: "#allow-showing-first-letters-checkbox",
-    type: HTMLInputElement,
-  });
-  const allowShowingTextCheckboxElement = requireElement({
-    root: containerElement,
-    selector: "#allow-showing-text-checkbox",
-    type: HTMLInputElement,
-  });
-  const generateUrlButtonElement = requireElement({
-    root: containerElement,
-    selector: "#generate-url-button",
-    type: HTMLButtonElement,
-  });
-  const errorElement = requireElement({
-    root: containerElement,
-    selector: "#generate-url-error",
-    type: HTMLElement,
-  });
-  const generatedUrlContainerElement = requireElement({
-    root: containerElement,
-    selector: "#generated-url-container",
-    type: HTMLElement,
-  });
-  const generatedUrlElement = requireElement({
-    root: containerElement,
-    selector: "#generated-url",
-    type: HTMLAnchorElement,
-  });
-  const copyGeneratedUrlButtonElement = requireElement({
-    root: containerElement,
-    selector: "#copy-generated-url-button",
-    type: HTMLButtonElement,
-  });
-
-  return {
-    titleInputElement,
-    descriptionInputElement,
-    textInputElement,
-    allowShowingFirstLettersCheckboxElement,
-    allowShowingTextCheckboxElement,
-    generateUrlButtonElement,
-    errorElement,
-    generatedUrlContainerElement,
-    generatedUrlElement,
-    copyGeneratedUrlButtonElement,
-  };
+/** Returns the use cases that store new texts through the API `options` names. */
+export function newCreateTextUseCases(options: CreateTextUseCasesOptions): CreateTextUseCases {
+  return new CreateTextUseCases(options);
 }

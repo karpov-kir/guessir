@@ -3,7 +3,7 @@ import type { InjectOptions, LightMyRequestResponse } from "fastify";
 
 import { HealthController } from "./http/HealthController.js";
 import { TextsController } from "./http/TextsController.js";
-import { Texts, type TextRows } from "../../features/texts/exports.js";
+import { newTextsUseCases, TextsUseCases, type TextRows } from "../../features/texts/exports.js";
 import { newTextStore } from "../../features/texts/infra/exports.js";
 import { type Db, type DbPing, newDbPing, openDb } from "../../infra/db/exports.js";
 import { readEnv } from "../../infra/env.js";
@@ -122,11 +122,11 @@ export async function compose(overrides: ServerOverrides = {}): Promise<ServerHa
       textRows = newTextStore({ db });
     }
 
-    const texts = new Texts({ rows: textRows, ids: overrides.ids ?? systemIds });
+    const texts = newTextsUseCases({ rows: textRows, ids: overrides.ids ?? systemIds });
 
     @Module({
       controllers: [HealthController, TextsController],
-      providers: [{ provide: Texts, useValue: texts }],
+      providers: [{ provide: TextsUseCases, useValue: texts }],
     })
     class ServerModule {}
 

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { LogLevel } from "./Logger.js";
+import { LogLevel } from "../../shared/Logger.js";
 import { newConsoleSink } from "./consoleSink.js";
 
 const clock = { now: () => Date.parse("2026-11-15T12:00:00.000Z") };

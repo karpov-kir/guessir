@@ -1,6 +1,6 @@
 import { RevealedWord, SkeletonLexeme } from "@guessir/game";
 
-import { requireElement } from "../../../shared/dom";
+import { newElement, requireElement } from "../../../shared/dom";
 import { ChildRenderer } from "../ChildRenderer";
 import { WordHint, WordRenderer } from "./WordRenderer";
 
@@ -106,11 +106,11 @@ export class TextRenderer implements ChildRenderer {
   }
 
   private initElement() {
-    this.containerElement.innerHTML = `
-      <h1 id="title" class="hide"></h1>
-      <p id="description" class="hide"></p>
-      <div id="lexemes"></div>
-    `;
+    this.containerElement.replaceChildren(
+      newElement("h1", { id: "title", class: "hide" }),
+      newElement("p", { id: "description", class: "hide" }),
+      newElement("div", { id: "lexemes" }),
+    );
 
     const { titleElement, descriptionElement, lexemesElement } = getElements(this.containerElement);
 

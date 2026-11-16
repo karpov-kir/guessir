@@ -1,7 +1,7 @@
 import "./gamePage.css";
-import { mountPlay } from "../../features/play/exports";
-import { CreateTextApi, mountCreateText } from "../../features/createText/exports";
-import { GameApi, loadGame } from "../../features/gameLoading/exports";
+import { newPlayUseCases } from "../../features/play/exports";
+import { CreateTextApi, newCreateTextUseCases } from "../../features/createText/exports";
+import { GameApi, newGameLoadingUseCases } from "../../features/gameLoading/exports";
 import type { Clock } from "../../shared/Clock";
 
 export type GamePageDependencies = {
@@ -19,11 +19,13 @@ export async function mountGamePage(
   container: HTMLElement,
   { api, location, clipboard, clock }: GamePageDependencies,
 ) {
-  const game = await loadGame({ api, search: location.search });
+  const game = await newGameLoadingUseCases({ api }).load(location.search);
   const mainElement = document.createElement("main");
 
   mainElement.id = "guessir";
   container.appendChild(mainElement);
-  mainElement.appendChild(mountPlay(game));
-  mainElement.appendChild(mountCreateText({ api, origin: location.origin, clipboard, clock }));
+  mainElement.appendChild(newPlayUseCases({ game }).getElement());
+  mainElement.appendChild(
+    newCreateTextUseCases({ api, origin: location.origin, clipboard, clock }).getElement(),
+  );
 }

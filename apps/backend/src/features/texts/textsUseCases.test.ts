@@ -6,7 +6,8 @@ import {
   HintNotAllowedError,
   Text,
   TextNotFoundError,
-  Texts,
+  newTextsUseCases,
+  TextsUseCases,
   WordNotFoundError,
 } from "./exports.js";
 
@@ -19,14 +20,14 @@ const text = {
   allowShowingText: true,
 } satisfies Text;
 
-describe(Texts, () => {
+describe(TextsUseCases, () => {
   let rows: ReturnType<typeof fakeTextRows>;
-  let texts: Texts;
+  let texts: TextsUseCases;
 
-  /** Stores `text` with `overrides` under its id. */
+  /** Replaces `rows` with a store of `text` with `overrides` and builds a new `texts` over it. */
   const storeText = (overrides: Partial<Text> = {}) => {
     rows = fakeTextRows([{ ...text, ...overrides }]);
-    texts = new Texts({ rows, ids: fakeIds() });
+    texts = newTextsUseCases({ rows, ids: fakeIds() });
   };
 
   beforeEach(() => storeText());
@@ -152,10 +153,10 @@ describe(Texts, () => {
   });
 });
 
-describe("Texts.create", () => {
+describe("TextsUseCases.create", () => {
   it("should store the text under a new 20-character id and return only the id", async () => {
     const rows = fakeTextRows();
-    const { id } = await new Texts({ rows, ids: fakeIds() }).create({
+    const { id } = await newTextsUseCases({ rows, ids: fakeIds() }).create({
       title: "Title",
       text: "One",
       allowShowingFirstLetters: true,

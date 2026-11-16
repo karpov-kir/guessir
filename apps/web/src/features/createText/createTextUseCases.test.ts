@@ -4,14 +4,15 @@ import { mock, MockProxy } from "vitest-mock-extended";
 
 import { newManualClock } from "../../../tests/utils/manualClock";
 import { CreateTextApi } from "./createTextApi";
-import { CreateTextRenderer, getElements } from "./CreateTextRenderer";
+import { CreateTextUseCases, newCreateTextUseCases } from "./createTextUseCases";
+import { getElements } from "./formElements";
 
 const mockedText = {
   id: "mocked-id",
 };
 let api: MockProxy<CreateTextApi>;
 const clipboard = { writeText: vi.fn<(text: string) => Promise<void>>() };
-let createTextRenderer: CreateTextRenderer;
+let useCases: CreateTextUseCases;
 let time: ReturnType<typeof newManualClock>;
 
 const createText = async () => {
@@ -21,7 +22,7 @@ const createText = async () => {
     descriptionInputElement,
     allowShowingFirstLettersCheckboxElement,
     generateUrlButtonElement,
-  } = getElements(createTextRenderer.getElement());
+  } = getElements(useCases.getElement());
   const deferred = Promise.withResolvers<CreateTextDtoResponse>();
 
   api.post.mockReturnValue(deferred.promise);
@@ -34,18 +35,18 @@ const createText = async () => {
   generateUrlButtonElement.click();
   deferred.resolve(mockedText);
   await vi.waitFor(() =>
-    expect(
-      getElements(createTextRenderer.getElement()).generatedUrlContainerElement.classList,
-    ).not.toContain("hide"),
+    expect(getElements(useCases.getElement()).generatedUrlContainerElement.classList).not.toContain(
+      "hide",
+    ),
   );
 };
 
-describe(CreateTextRenderer, () => {
+describe(CreateTextUseCases, () => {
   beforeEach(() => {
     api = mock<CreateTextApi>();
     time = newManualClock();
     clipboard.writeText.mockReset();
-    createTextRenderer = new CreateTextRenderer({
+    useCases = newCreateTextUseCases({
       api,
       origin: "http://localhost:3000",
       clipboard,
@@ -58,7 +59,7 @@ describe(CreateTextRenderer, () => {
 
   it("should create a text when the form is submitted", async () => {
     const { generatedUrlElement, generatedUrlContainerElement } = getElements(
-      createTextRenderer.getElement(),
+      useCases.getElement(),
     );
 
     expect(generatedUrlContainerElement.classList).toContain("hide");
@@ -82,7 +83,7 @@ describe(CreateTextRenderer, () => {
   });
 
   it("should reset the length counters after a text is created", async () => {
-    const { titleInputElement } = getElements(createTextRenderer.getElement());
+    const { titleInputElement } = getElements(useCases.getElement());
     const getTitleLimitText = () =>
       titleInputElement.parentElement?.querySelector(".limit-text")?.textContent;
 
@@ -98,7 +99,7 @@ describe(CreateTextRenderer, () => {
   it("should render an error if text creation fails", async () => {
     const deferred = Promise.withResolvers<CreateTextDtoResponse>();
     const { errorElement, generateUrlButtonElement, textInputElement, titleInputElement } =
-      getElements(createTextRenderer.getElement());
+      getElements(useCases.getElement());
 
     api.post.mockReturnValue(deferred.promise);
 
@@ -118,7 +119,7 @@ describe(CreateTextRenderer, () => {
   it("should render a fallback error if text creation fails with something other than an Error", async () => {
     const deferred = Promise.withResolvers<CreateTextDtoResponse>();
     const { errorElement, generateUrlButtonElement, textInputElement, titleInputElement } =
-      getElements(createTextRenderer.getElement());
+      getElements(useCases.getElement());
 
     api.post.mockReturnValue(deferred.promise);
     textInputElement.value = "Text text";
@@ -133,9 +134,9 @@ describe(CreateTextRenderer, () => {
   it("should disable form while a request is executing", async () => {
     const deferred = Promise.withResolvers<CreateTextDtoResponse>();
     const { textInputElement, titleInputElement, generateUrlButtonElement } = getElements(
-      createTextRenderer.getElement(),
+      useCases.getElement(),
     );
-    const containerElement = createTextRenderer.getElement();
+    const containerElement = useCases.getElement();
     const getDisabledElements = () =>
       containerElement.querySelectorAll("input:disabled, textarea:disabled");
 
@@ -157,7 +158,7 @@ describe(CreateTextRenderer, () => {
   });
 
   it("should not submit an invalid form", () => {
-    const { generateUrlButtonElement } = getElements(createTextRenderer.getElement());
+    const { generateUrlButtonElement } = getElements(useCases.getElement());
 
     generateUrlButtonElement.click();
 
@@ -165,7 +166,7 @@ describe(CreateTextRenderer, () => {
   });
 
   it("should initialize inputs without validation classes", () => {
-    const { textInputElement, titleInputElement } = getElements(createTextRenderer.getElement());
+    const { textInputElement, titleInputElement } = getElements(useCases.getElement());
 
     expect(titleInputElement.classList).not.toContain("invalid");
     expect(textInputElement.classList).not.toContain("invalid");
@@ -173,7 +174,7 @@ describe(CreateTextRenderer, () => {
 
   it("should validate inputs on submit", () => {
     const { textInputElement, titleInputElement, generateUrlButtonElement } = getElements(
-      createTextRenderer.getElement(),
+      useCases.getElement(),
     );
 
     generateUrlButtonElement.click();
@@ -184,7 +185,7 @@ describe(CreateTextRenderer, () => {
 
   it("should mark empty required fields invalid for screen readers too", () => {
     const { textInputElement, titleInputElement, generateUrlButtonElement } = getElements(
-      createTextRenderer.getElement(),
+      useCases.getElement(),
     );
 
     generateUrlButtonElement.click();
@@ -200,7 +201,7 @@ describe(CreateTextRenderer, () => {
   });
 
   it("should validate inputs on input", () => {
-    const { textInputElement, titleInputElement } = getElements(createTextRenderer.getElement());
+    const { textInputElement, titleInputElement } = getElements(useCases.getElement());
 
     titleInputElement.dispatchEvent(new Event("input"));
     textInputElement.dispatchEvent(new Event("input"));
@@ -211,7 +212,7 @@ describe(CreateTextRenderer, () => {
 
   it("should limit inputs length", () => {
     const { textInputElement, titleInputElement, descriptionInputElement } = getElements(
-      createTextRenderer.getElement(),
+      useCases.getElement(),
     );
     const elements = [textInputElement, titleInputElement, descriptionInputElement];
 
@@ -225,7 +226,7 @@ describe(CreateTextRenderer, () => {
 
   it("should count and cut inputs in code points, as the server counts them", () => {
     const { textInputElement, titleInputElement, descriptionInputElement } = getElements(
-      createTextRenderer.getElement(),
+      useCases.getElement(),
     );
 
     [textInputElement, titleInputElement, descriptionInputElement].forEach((element) => {
@@ -238,7 +239,7 @@ describe(CreateTextRenderer, () => {
   });
 
   it("should copy a generated URL on click", async () => {
-    const { copyGeneratedUrlButtonElement } = getElements(createTextRenderer.getElement());
+    const { copyGeneratedUrlButtonElement } = getElements(useCases.getElement());
 
     await createText();
     copyGeneratedUrlButtonElement.click();
@@ -247,7 +248,7 @@ describe(CreateTextRenderer, () => {
   });
 
   it("should hide the alert that a generated URL was copied 5 seconds after the last copy", async () => {
-    const { copyGeneratedUrlButtonElement } = getElements(createTextRenderer.getElement());
+    const { copyGeneratedUrlButtonElement } = getElements(useCases.getElement());
     const alert = () => copyGeneratedUrlButtonElement.querySelector("div")?.textContent;
 
     await createText();

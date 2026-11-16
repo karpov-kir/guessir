@@ -1,5 +1,4 @@
-// Vendored from karpov-kir/configs, ai/kk-flavor/standards/architecture/Logger.ts at 468d7c1c.
-// Changed here: the comments name this package, which both apps import, as the home of the sink.
+// Vendored from karpov-kir/configs, ai/kk-flavor/standards/architecture/Logger.ts at c1e1e43c.
 
 /**
  * Log levels (lower number = more verbose). `Silent` is highest, so it drops every record.
@@ -23,7 +22,7 @@ export type LogRecord =
   | { kind: "group"; collapsed: boolean; scope: readonly string[]; label: string }
   | { kind: "groupEnd" };
 
-/** Writes records out. The console sink of this package and an app's `infra` implement it. */
+/** Writes records out. Its implementations live in `infra`, the one layer that writes log output. */
 export type LogSink = (record: LogRecord) => void;
 
 /**
@@ -46,8 +45,9 @@ export class Logger {
   static readonly root = new Logger([]);
 
   /**
-   * Sets the sink and the level for every logger. The composition root calls it right after it reads the environment,
-   * with the sink `LOG_FORMAT` names, and again once the config parses.
+   * Sets the sink and the level for every logger. The composition root calls it before anything logs. An app with one
+   * sink calls it first, before it reads the environment. An app with a sink per `LOG_FORMAT` calls it
+   * after that read, with the sink `LOG_FORMAT` names. Both call it again once the config parses.
    */
   static install(sink: LogSink, level: LogLevel): void {
     Logger.sink = sink;

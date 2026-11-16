@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { onChangeAndEnter, requireElement } from "./dom";
+import { newElement, onChangeAndEnter, requireElement } from "./dom";
 
 let inputElement: HTMLInputElement;
 let callback: () => void;
@@ -76,5 +76,22 @@ describe(requireElement, () => {
     expect(() => requireElement({ root, selector: "#missing", type: HTMLElement })).toThrow(
       'Expected an instance of HTMLElement at "#missing"',
     );
+  });
+});
+
+describe(newElement, () => {
+  it("should insert a string child as text, never as markup", () => {
+    const element = newElement("div", {}, "<img src=x onerror=alert(1)>");
+
+    expect(element.childElementCount).toBe(0);
+    expect(element.textContent).toBe("<img src=x onerror=alert(1)>");
+  });
+
+  it("should set a true attribute empty, leave a false one out and write a number as text", () => {
+    const element = newElement("input", { disabled: true, checked: false, size: 2 });
+
+    expect(element.getAttribute("disabled")).toBe("");
+    expect(element.hasAttribute("checked")).toBe(false);
+    expect(element.getAttribute("size")).toBe("2");
   });
 });

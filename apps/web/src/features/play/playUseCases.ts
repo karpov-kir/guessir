@@ -1,5 +1,10 @@
 import { RevealedWord } from "@guessir/game";
 
+import "./play.css";
+import "./ScoreRenderer.css";
+import "./ControlsRenderer.css";
+import "./text/TextRenderer.css";
+import "./text/WordRenderer.css";
 import { Game } from "../../entities/game/exports";
 import { ControlsRenderer } from "./ControlsRenderer";
 import { ScoreRenderer } from "./ScoreRenderer";
@@ -7,14 +12,15 @@ import { TextRenderer } from "./text/TextRenderer";
 import { WordHint } from "./text/WordRenderer";
 import { Logger } from "@guessir/logger";
 
-const logger = Logger.root.scope("PlayController");
+const logger = Logger.root.scope("play");
 
-export type PlayControllerOptions = {
+export type PlayUseCasesOptions = {
   game: Game;
 };
 
-export class PlayController {
-  private readonly deps: PlayControllerOptions;
+/** Plays the game `options` names: shows it and answers the player's moves. */
+export class PlayUseCases {
+  private readonly deps: PlayUseCasesOptions;
 
   private readonly textRenderer: TextRenderer;
   private readonly controlsRenderer: ControlsRenderer;
@@ -24,7 +30,7 @@ export class PlayController {
   /** The hint the user turned on last, which turns on once its letters load. */
   private wantedHint = WordHint.None;
 
-  constructor({ ...deps }: PlayControllerOptions) {
+  constructor({ ...deps }: PlayUseCasesOptions) {
     const { skeleton } = deps.game;
 
     this.deps = deps;
@@ -170,4 +176,9 @@ export class PlayController {
       this.textRenderer.setHint(options.hint);
     }
   }
+}
+
+/** Returns the use cases that play the game `options` names. */
+export function newPlayUseCases(options: PlayUseCasesOptions): PlayUseCases {
+  return new PlayUseCases(options);
 }

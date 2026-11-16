@@ -13,7 +13,7 @@ import {
   HintNotAllowedError,
   NewText,
   TextNotFoundError,
-  TextsOptions,
+  TextsUseCasesOptions,
   WordNotFoundError,
 } from "./types.js";
 
@@ -25,16 +25,16 @@ const cachedTextCount = 200;
  * Stores texts and answers the moves of the games over them. A move gets only the words it opens,
  * so the text stays on the server and a player cannot read the hidden words in the browser.
  */
-export class Texts {
+export class TextsUseCases {
   /**
    * Keeps the analysed game of recently played texts, so a move does not reload and re-analyse its
    * text. A text never changes after it is created, so a cached game never goes stale.
    */
   private readonly playedTexts = new LruCache<string, PlayedText>({ maxSize: cachedTextCount });
 
-  private readonly deps: TextsOptions;
+  private readonly deps: TextsUseCasesOptions;
 
-  constructor(deps: TextsOptions) {
+  constructor({ ...deps }: TextsUseCasesOptions) {
     this.deps = deps;
   }
 
@@ -114,4 +114,9 @@ export class Texts {
 
     return playedText;
   }
+}
+
+/** Returns the texts use cases over the text rows and the id source that `options` gives. */
+export function newTextsUseCases(options: TextsUseCasesOptions): TextsUseCases {
+  return new TextsUseCases(options);
 }

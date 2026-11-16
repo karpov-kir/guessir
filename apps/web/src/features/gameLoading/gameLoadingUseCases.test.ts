@@ -5,13 +5,13 @@ import { mock, MockProxy } from "vitest-mock-extended";
 import { newTextSkeleton } from "../../../tests/utils/textSkeleton";
 import { LocalGame } from "../../entities/game/exports";
 import { GameApi } from "./GameApi";
-import { loadGame } from "./loadGame";
+import { newGameLoadingUseCases } from "./gameLoadingUseCases";
 import { RemoteGame } from "./RemoteGame";
 
 const skeleton = newTextSkeleton();
 let api: MockProxy<GameApi>;
 
-describe(loadGame, () => {
+describe("GameLoadingUseCases.load", () => {
   beforeEach(() => {
     api = mock<GameApi>();
   });
@@ -19,7 +19,7 @@ describe(loadGame, () => {
   it("should load the remote text the query string names", async () => {
     api.get.mockResolvedValue(skeleton);
 
-    const game = await loadGame({ api, search: "?textId=text-id" });
+    const game = await newGameLoadingUseCases({ api }).load("?textId=text-id");
 
     expect(api.get).toHaveBeenCalledWith("texts/text-id", textSkeletonSchema);
     expect(game).toBeInstanceOf(RemoteGame);
@@ -29,7 +29,7 @@ describe(loadGame, () => {
   it("should give an error text if loading the remote text fails", async () => {
     api.get.mockRejectedValue(new Error("Test"));
 
-    const game = await loadGame({ api, search: "?textId=text-id" });
+    const game = await newGameLoadingUseCases({ api }).load("?textId=text-id");
 
     expect(game).toBeInstanceOf(LocalGame);
     expect(game.skeleton).toEqual(
@@ -49,7 +49,7 @@ describe(loadGame, () => {
   });
 
   it("should give the default text if the query string names no text", async () => {
-    const game = await loadGame({ api, search: "" });
+    const game = await newGameLoadingUseCases({ api }).load("");
 
     expect(api.get).not.toHaveBeenCalled();
     expect(game).toBeInstanceOf(LocalGame);

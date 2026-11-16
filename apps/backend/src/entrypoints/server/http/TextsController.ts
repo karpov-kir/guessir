@@ -13,7 +13,7 @@ import {
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from "@nestjs/common";
 
 import { ZodBodyPipe } from "./ZodBodyPipe.js";
-import { Texts } from "../../../features/texts/exports.js";
+import { TextsUseCases } from "../../../features/texts/exports.js";
 
 /**
  * Serves the texts over HTTP. The game rules live in the texts feature; this controller maps routes
@@ -21,7 +21,7 @@ import { Texts } from "../../../features/texts/exports.js";
  */
 @Controller("texts")
 export class TextsController {
-  constructor(private readonly texts: Texts) {}
+  constructor(private readonly texts: TextsUseCases) {}
 
   @Get("/:id")
   findById(@Param("id") id: string): Promise<TextSkeleton> {

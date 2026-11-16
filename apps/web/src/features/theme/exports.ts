@@ -1,1 +1,6 @@
-export { initThemeToggle, type SystemThemeQuery } from "./theme";
+export {
+  newThemeUseCases,
+  type SystemThemeQuery,
+  ThemeUseCases,
+  type ThemeUseCasesOptions,
+} from "./themeUseCases";
