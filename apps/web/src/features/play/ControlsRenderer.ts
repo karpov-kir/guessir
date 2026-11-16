@@ -1,5 +1,5 @@
 import arrowIcon from "./arrowIcon.svg?raw";
-import { onChangeAndEnter, onEnter, requireElement } from "../../shared/dom";
+import { newElement, onChangeAndEnter, onEnter, requireElement } from "../../shared/dom";
 import { icon } from "../../shared/icon";
 import { ChildRenderer } from "./ChildRenderer";
 
@@ -115,25 +115,50 @@ export class ControlsRenderer implements ChildRenderer {
   }
 
   private initElement(allowShowingText?: boolean, allowShowingFirstLetters?: boolean) {
-    this.containerElement.innerHTML = `
-      <div id="guess-container">
-        <label for="guess-input" class="visually-hidden">Your guess</label>
-        <input id="guess-input" type="text" placeholder="Type a word" autocomplete="off" autocapitalize="off" spellcheck="false" />
-        <button title="Please, input at least one letter to try to guess!" disabled id="guess-button" type="button">
-          Guess ${icon(arrowIcon)}
-        </button>
-      </div>
-      <div id="guess-status" role="status"></div>
-      <div id="hints" role="group" aria-labelledby="hints-label">
-        <span id="hints-label">Hints:</span>
-        <label class="chip">
-          <input type="checkbox" id="show-first-letters-checkbox"> First letters
-        </label>
-        <label class="chip">
-          <input type="checkbox" id="show-text-checkbox" /> Peek at text
-        </label>
-      </div>
-    `;
+    this.containerElement.replaceChildren(
+      newElement(
+        "div",
+        { id: "guess-container" },
+        newElement("label", { for: "guess-input", class: "visually-hidden" }, "Your guess"),
+        newElement("input", {
+          id: "guess-input",
+          type: "text",
+          placeholder: "Type a word",
+          autocomplete: "off",
+          autocapitalize: "off",
+          spellcheck: "false",
+        }),
+        newElement(
+          "button",
+          {
+            title: "Please, input at least one letter to try to guess!",
+            disabled: true,
+            id: "guess-button",
+            type: "button",
+          },
+          "Guess ",
+          icon(arrowIcon),
+        ),
+      ),
+      newElement("div", { id: "guess-status", role: "status" }),
+      newElement(
+        "div",
+        { id: "hints", role: "group", "aria-labelledby": "hints-label" },
+        newElement("span", { id: "hints-label" }, "Hints:"),
+        newElement(
+          "label",
+          { class: "chip" },
+          newElement("input", { type: "checkbox", id: "show-first-letters-checkbox" }),
+          " First letters",
+        ),
+        newElement(
+          "label",
+          { class: "chip" },
+          newElement("input", { type: "checkbox", id: "show-text-checkbox" }),
+          " Peek at text",
+        ),
+      ),
+    );
 
     const { showTextCheckboxElement, showFirstLettersCheckboxElement } = this.getElements();
 

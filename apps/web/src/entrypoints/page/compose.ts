@@ -1,4 +1,4 @@
-import { initThemeToggle, type SystemThemeQuery } from "../../features/theme/exports";
+import { newThemeUseCases, type SystemThemeQuery } from "../../features/theme/exports";
 import {
   browserStorage,
   pageLocation,
@@ -9,7 +9,8 @@ import { readEnv } from "../../infra/env";
 import { FetchHttpClient } from "../../infra/fetchHttp";
 import { systemClock } from "../../infra/systemClock";
 import type { Clock } from "../../shared/Clock";
-import { Logger, LogLevel, type LogSink, newConsoleSink } from "@guessir/logger";
+import { Logger, LogLevel, type LogSink } from "@guessir/logger";
+import { newConsoleSink } from "@guessir/logger/infra";
 import { type GamePageDependencies, mountGamePage } from "../../orchestration/gamePage/exports";
 import { type PageConfig, parseConfig } from "./config";
 
@@ -38,12 +39,12 @@ export function compose(overrides: PageOverrides = {}) {
   return {
     /** Wires the theme toggle and renders the game page into `body`. */
     async mount({ body, themeButton }: { body: HTMLElement; themeButton: HTMLButtonElement }) {
-      initThemeToggle({
+      newThemeUseCases({
         button: themeButton,
         root: document.documentElement,
         getStorage: overrides.storage ?? browserStorage,
         systemTheme: overrides.systemTheme ?? systemDarkTheme(),
-      });
+      }).attach();
       await mountGamePage(body, {
         api: overrides.api ?? new FetchHttpClient({ baseUrl: config.apiBaseUrl }),
         location: overrides.location ?? pageLocation(),

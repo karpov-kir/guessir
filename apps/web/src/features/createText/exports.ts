@@ -1,2 +1,6 @@
 export type { CreateTextApi } from "./createTextApi";
-export { mountCreateText } from "./mountCreateText";
+export {
+  CreateTextUseCases,
+  type CreateTextUseCasesOptions,
+  newCreateTextUseCases,
+} from "./createTextUseCases";

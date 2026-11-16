@@ -1,2 +1,6 @@
 export type { GameApi } from "./GameApi";
-export { loadGame } from "./loadGame";
+export {
+  GameLoadingUseCases,
+  type GameLoadingUseCasesOptions,
+  newGameLoadingUseCases,
+} from "./gameLoadingUseCases";

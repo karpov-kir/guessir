@@ -1,4 +1,4 @@
-import { requireElement } from "../../shared/dom";
+import { newElement, requireElement } from "../../shared/dom";
 import { ChildRenderer } from "./ChildRenderer";
 
 type ScoreRendererOptions = {
@@ -32,18 +32,41 @@ export class ScoreRenderer implements ChildRenderer {
   }
 
   private initElement() {
-    this.containerElement.innerHTML = `
-      <div id="score-badge">
-        <div id="current-score">${this.score}</div>
-        <div id="score-total"><span aria-hidden="true">/ </span><span class="visually-hidden">of </span><span id="total-score">${this.wordLikeCount}</span></div>
-      </div>
-      <div id="score-details">
-        <div id="score-label" aria-live="polite"><span id="score-percent"></span> found</div>
-        <div id="score-progress" role="progressbar" aria-label="Words found" aria-valuemin="0" aria-valuemax="${this.wordLikeCount}">
-          <div id="score-progress-bar"></div>
-        </div>
-      </div>
-    `;
+    this.containerElement.replaceChildren(
+      newElement(
+        "div",
+        { id: "score-badge" },
+        newElement("div", { id: "current-score" }, String(this.score)),
+        newElement(
+          "div",
+          { id: "score-total" },
+          newElement("span", { "aria-hidden": "true" }, "/ "),
+          newElement("span", { class: "visually-hidden" }, "of "),
+          newElement("span", { id: "total-score" }, String(this.wordLikeCount)),
+        ),
+      ),
+      newElement(
+        "div",
+        { id: "score-details" },
+        newElement(
+          "div",
+          { id: "score-label", "aria-live": "polite" },
+          newElement("span", { id: "score-percent" }),
+          " found",
+        ),
+        newElement(
+          "div",
+          {
+            id: "score-progress",
+            role: "progressbar",
+            "aria-label": "Words found",
+            "aria-valuemin": 0,
+            "aria-valuemax": this.wordLikeCount,
+          },
+          newElement("div", { id: "score-progress-bar" }),
+        ),
+      ),
+    );
 
     this.renderProgress();
   }

@@ -58,3 +58,28 @@ export function requireElement<T extends Element>({
 
   return element;
 }
+
+type Attributes = Readonly<Record<string, string | number | boolean>>;
+
+/**
+ * Returns a new element of `tag` with `attributes` and `children`. An attribute set to `true` is
+ * present and empty, one set to `false` is left out. A string child goes in as text, so it never
+ * runs as markup.
+ */
+export function newElement<Tag extends keyof HTMLElementTagNameMap>(
+  tag: Tag,
+  attributes: Attributes = {},
+  ...children: (Node | string)[]
+): HTMLElementTagNameMap[Tag] {
+  const element = document.createElement(tag);
+
+  for (const [name, value] of Object.entries(attributes)) {
+    if (value !== false) {
+      element.setAttribute(name, value === true ? "" : String(value));
+    }
+  }
+
+  element.append(...children);
+
+  return element;
+}

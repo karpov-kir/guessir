@@ -3,7 +3,7 @@
 // package imports no app. An object that JSON cannot hold goes to the console as it is, not as a
 // string. The comments name this package, which both apps import.
 
-import { LogLevel, type LogRecord, type LogSink } from "./Logger.js";
+import { LogLevel, type LogRecord, type LogSink } from "../../shared/Logger.js";
 
 /** Tells the time the sink stamps each line with, in milliseconds since the Unix epoch. */
 type Clock = { now(): number };

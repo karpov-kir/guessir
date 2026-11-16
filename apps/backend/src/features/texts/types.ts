@@ -5,7 +5,7 @@ import type { TextRows } from "./port.js";
 
 export type NewText = CreateTextDto;
 
-export type TextsOptions = {
+export type TextsUseCasesOptions = {
   /** Holds the stored texts. */
   rows: TextRows;
   /** Makes the id of a new text. */

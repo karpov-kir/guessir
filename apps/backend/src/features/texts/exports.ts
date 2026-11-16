@@ -1,5 +1,6 @@
 export type { Text, TextRows } from "./port.js";
-export { Texts } from "./Texts.js";
+export type { TextsUseCasesOptions } from "./types.js";
+export { newTextsUseCases, TextsUseCases } from "./textsUseCases.js";
 export {
   HintNotAllowedError,
   type NewText,

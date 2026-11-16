@@ -1,6 +1,11 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { initThemeToggle, SystemThemeQuery } from "./theme";
+import {
+  newThemeUseCases,
+  SystemThemeQuery,
+  ThemeUseCases,
+  type ThemeUseCasesOptions,
+} from "./themeUseCases";
 
 let root: HTMLElement;
 let button: HTMLButtonElement;
@@ -45,16 +50,16 @@ const createSystemTheme = (matches: boolean) => {
   return systemTheme;
 };
 
-const initToggle = (options: Partial<Parameters<typeof initThemeToggle>[0]> = {}) =>
-  initThemeToggle({
+const initToggle = (options: Partial<ThemeUseCasesOptions> = {}) =>
+  newThemeUseCases({
     button,
     root,
     getStorage: () => storage,
     systemTheme: createSystemTheme(false),
     ...options,
-  });
+  }).attach();
 
-describe(initThemeToggle, () => {
+describe(ThemeUseCases, () => {
   beforeEach(() => {
     root = document.createElement("html");
     button = document.createElement("button");

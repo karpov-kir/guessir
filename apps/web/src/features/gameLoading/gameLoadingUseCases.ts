@@ -1,0 +1,65 @@
+import { CreateTextDto } from "@guessir/game";
+
+import { Game, LocalGame } from "../../entities/game/exports";
+import { parseTextId } from "../../entities/textLink/exports";
+import { Logger } from "@guessir/logger";
+import { GameApi } from "./GameApi";
+import { loadRemoteGame } from "./loadRemoteGame";
+
+const logger = Logger.root.scope("gameLoading");
+
+const defaultText: CreateTextDto = {
+  title: "Hello!",
+  description: `I am a simple tool to turn any English text into a word guessing game.`,
+  text: `In order to create your own text find the form below.`,
+  allowShowingFirstLetters: true,
+  allowShowingText: true,
+};
+
+const couldNotLoadRemoteTextText = `
+  I could not load the remote text. Please, verify your URL or create a new text.
+`;
+
+export type GameLoadingUseCasesOptions = {
+  api: GameApi;
+};
+
+/** Loads the game the page URL names. */
+export class GameLoadingUseCases {
+  private readonly deps: GameLoadingUseCasesOptions;
+
+  constructor({ ...deps }: GameLoadingUseCasesOptions) {
+    this.deps = deps;
+  }
+
+  /**
+   * Returns the remote game of the text that the query string `search` names. Returns a local game
+   * with the default text when it names none, or with an error text when the load fails.
+   */
+  async load(search: string): Promise<Game> {
+    const textId = parseTextId(search);
+
+    if (!textId) {
+      return new LocalGame(defaultText);
+    }
+
+    try {
+      logger.debug("Trying to load text...");
+
+      const remoteGame = await loadRemoteGame(this.deps.api, textId);
+
+      logger.debug("Text has been loaded", remoteGame.skeleton);
+
+      return remoteGame;
+    } catch (error) {
+      logger.error("Failed to load the text", error);
+
+      return new LocalGame({ ...defaultText, text: couldNotLoadRemoteTextText });
+    }
+  }
+}
+
+/** Returns the use cases that load a game through the API `options` names. */
+export function newGameLoadingUseCases(options: GameLoadingUseCasesOptions): GameLoadingUseCases {
+  return new GameLoadingUseCases(options);
+}
