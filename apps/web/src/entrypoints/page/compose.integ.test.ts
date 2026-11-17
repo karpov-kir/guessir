@@ -1,19 +1,32 @@
+import { newRecordingCollector } from "@kk-forge/artel-collector/testing";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { collectLogs, silentSink } from "@guessir/logger/testing";
+import { AnalyticsEvents } from "../../entities/analytics/exports";
 import { GameApi } from "../../features/gameLoading/exports";
+import { track } from "../../shared/analytics";
 import { Logger, LogLevel } from "@guessir/logger";
 import { compose } from "./compose";
+
+const config = {
+  apiBaseUrl: "https://api.guessir.test",
+  analytics: {
+    key: "site-test-aaaaaaaaaa",
+    endpoint: "https://intake.guessir.test/v1/public/relay",
+    version: "1.0.0",
+  },
+};
 
 describe(compose, () => {
   afterEach(() => {
     vi.unstubAllEnvs();
   });
 
-  it("should wire the theme toggle and render the game page", async () => {
+  it("should wire the theme toggle, render the game page, count the page view and bind the analytics track", async () => {
     const body = document.createElement("div");
     const themeButton = document.createElement("button");
+    const analytics = newRecordingCollector();
 
     await compose({
       api: mock<GameApi>(),
@@ -22,17 +35,21 @@ describe(compose, () => {
       storage: () => mock<Storage>(),
       systemTheme: { matches: true, addEventListener: vi.fn<() => void>() },
       logSink: silentSink,
-      config: { apiBaseUrl: "https://api.guessir.test" },
+      analytics,
+      config,
     }).mount({ body, themeButton });
 
     expect(themeButton.getAttribute("aria-pressed")).toBe("true");
     expect(body.querySelector("main#guessir #game")).not.toBeNull();
+    await expect.poll(() => analytics.events).toEqual([{ name: "page_view" }]);
+    track(AnalyticsEvents.TextCreated);
+    expect(analytics.events).toEqual([{ name: "page_view" }, { name: "text_created" }]);
   });
 
   it("should log through the sink it was given, from the info level up", () => {
     const logs = collectLogs();
 
-    compose({ logSink: logs.sink, config: { apiBaseUrl: "https://api.guessir.test" } });
+    compose({ logSink: logs.sink, config });
     Logger.root.scope("Test").debug("dropped");
     Logger.root.scope("Test").info("kept");
 

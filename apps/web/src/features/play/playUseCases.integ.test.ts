@@ -1,11 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { recordTrackedEvents } from "../../../tests/utils/trackedEvents";
 import { LocalGame } from "../../entities/game/exports";
 import { newPlayUseCases, PlayUseCases } from "./playUseCases";
 import { requireElement } from "../../shared/dom";
 
 let game: LocalGame;
 let gameElement: HTMLElement;
+let trackedEvents: ReturnType<typeof recordTrackedEvents>;
 
 /** Lets the game answers, which are promises, reach the renderers. */
 const settle = () => new Promise((resolve) => setTimeout(resolve));
@@ -49,6 +51,7 @@ describe(PlayUseCases, () => {
       allowShowingText: true,
     });
 
+    trackedEvents = recordTrackedEvents();
     gameElement = newPlayUseCases({ game }).getElement();
   });
 
@@ -285,5 +288,31 @@ describe(PlayUseCases, () => {
     expect(getStatus()).toBe("");
     expect(getCheckbox("#show-text-checkbox").checked).toBe(true);
     expect(getTextClasses()).toContain("show-text");
+  });
+
+  it("should track the guesses, the hints turned on and the words opened, and nothing the game failed", async () => {
+    submitGuess("one");
+    await settle();
+    submitGuess("unknown");
+    await settle();
+    toggleCheckbox("#show-first-letters-checkbox");
+    await settle();
+    toggleCheckbox("#show-text-checkbox");
+    await settle();
+    clickWord(1);
+    await settle();
+    vi.spyOn(game, "guess").mockRejectedValue(new Error("Test"));
+    vi.spyOn(game, "reveal").mockRejectedValue(new Error("Test"));
+    submitGuess("two");
+    clickWord(1);
+    await settle();
+
+    expect(trackedEvents).toEqual([
+      { name: "guess_made", params: { is_hit: true } },
+      { name: "guess_made", params: { is_hit: false } },
+      { name: "hint_shown", params: { hint: "first_letters" } },
+      { name: "hint_shown", params: { hint: "text" } },
+      { name: "word_revealed" },
+    ]);
   });
 });
