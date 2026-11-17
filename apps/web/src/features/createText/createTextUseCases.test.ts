@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mock, MockProxy } from "vitest-mock-extended";
 
 import { newManualClock } from "../../../tests/utils/manualClock";
+import { recordTrackedEvents } from "../../../tests/utils/trackedEvents";
 import { CreateTextApi } from "./createTextApi";
 import { CreateTextUseCases, newCreateTextUseCases } from "./createTextUseCases";
 import { getElements } from "./formElements";
@@ -14,6 +15,7 @@ let api: MockProxy<CreateTextApi>;
 const clipboard = { writeText: vi.fn<(text: string) => Promise<void>>() };
 let useCases: CreateTextUseCases;
 let time: ReturnType<typeof newManualClock>;
+let trackedEvents: ReturnType<typeof recordTrackedEvents>;
 
 const createText = async () => {
   const {
@@ -46,6 +48,7 @@ describe(CreateTextUseCases, () => {
     api = mock<CreateTextApi>();
     time = newManualClock();
     clipboard.writeText.mockReset();
+    trackedEvents = recordTrackedEvents();
     useCases = newCreateTextUseCases({
       api,
       origin: "http://localhost:3000",
@@ -80,6 +83,7 @@ describe(CreateTextUseCases, () => {
     expect(generatedUrlElement.textContent).toBe("http://localhost:3000?textId=mocked-id");
     expect(generatedUrlElement.href).toBe("http://localhost:3000/?textId=mocked-id");
     expect(generatedUrlContainerElement.classList).not.toContain("hide");
+    expect(trackedEvents).toEqual([{ name: "text_created" }]);
   });
 
   it("should reset the length counters after a text is created", async () => {
@@ -114,6 +118,7 @@ describe(CreateTextUseCases, () => {
 
     await vi.waitFor(() => expect(errorElement.textContent).toBe("Test error"));
     expect(errorElement.classList).not.toContain("hide");
+    expect(trackedEvents).toEqual([]);
   });
 
   it("should render a fallback error if text creation fails with something other than an Error", async () => {
@@ -233,6 +238,7 @@ describe(CreateTextUseCases, () => {
     copyGeneratedUrlButtonElement.click();
 
     expect(clipboard.writeText).toHaveBeenCalledWith("http://localhost:3000?textId=mocked-id");
+    expect(trackedEvents).toEqual([{ name: "text_created" }, { name: "game_link_copied" }]);
   });
 
   it("should hide the alert that a generated URL was copied 5 seconds after the last copy", async () => {

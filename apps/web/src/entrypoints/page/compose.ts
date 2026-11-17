@@ -1,3 +1,6 @@
+import type { Collector } from "@kk-forge/artel-collector";
+import { trackPageViews } from "@kk-forge/artel-collector/web";
+
 import { newThemeUseCases, type SystemThemeQuery } from "../../features/theme/exports";
 import {
   browserStorage,
@@ -5,10 +8,12 @@ import {
   systemClipboard,
   systemDarkTheme,
 } from "../../infra/browser";
+import { newAnalytics } from "../../infra/analytics";
 import { readEnv } from "../../infra/env";
 import { FetchHttpClient } from "../../infra/fetchHttp";
 import { systemClock } from "../../infra/systemClock";
 import type { Clock } from "../../shared/Clock";
+import { bindTrack } from "../../shared/analytics";
 import { Logger, LogLevel, type LogSink } from "@guessir/logger";
 import { newConsoleSink } from "@guessir/logger/infra";
 import { type GamePageDependencies, mountGamePage } from "../../orchestration/gamePage/exports";
@@ -17,6 +22,8 @@ import { type PageConfig, parseConfig } from "./config";
 export type PageOverrides = Partial<
   Omit<GamePageDependencies, "clock"> & {
     clock: Clock;
+    /** Stands in for the analytics collector that sends to the intake. */
+    analytics: Collector<"anonymous">;
     /** Stands in for the config the build's environment holds. */
     config: PageConfig;
     storage: () => Storage;
@@ -37,8 +44,15 @@ export function compose(overrides: PageOverrides = {}) {
   const config = overrides.config ?? parseConfig(readEnv());
 
   return {
-    /** Wires the theme toggle and renders the game page into `body`. */
+    /**
+     * Binds the analytics `track`, counts the page view, wires the theme toggle and renders the game
+     * page into `body`.
+     */
     async mount({ body, themeButton }: { body: HTMLElement; themeButton: HTMLButtonElement }) {
+      const analytics = overrides.analytics ?? newAnalytics(config.analytics);
+
+      bindTrack((event, params) => void analytics.track(event, params));
+      trackPageViews(analytics);
       newThemeUseCases({
         button: themeButton,
         root: document.documentElement,

@@ -4,6 +4,8 @@ import "./CreateTextRenderer.css";
 import copyIcon from "./copyIcon.svg?raw";
 import { newElement, onChangeAndEnter } from "../../shared/dom";
 import { icon } from "../../shared/icon";
+import { AnalyticsEvents } from "../../entities/analytics/exports";
+import { track } from "../../shared/analytics";
 import { textUrl } from "../../entities/textLink/exports";
 import { CreateTextApi, createText } from "./createTextApi";
 import { getElements } from "./formElements";
@@ -373,6 +375,7 @@ export class CreateTextUseCases {
 
           generatedUrlElement.textContent = this.generatedUrl;
           generatedUrlElement.href = this.generatedUrl;
+          track(AnalyticsEvents.TextCreated);
         })
         .catch((error: unknown) => {
           logger.error("Failed to create the text", error);
@@ -400,6 +403,7 @@ export class CreateTextUseCases {
 
     copyGeneratedUrlButtonElement.addEventListener("click", () => {
       void this.deps.clipboard.writeText(this.generatedUrl);
+      track(AnalyticsEvents.GameLinkCopied);
       copyGeneratedUrlButtonElement.appendChild(this.copiedAlertElement);
 
       cancelAlertTimer?.();

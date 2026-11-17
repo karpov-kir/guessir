@@ -5,6 +5,8 @@ import "./ScoreRenderer.css";
 import "./ControlsRenderer.css";
 import "./text/TextRenderer.css";
 import "./text/WordRenderer.css";
+import { AnalyticsEvents, ShownHint } from "../../entities/analytics/exports";
+import { track } from "../../shared/analytics";
 import { Game } from "../../entities/game/exports";
 import { ControlsRenderer } from "./ControlsRenderer";
 import { ScoreRenderer } from "./ScoreRenderer";
@@ -91,6 +93,7 @@ export class PlayUseCases {
 
     if (this.textRenderer.showWord(revealedWord)) {
       this.scoreRenderer.addScore(1);
+      track(AnalyticsEvents.WordRevealed);
     }
   }
 
@@ -116,11 +119,13 @@ export class PlayUseCases {
     }
 
     this.scoreRenderer.addScore(shownCount);
+    track(AnalyticsEvents.GuessMade, { is_hit: shownCount > 0 });
   }
 
   private async handleShowText(isTextShown: boolean) {
     await this.switchHint({
       hint: WordHint.Text,
+      trackedHint: ShownHint.Text,
       isShown: isTextShown,
       load: async () => this.textRenderer.fillWords(await this.deps.game.words()),
       uncheck: () => this.controlsRenderer.uncheckText(),
@@ -131,6 +136,7 @@ export class PlayUseCases {
   private async handleShowFirstLetters(isFirstLettersShown: boolean) {
     await this.switchHint({
       hint: WordHint.FirstLetters,
+      trackedHint: ShownHint.FirstLetters,
       isShown: isFirstLettersShown,
       load: async () => this.textRenderer.fillFirstLetters(await this.deps.game.firstLetters()),
       uncheck: () => this.controlsRenderer.uncheckFirstLetters(),
@@ -145,6 +151,7 @@ export class PlayUseCases {
    */
   private async switchHint(options: {
     hint: WordHint;
+    trackedHint: ShownHint;
     isShown: boolean;
     load: () => Promise<void>;
     uncheck: () => void;
@@ -174,6 +181,7 @@ export class PlayUseCases {
 
     if (this.wantedHint === options.hint) {
       this.textRenderer.setHint(options.hint);
+      track(AnalyticsEvents.HintShown, { hint: options.trackedHint });
     }
   }
 }
