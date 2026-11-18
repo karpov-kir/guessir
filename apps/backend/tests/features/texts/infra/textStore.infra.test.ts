@@ -1,9 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { startMigratedPostgres, TestPostgres } from "../../../../tests/utils/postgres.js";
-import { Db, openDb, QueryError } from "../../../infra/db/exports.js";
-import type { Text, TextRows } from "../port.js";
-import { newTextStore } from "./exports.js";
+import { newMigratedTestDatabase, TestDatabase } from "../../../utils/postgres.js";
+import { Db, openDb, QueryError } from "../../../../src/infra/db/exports.js";
+import type { Text, TextRows } from "../../../../src/features/texts/exports.js";
+import { newTextStore } from "../../../../src/features/texts/infra/exports.js";
 
 const text: Text = {
   id: "aaaaaaaaaaaaaaaaaaaa",
@@ -15,19 +15,19 @@ const text: Text = {
 };
 
 describe("the texts table on Postgres", () => {
-  let postgres: TestPostgres;
+  let postgres: TestDatabase;
   let db: Db;
   let rows: TextRows;
 
   beforeAll(async () => {
-    postgres = await startMigratedPostgres();
+    postgres = await newMigratedTestDatabase();
     db = await openDb(postgres.settings);
     rows = newTextStore({ db });
   }, 120_000);
 
   afterAll(async () => {
     await db?.close();
-    await postgres?.stop();
+    await postgres?.drop();
   });
 
   it("should give back a stored text and nothing for an unknown id", async () => {

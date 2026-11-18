@@ -1,12 +1,9 @@
 import { createTextDtoSchema } from "@guessir/game";
-import { DataSource } from "typeorm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
-import { startPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
-import { Db, openDb } from "./openDb.js";
-import { openPostgres } from "./postgres.js";
-import { errorText } from "../../shared/errorText.js";
-import { QueryError } from "./QueryError.js";
+import { newTestDatabase, TestDatabase } from "../../utils/postgres.js";
+import { Db, openDb, QueryError } from "../../../src/infra/db/exports.js";
+import { errorText } from "../../../src/shared/errorText.js";
 
 interface Row {
   id: string;
@@ -57,39 +54,37 @@ const cleaned = rows
   }));
 
 describe("the blank texts migration", () => {
-  let postgres: TestPostgres;
+  let postgres: TestDatabase;
   let db: Db;
-  let dataSource: DataSource;
 
   const storedRows = async () =>
-    (await dataSource.query<Row[]>("SELECT id, title, description, text FROM texts")).toSorted(
-      byId,
-    );
+    (await postgres.query<Row>("SELECT id, title, description, text FROM texts")).toSorted(byId);
 
-  /** Runs the blank texts migration again by deleting its row from `migrations`. */
+  /**
+   * Runs the blank texts migration again on the rows each test inserts. The run in `beforeAll` saw
+   * an empty `texts` table, and `db.migrate()` skips a migration that has a row in `migrations`.
+   */
   const runMigrationAgain = async () => {
-    await dataSource.query("DELETE FROM migrations WHERE name LIKE '2026-11-14-blank-texts.%'");
+    await postgres.query("DELETE FROM migrations WHERE name LIKE '2026-11-14-blank-texts.%'");
     await db.migrate();
   };
 
   beforeAll(async () => {
-    postgres = await startPostgres();
+    postgres = await newTestDatabase();
     db = await openDb(postgres.settings);
     await db.migrate();
-    dataSource = await openPostgres(postgres.settings);
   }, 120_000);
 
   afterAll(async () => {
-    await dataSource?.destroy();
     await db?.close();
-    await postgres?.stop();
+    await postgres?.drop();
   });
 
   beforeEach(async () => {
-    await dataSource.query("DELETE FROM texts");
+    await postgres.query("DELETE FROM texts");
 
     for (const { id, title, description, text } of rows) {
-      await dataSource.query(
+      await postgres.query(
         `INSERT INTO texts (id, title, description, text, "allowShowingFirstLetters", "allowShowingText")
          VALUES ($1, $2, $3, $4, true, true)`,
         [id, title, description, text],
@@ -115,7 +110,7 @@ describe("the blank texts migration", () => {
   it("should leave every row as it was when a statement fails, and keep its text out of the error", async () => {
     const before = await storedRows();
 
-    await dataSource.query(`
+    await postgres.query(`
       CREATE FUNCTION refuse_update() RETURNS trigger LANGUAGE plpgsql AS $$
       BEGIN RAISE EXCEPTION 'update refused for %', NEW.text; END $$;
       CREATE TRIGGER refuse_update BEFORE UPDATE ON texts FOR EACH ROW EXECUTE FUNCTION refuse_update();
@@ -132,7 +127,7 @@ describe("the blank texts migration", () => {
       expect(error instanceof Error && error.cause).toBeInstanceOf(QueryError);
       expect(await storedRows()).toEqual(before);
     } finally {
-      await dataSource.query(`
+      await postgres.query(`
         DROP TRIGGER refuse_update ON texts;
         DROP FUNCTION refuse_update();
       `);

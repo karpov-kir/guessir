@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { recordTrackedEvents } from "../../../tests/utils/trackedEvents";
-import { LocalGame } from "../../entities/game/exports";
-import { newPlayUseCases, PlayUseCases } from "./playUseCases";
-import { requireElement } from "../../shared/dom";
+import { recordTrackedEvents } from "../../utils/trackedEvents";
+import { LocalGame } from "../../../src/entities/game/exports";
+import { newPlayUseCases, PlayUseCases } from "../../../src/features/play/exports";
+import { requireElement } from "../../../src/shared/dom";
 
 let game: LocalGame;
 let gameElement: HTMLElement;

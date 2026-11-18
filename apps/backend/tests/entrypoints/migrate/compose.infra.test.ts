@@ -1,31 +1,27 @@
-import { DataSource } from "typeorm";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { collectLogs, silentSink } from "@guessir/logger/testing";
-import { startPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
-import { steppingClock } from "../../../tests/utils/steppingClock.js";
-import { testConfig } from "../../../tests/utils/testConfig.js";
-import { unreachableDbConfig } from "../../../tests/utils/unreachableDbConfig.js";
-import { openPostgres } from "../../infra/db/postgres.js";
+import { newTestDatabase, TestDatabase } from "../../utils/postgres.js";
+import { steppingClock } from "../../utils/steppingClock.js";
+import { testConfig } from "../../utils/testConfig.js";
+import { unreachableDbConfig } from "../../utils/unreachableDbConfig.js";
 import { LogLevel, type LogSink } from "@guessir/logger";
-import { compose as composeServer, ServerHandle } from "../server/compose.js";
-import { compose } from "./compose.js";
+import { compose as composeServer, ServerHandle } from "../../../src/entrypoints/server/compose.js";
+import { compose } from "../../../src/entrypoints/migrate/compose.js";
 
 describe("the migrate step", () => {
-  let postgres: TestPostgres | undefined;
+  let postgres: TestDatabase | undefined;
   let server: ServerHandle | undefined;
-  let dataSource: DataSource | undefined;
   let unreachable: ReturnType<typeof unreachableDbConfig> | undefined;
 
-  const serverOver = (settings: TestPostgres["settings"], logSink: LogSink = silentSink) =>
+  const serverOver = (settings: TestDatabase["settings"], logSink: LogSink = silentSink) =>
     composeServer({ config: testConfig(settings), logSink });
-  const migrateStep = (settings: TestPostgres["settings"], logSink: LogSink = silentSink) =>
+  const migrateStep = (settings: TestDatabase["settings"], logSink: LogSink = silentSink) =>
     compose({ config: testConfig(settings), logSink });
 
   /** Returns the migrations the database has run, without their extensions, with their kinds. */
-  const migrationRows = async (settings: TestPostgres["settings"]) => {
-    dataSource ??= await openPostgres(settings);
-    const rows = await dataSource.query<{ name: string; kind: string | null }[]>(
+  const migrationRows = async (database: TestDatabase) => {
+    const rows = await database.query<{ name: string; kind: string | null }>(
       "SELECT name, kind FROM migrations ORDER BY name",
     );
 
@@ -33,9 +29,8 @@ describe("the migrate step", () => {
   };
 
   /** Records a migration from newer code in the database, of `kind`, or of no kind. */
-  const recordNewerMigration = async (settings: TestPostgres["settings"], kind: string | null) => {
-    dataSource ??= await openPostgres(settings);
-    await dataSource.query("INSERT INTO migrations (name, kind) VALUES ($1, $2)", [
+  const recordNewerMigration = async (database: TestDatabase, kind: string | null) => {
+    await database.query("INSERT INTO migrations (name, kind) VALUES ($1, $2)", [
       "2099-01-01-from-newer-code.js",
       kind,
     ]);
@@ -43,17 +38,15 @@ describe("the migrate step", () => {
 
   afterEach(async () => {
     await server?.stop();
-    await dataSource?.destroy();
-    await postgres?.stop();
+    await postgres?.drop();
     unreachable?.remove();
     server = undefined;
-    dataSource = undefined;
     postgres = undefined;
     unreachable = undefined;
   });
 
   it("should migrate a new database, so the server, which refused it, then starts", async () => {
-    postgres = await startPostgres();
+    postgres = await newTestDatabase();
 
     await expect(serverOver(postgres.settings)).rejects.toThrow(
       /^The database lacks the migrations 2022-03-23-initial, 2026-11-14-blank-texts: run the migrate step first$/,
@@ -66,7 +59,7 @@ describe("the migrate step", () => {
   }, 120_000);
 
   it("should log each migration it applies as one line of text", async () => {
-    postgres = await startPostgres();
+    postgres = await newTestDatabase();
     const logs = collectLogs();
 
     await migrateStep(postgres.settings, logs.sink).run();
@@ -85,13 +78,13 @@ describe("the migrate step", () => {
   }, 120_000);
 
   it("should apply each migration once and record its kind, even with two steps at once", async () => {
-    postgres = await startPostgres();
+    postgres = await newTestDatabase();
     const step = migrateStep(postgres.settings);
 
     await Promise.all([step.run(), step.run()]);
     await step.run();
 
-    expect(await migrationRows(postgres.settings)).toEqual([
+    expect(await migrationRows(postgres)).toEqual([
       { name: "2022-03-23-initial", kind: "expand" },
       { name: "2026-11-14-blank-texts", kind: "expand" },
     ]);
@@ -100,9 +93,9 @@ describe("the migrate step", () => {
   it.each(["contract", null])(
     "should refuse, as the server does, a database with a newer migration of kind %s",
     async (kind) => {
-      postgres = await startPostgres();
+      postgres = await newTestDatabase();
       await migrateStep(postgres.settings).run();
-      await recordNewerMigration(postgres.settings, kind);
+      await recordNewerMigration(postgres, kind);
       const newerContract =
         /^The database holds the migrations 2099-01-01-from-newer-code, which this code does not know and which are contracts or record no kind: newer code changed it in a way this code cannot run on$/;
 
@@ -113,9 +106,9 @@ describe("the migrate step", () => {
   );
 
   it("should run on, with a warning, a database with a newer expand migration", async () => {
-    postgres = await startPostgres();
+    postgres = await newTestDatabase();
     await migrateStep(postgres.settings).run();
-    await recordNewerMigration(postgres.settings, "expand");
+    await recordNewerMigration(postgres, "expand");
     const logs = collectLogs();
     const newerExpand =
       /^The database holds the expand migrations 2099-01-01-from-newer-code, which this code does not know: newer code migrated it, and this code runs on/;
@@ -133,18 +126,17 @@ describe("the migrate step", () => {
   }, 120_000);
 
   it("should take a database that a release before migrations recorded a kind migrated", async () => {
-    postgres = await startPostgres();
+    postgres = await newTestDatabase();
     await migrateStep(postgres.settings).run();
-    // Such a release made the table without the kind column
-    dataSource = await openPostgres(postgres.settings);
-    await dataSource.query("ALTER TABLE migrations DROP COLUMN kind");
+    // A release from before migrations recorded a kind made this table without the kind column.
+    await postgres.query("ALTER TABLE migrations DROP COLUMN kind");
 
     server = await serverOver(postgres.settings);
     await server.stop();
     server = undefined;
     await migrateStep(postgres.settings).run();
 
-    expect(await migrationRows(postgres.settings)).toEqual([
+    expect(await migrationRows(postgres)).toEqual([
       { name: "2022-03-23-initial", kind: null },
       { name: "2026-11-14-blank-texts", kind: null },
     ]);

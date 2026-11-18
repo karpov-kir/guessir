@@ -3,11 +3,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { collectLogs, silentSink } from "@guessir/logger/testing";
-import { AnalyticsEvents } from "../../entities/analytics/exports";
-import { GameApi } from "../../features/gameLoading/exports";
-import { track } from "../../shared/analytics";
+import { AnalyticsEvents } from "../../../src/entities/analytics/exports";
+import { GameApi } from "../../../src/features/gameLoading/exports";
+import { track } from "../../../src/shared/analytics";
 import { Logger, LogLevel } from "@guessir/logger";
-import { compose } from "./compose";
+import { compose } from "../../../src/entrypoints/page/compose";
 
 const config = {
   apiBaseUrl: "https://api.guessir.test",

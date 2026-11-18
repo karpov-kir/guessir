@@ -2,24 +2,24 @@ import { Logger, LogLevel } from "@guessir/logger";
 import { collectLogs } from "@guessir/logger/testing";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { startMigratedPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
-import { Db, newDbPing, openDb, QueryError } from "./exports.js";
+import { newMigratedTestDatabase, TestDatabase } from "../../utils/postgres.js";
+import { Db, newDbPing, openDb, QueryError } from "../../../src/infra/db/exports.js";
 
 const hiddenTitle = "the hidden text";
 const hiddenTextId = "hidden".padEnd(20, "x");
 
 describe("the database on Postgres", () => {
-  let postgres: TestPostgres;
+  let postgres: TestDatabase;
   let db: Db;
 
   beforeAll(async () => {
-    postgres = await startMigratedPostgres();
+    postgres = await newMigratedTestDatabase();
     db = await openDb(postgres.settings);
   }, 120_000);
 
   afterAll(async () => {
     await db?.close();
-    await postgres?.stop();
+    await postgres?.drop();
   });
 
   it("should answer a query with its rows", async () => {
