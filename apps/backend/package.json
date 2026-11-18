@@ -1,16 +1,16 @@
 {
   "name": "@guessir/backend",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "type": "module",
   "scripts": {
     "build": "npm run clean && tsc -b tsconfig.build.json",
     "clean": "del-cli ./dist ./tsconfig.build.tsbuildinfo",
     "start": "node ./dist/entrypoints/server/start.js",
-    "db:migrate": "node --env-file=env/.env.development ./dist/entrypoints/migrate/start.js",
+    "db:migrate": "node ./dist/entrypoints/migrate/start.js",
     "dev:compile": "tsc -b tsconfig.build.json --watch --preserveWatchOutput",
-    "dev:run": "node --watch --env-file=env/.env.development ./dist/entrypoints/server/start.js",
+    "dev:run": "node --watch ./dist/entrypoints/server/start.js",
     "dev:watch": "run-p dev:compile dev:run",
-    "dev:run:debug": "node --env-file=env/.env.development --inspect-brk ./dist/entrypoints/server/start.js"
+    "dev:run:debug": "node --inspect-brk ./dist/entrypoints/server/start.js"
   },
   "dependencies": {
     "@fastify/helmet": "^13.2.0",

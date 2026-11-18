@@ -2,6 +2,7 @@ import type { Config } from "../../src/infra/env/exports.js";
 import type { DbSettings } from "../../src/infra/db/exports.js";
 import { LogFormat } from "../../src/infra/logger/exports.js";
 import { LogLevel } from "@guessir/logger";
+import { Environment } from "../../src/infra/env/exports.js";
 
 /**
  * Returns a server config for a test, with the server on a free local port. The database is `db`,
@@ -10,6 +11,7 @@ import { LogLevel } from "@guessir/logger";
  */
 export function testConfig(db?: DbSettings): Config {
   return {
+    environment: Environment.Development,
     host: "127.0.0.1",
     port: 0,
     db: db ?? {
@@ -20,5 +22,6 @@ export function testConfig(db?: DbSettings): Config {
       database: "unused",
     },
     log: { format: LogFormat.Pretty, level: LogLevel.Info },
+    corsOrigins: ["https://web.test"],
   };
 }

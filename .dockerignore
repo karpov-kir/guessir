@@ -5,5 +5,7 @@
 **/*.tsbuildinfo
 coverage
 .git
-# The development database password; production reads its own from a secret
-apps/backend/env
+# Of the backend's env files only production's, which holds no secret, enters a build. Production reads
+# its database password from a Docker secret
+apps/backend/env/*
+!apps/backend/env/.env.production

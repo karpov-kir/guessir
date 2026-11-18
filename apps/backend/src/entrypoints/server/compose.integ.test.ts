@@ -87,13 +87,21 @@ describe("the texts API over HTTP", () => {
     });
   });
 
-  it("should send the security headers and allow the web origin", async () => {
+  it("should send the security headers and allow the origin the config lists", async () => {
     const response = await request("GET", "/texts/text-id", undefined, {
-      origin: "https://guessir.kk-forge.com",
+      origin: "https://web.test",
     });
 
     expect(response.headers["x-content-type-options"]).toBe("nosniff");
-    expect(response.headers["access-control-allow-origin"]).toBe("https://guessir.kk-forge.com");
+    expect(response.headers["access-control-allow-origin"]).toBe("https://web.test");
+  });
+
+  it("should refuse an origin the config does not allow", async () => {
+    const response = await request("GET", "/texts/text-id", undefined, {
+      origin: "https://elsewhere.example",
+    });
+
+    expect(response.headers["access-control-allow-origin"]).toBeUndefined();
   });
 
   it("should answer and log a failed query without the text it carried", async () => {
@@ -252,6 +260,10 @@ describe("the server's log", () => {
     await server.handle({ method: "GET", url: "/health" });
     await server.stop();
 
-    expect(logs.lines()).toEqual([]);
+    // The server logs the env file read before it parses the config, so the default level keeps
+    // that line.
+    expect(logs.lines()).toEqual([
+      expect.objectContaining({ args: [expect.stringMatching(/^Read the env file /)] }),
+    ]);
   });
 });
