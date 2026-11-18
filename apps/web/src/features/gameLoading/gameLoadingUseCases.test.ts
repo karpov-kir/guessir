@@ -4,7 +4,7 @@ import { mock, MockProxy } from "vitest-mock-extended";
 
 import { newTextSkeleton } from "../../../tests/utils/textSkeleton";
 import { LocalGame } from "../../entities/game/exports";
-import { GameApi } from "./GameApi";
+import { GameApi } from "./port";
 import { newGameLoadingUseCases } from "./gameLoadingUseCases";
 import { RemoteGame } from "./RemoteGame";
 

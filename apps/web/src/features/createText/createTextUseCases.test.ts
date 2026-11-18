@@ -4,7 +4,7 @@ import { mock, MockProxy } from "vitest-mock-extended";
 
 import { newManualClock } from "../../../tests/utils/manualClock";
 import { recordTrackedEvents } from "../../../tests/utils/trackedEvents";
-import { CreateTextApi } from "./createTextApi";
+import { CreateTextApi } from "./port";
 import { CreateTextUseCases, newCreateTextUseCases } from "./createTextUseCases";
 import { getElements } from "./formElements";
 

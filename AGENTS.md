@@ -2,7 +2,7 @@
 
 ## Product
 
-The game is for English texts. Expand only English contractions, such as `don't` into `do not`, from the table in `packages/game/src/lexemeAnalyzer/LexemeNormalizer.ts`. Support another language only as far as its words appear in an English text. Count a letter of any script, and a mark that joins one, as part of a word, so `Café`, `naïve` or `İstanbul` stays one word to guess.
+The game is for English texts. Expand only English contractions, such as `don't` into `do not`, from the table in `packages/game/src/shared/lexemeAnalyzer/LexemeNormalizer.ts`. Support another language only as far as its words appear in an English text. Count a letter of any script, and a mark that joins one, as part of a word, so `Café`, `naïve` or `İstanbul` stays one word to guess.
 
 ## Usage statistics
 

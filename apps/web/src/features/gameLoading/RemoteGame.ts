@@ -1,7 +1,7 @@
 import { RevealedWord, revealedWordSchema, revealedWordsSchema, TextSkeleton } from "@guessir/game";
 import urlJoin from "url-join";
 
-import { GameApi } from "./GameApi";
+import { GameApi } from "./port";
 import { Game } from "../../entities/game/exports";
 
 export type RemoteGameOptions = { api: GameApi; textPath: string; skeleton: TextSkeleton };

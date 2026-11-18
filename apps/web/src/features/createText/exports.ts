@@ -1,4 +1,4 @@
-export type { CreateTextApi } from "./createTextApi";
+export type { ClipboardWriter, CreateTextApi } from "./port";
 export {
   CreateTextUseCases,
   type CreateTextUseCasesOptions,

@@ -1,4 +1,4 @@
-export type { GameApi } from "./GameApi";
+export type { GameApi } from "./port";
 export {
   GameLoadingUseCases,
   type GameLoadingUseCasesOptions,

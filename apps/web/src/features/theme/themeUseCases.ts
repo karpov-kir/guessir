@@ -1,6 +1,7 @@
 import moonIcon from "./moonIcon.svg?raw";
 import sunIcon from "./sunIcon.svg?raw";
 import { icon } from "../../shared/icon";
+import type { SystemThemeQuery, ThemeStorage } from "./port";
 
 const Theme = {
   Light: "light",
@@ -8,19 +9,10 @@ const Theme = {
 } as const;
 type Theme = (typeof Theme)[keyof typeof Theme];
 
-/**
- * Describes the part of `MediaQueryList` the toggle reads, so a test can stand in for the system
- * theme.
- */
-export type SystemThemeQuery = {
-  matches: boolean;
-  addEventListener(type: "change", listener: () => void): void;
-};
-
 export type ThemeUseCasesOptions = {
   button: HTMLButtonElement;
   root: HTMLElement;
-  getStorage: () => Storage;
+  getStorage: () => ThemeStorage;
   systemTheme: SystemThemeQuery;
 };
 
@@ -31,7 +23,7 @@ const storageKey = "guessir.theme";
  * a private window or with blocked site data, even on reading `globalThis.localStorage`, so the
  * toggle keeps working without it.
  */
-function readStoredTheme(getStorage: () => Storage): Theme | undefined {
+function readStoredTheme(getStorage: () => ThemeStorage): Theme | undefined {
   try {
     const value = getStorage().getItem(storageKey);
 
@@ -41,7 +33,7 @@ function readStoredTheme(getStorage: () => Storage): Theme | undefined {
   }
 }
 
-function storeTheme(getStorage: () => Storage, theme: Theme) {
+function storeTheme(getStorage: () => ThemeStorage, theme: Theme) {
   try {
     getStorage().setItem(storageKey, theme);
   } catch {

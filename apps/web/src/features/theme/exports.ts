@@ -1,6 +1,2 @@
-export {
-  newThemeUseCases,
-  type SystemThemeQuery,
-  ThemeUseCases,
-  type ThemeUseCasesOptions,
-} from "./themeUseCases";
+export type { SystemThemeQuery, ThemeStorage } from "./port";
+export { newThemeUseCases, ThemeUseCases, type ThemeUseCasesOptions } from "./themeUseCases";

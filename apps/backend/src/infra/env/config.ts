@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-import type { DbSettings } from "../../infra/db/exports.js";
-import { LogFormat } from "../../infra/logger/exports.js";
+import type { DbSettings } from "../db/exports.js";
+import { LogFormat } from "../logger/exports.js";
 import { LogLevel } from "@guessir/logger";
 
-export type ServerConfig = {
+export type Config = {
   /** The address the server listens on. */
   host: string;
   port: number;
@@ -57,8 +57,11 @@ const envSchema = z.object({
 export const logFormatOf = (env: Readonly<Record<string, string | undefined>>): LogFormat =>
   logFormat.safeParse(env.LOG_FORMAT).data ?? defaultLogFormat;
 
-/** Reads the server's config from `env`, and throws with every problem when a variable is wrong. */
-export function parseConfig(env: Readonly<Record<string, string | undefined>>): ServerConfig {
+/**
+ * Reads the config that the server and the migrate step share from `env`, and throws with every
+ * problem when a variable is wrong.
+ */
+export function parseConfig(env: Readonly<Record<string, string | undefined>>): Config {
   const parsed = envSchema.safeParse(env);
 
   if (!parsed.success) {

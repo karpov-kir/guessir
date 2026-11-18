@@ -7,8 +7,9 @@ import { icon } from "../../shared/icon";
 import { AnalyticsEvents } from "../../entities/analytics/exports";
 import { track } from "../../shared/analytics";
 import { textUrl } from "../../entities/textLink/exports";
-import { CreateTextApi, createText } from "./createTextApi";
+import { createText } from "./createText";
 import { getElements } from "./formElements";
+import type { ClipboardWriter, CreateTextApi } from "./port";
 import type { Clock } from "../../shared/Clock";
 import { Logger } from "@guessir/logger";
 
@@ -18,7 +19,7 @@ export type CreateTextUseCasesOptions = {
   api: CreateTextApi;
   /** The page origin the link to a created text starts with. */
   origin: string;
-  clipboard: Pick<Clipboard, "writeText">;
+  clipboard: ClipboardWriter;
   /** Hides the alert that a link was copied once its time passes. */
   clock: Pick<Clock, "schedule">;
   maxTitleLength?: number;

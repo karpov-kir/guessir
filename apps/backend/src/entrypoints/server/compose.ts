@@ -6,14 +6,13 @@ import { TextsController } from "./http/TextsController.js";
 import { newTextsUseCases, TextsUseCases, type TextRows } from "../../features/texts/exports.js";
 import { newTextStore } from "../../features/texts/infra/exports.js";
 import { type Db, type DbPing, newDbPing, openDb } from "../../infra/db/exports.js";
-import { readEnv } from "../../infra/env.js";
+import { logFormatOf, parseConfig, readEnv, type Config } from "../../infra/env/exports.js";
 import { LogFormat, newLogSink } from "../../infra/logger/exports.js";
 import { systemClock } from "../../infra/systemClock.js";
 import { systemIds } from "../../infra/systemIds.js";
 import type { Clock } from "../../shared/Clock.js";
 import type { IdGenerator } from "../../shared/IdGenerator.js";
 import { Logger, LogLevel, type LogSink } from "@guessir/logger";
-import { logFormatOf, parseConfig, type ServerConfig } from "./config.js";
 import { pingEveryMs, waitForDbAtStart, watchDb } from "../../shared/dbWatch.js";
 import { errorText } from "../../shared/errorText.js";
 import { newApp } from "./http/newApp.js";
@@ -31,7 +30,7 @@ export type ServerOverrides = {
    */
   textRows?: TextRows;
   /** Stands in for the config the environment holds. */
-  config?: ServerConfig;
+  config?: Config;
   clock?: Clock;
   ids?: IdGenerator;
   /** Runs once the database has been lost for good. By default it exits the process with 1. */

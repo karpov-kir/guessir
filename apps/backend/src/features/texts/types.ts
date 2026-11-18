@@ -1,16 +1,6 @@
 import { CreateTextDto } from "@guessir/game";
 
-import type { IdGenerator } from "../../shared/IdGenerator.js";
-import type { TextRows } from "./port.js";
-
 export type NewText = CreateTextDto;
-
-export type TextsUseCasesOptions = {
-  /** Holds the stored texts. */
-  rows: TextRows;
-  /** Makes the id of a new text. */
-  ids: IdGenerator;
-};
 
 /** Means that no text has the id a request names. */
 export class TextNotFoundError extends Error {
