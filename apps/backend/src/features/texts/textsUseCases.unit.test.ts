@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { fakeIds } from "../../../tests/utils/fakeIds.js";
-import { fakeTextRows } from "../../../tests/utils/fakeTextRows.js";
+import { fakeTextRows, type FakeTextRows } from "../../../tests/utils/fakeTextRows.js";
 import {
   HintNotAllowedError,
   Text,
@@ -21,7 +21,7 @@ const text = {
 } satisfies Text;
 
 describe(TextsUseCases, () => {
-  let rows: ReturnType<typeof fakeTextRows>;
+  let rows: FakeTextRows;
   let texts: TextsUseCases;
 
   /** Replaces `rows` with a store of `text` with `overrides` and builds a new `texts` over it. */
@@ -51,7 +51,7 @@ describe(TextsUseCases, () => {
   });
 
   it("should pass on a failed read", async () => {
-    rows.getById.mockRejectedValue(new Error("Test"));
+    rows.fail("getById", new Error("Test"));
 
     await expect(texts.findSkeleton("id")).rejects.toEqual(new Error("Test"));
   });
@@ -125,22 +125,25 @@ describe(TextsUseCases, () => {
       await texts.guess("id", "one");
       await texts.words("id");
 
-      expect(rows.getById).toHaveBeenCalledTimes(1);
+      expect(rows.readCount).toBe(1);
     });
 
     it("should read again for an unknown text", async () => {
       await expect(texts.findSkeleton("unknown")).rejects.toBeInstanceOf(TextNotFoundError);
       await expect(texts.findSkeleton("unknown")).rejects.toBeInstanceOf(TextNotFoundError);
 
-      expect(rows.getById).toHaveBeenCalledTimes(2);
+      expect(rows.readCount).toBe(2);
     });
 
     it("should keep a bounded number of texts and read again one it dropped", async () => {
-      rows.getById.mockImplementation(async (id) => ({ ...text, id }));
-
       // The test plays more texts than the cache keeps. The cache then drops `id-0`, and playing
       // it again reads it again.
       const textCount = 1000;
+
+      rows = fakeTextRows(
+        Array.from({ length: textCount }, (_, i) => ({ ...text, id: `id-${i}` })),
+      );
+      texts = newTextsUseCases({ rows, ids: fakeIds() });
 
       for (let i = 0; i < textCount; i++) {
         await texts.findSkeleton(`id-${i}`);
@@ -148,7 +151,7 @@ describe(TextsUseCases, () => {
 
       await texts.findSkeleton("id-0");
 
-      expect(rows.getById).toHaveBeenCalledTimes(textCount + 1);
+      expect(rows.readCount).toBe(textCount + 1);
     });
   });
 });

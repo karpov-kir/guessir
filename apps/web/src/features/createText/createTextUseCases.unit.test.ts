@@ -1,18 +1,14 @@
-import { CreateTextDtoResponse, createTextDtoResponseSchema } from "@guessir/game";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { mock, MockProxy } from "vitest-mock-extended";
 
+import { FakeApi } from "../../../tests/utils/fakeApi";
+import { FakeClipboard } from "../../../tests/utils/fakeClipboard";
 import { newManualClock } from "../../../tests/utils/manualClock";
 import { recordTrackedEvents } from "../../../tests/utils/trackedEvents";
-import { CreateTextApi } from "./port";
 import { CreateTextUseCases, newCreateTextUseCases } from "./createTextUseCases";
 import { getElements } from "./formElements";
 
-const mockedText = {
-  id: "mocked-id",
-};
-let api: MockProxy<CreateTextApi>;
-const clipboard = { writeText: vi.fn<(text: string) => Promise<void>>() };
+let api: FakeApi;
+let clipboard: FakeClipboard;
 let useCases: CreateTextUseCases;
 let time: ReturnType<typeof newManualClock>;
 let trackedEvents: ReturnType<typeof recordTrackedEvents>;
@@ -25,9 +21,6 @@ const createText = async () => {
     allowShowingFirstLettersCheckboxElement,
     generateUrlButtonElement,
   } = getElements(useCases.getElement());
-  const deferred = Promise.withResolvers<CreateTextDtoResponse>();
-
-  api.post.mockReturnValue(deferred.promise);
 
   textInputElement.value = "Text text";
   titleInputElement.value = "Test title";
@@ -35,7 +28,6 @@ const createText = async () => {
   allowShowingFirstLettersCheckboxElement.checked = false;
 
   generateUrlButtonElement.click();
-  deferred.resolve(mockedText);
   await vi.waitFor(() =>
     expect(getElements(useCases.getElement()).generatedUrlContainerElement.classList).not.toContain(
       "hide",
@@ -45,9 +37,9 @@ const createText = async () => {
 
 describe(CreateTextUseCases, () => {
   beforeEach(() => {
-    api = mock<CreateTextApi>();
+    api = new FakeApi();
+    clipboard = new FakeClipboard();
     time = newManualClock();
-    clipboard.writeText.mockReset();
     trackedEvents = recordTrackedEvents();
     useCases = newCreateTextUseCases({
       api,
@@ -69,19 +61,22 @@ describe(CreateTextUseCases, () => {
 
     await createText();
 
-    expect(api.post).toHaveBeenCalledWith(
-      "texts",
-      {
-        allowShowingFirstLetters: false,
-        allowShowingText: true,
-        description: "Test description",
-        text: "Text text",
-        title: "Test title",
-      },
-      createTextDtoResponseSchema,
+    expect(api.texts).toEqual(
+      new Map([
+        [
+          "text-1",
+          {
+            allowShowingFirstLetters: false,
+            allowShowingText: true,
+            description: "Test description",
+            text: "Text text",
+            title: "Test title",
+          },
+        ],
+      ]),
     );
-    expect(generatedUrlElement.textContent).toBe("http://localhost:3000?textId=mocked-id");
-    expect(generatedUrlElement.href).toBe("http://localhost:3000/?textId=mocked-id");
+    expect(generatedUrlElement.textContent).toBe("http://localhost:3000?textId=text-1");
+    expect(generatedUrlElement.href).toBe("http://localhost:3000/?textId=text-1");
     expect(generatedUrlContainerElement.classList).not.toContain("hide");
     expect(trackedEvents).toEqual([{ name: "text_created" }]);
   });
@@ -101,11 +96,10 @@ describe(CreateTextUseCases, () => {
   });
 
   it("should render an error if text creation fails", async () => {
-    const deferred = Promise.withResolvers<CreateTextDtoResponse>();
     const { errorElement, generateUrlButtonElement, textInputElement, titleInputElement } =
       getElements(useCases.getElement());
 
-    api.post.mockReturnValue(deferred.promise);
+    api.failNextRequest(new Error("Test error"));
 
     // The renderer submits the form only when the title and the text are set.
     textInputElement.value = "Text text";
@@ -114,7 +108,6 @@ describe(CreateTextUseCases, () => {
     expect(errorElement.classList).toContain("hide");
 
     generateUrlButtonElement.click();
-    deferred.reject(new Error("Test error"));
 
     await vi.waitFor(() => expect(errorElement.textContent).toBe("Test error"));
     expect(errorElement.classList).not.toContain("hide");
@@ -122,30 +115,25 @@ describe(CreateTextUseCases, () => {
   });
 
   it("should render a fallback error if text creation fails with something other than an Error", async () => {
-    const deferred = Promise.withResolvers<CreateTextDtoResponse>();
     const { errorElement, generateUrlButtonElement, textInputElement, titleInputElement } =
       getElements(useCases.getElement());
 
-    api.post.mockReturnValue(deferred.promise);
+    api.failNextRequest("Test error");
     textInputElement.value = "Text text";
     titleInputElement.value = "Test title";
 
     generateUrlButtonElement.click();
-    deferred.reject("Test error");
 
     await vi.waitFor(() => expect(errorElement.textContent).toBe("Could not create the text"));
   });
 
   it("should disable form while a request is executing", async () => {
-    const deferred = Promise.withResolvers<CreateTextDtoResponse>();
     const { textInputElement, titleInputElement, generateUrlButtonElement } = getElements(
       useCases.getElement(),
     );
     const containerElement = useCases.getElement();
     const getDisabledElements = () =>
       containerElement.querySelectorAll("input:disabled, textarea:disabled");
-
-    api.post.mockReturnValue(deferred.promise);
 
     // The renderer submits the form only when the title and the text are set.
     textInputElement.value = "Text text";
@@ -155,9 +143,8 @@ describe(CreateTextUseCases, () => {
 
     generateUrlButtonElement.click();
 
+    // The fake API answers in a later microtask, so the request is still open here.
     expect(getDisabledElements()).toHaveLength(5);
-
-    deferred.resolve(mockedText);
 
     await vi.waitFor(() => expect(getDisabledElements()).toHaveLength(0));
   });
@@ -167,7 +154,7 @@ describe(CreateTextUseCases, () => {
 
     generateUrlButtonElement.click();
 
-    expect(api.post).not.toHaveBeenCalled();
+    expect(api.requests).toEqual([]);
   });
 
   it("should mark empty required fields invalid on submit, for screen readers too", () => {
@@ -237,7 +224,7 @@ describe(CreateTextUseCases, () => {
     await createText();
     copyGeneratedUrlButtonElement.click();
 
-    expect(clipboard.writeText).toHaveBeenCalledWith("http://localhost:3000?textId=mocked-id");
+    expect(clipboard.text).toBe("http://localhost:3000?textId=text-1");
     expect(trackedEvents).toEqual([{ name: "text_created" }, { name: "game_link_copied" }]);
   });
 

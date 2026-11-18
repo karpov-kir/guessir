@@ -1,10 +1,11 @@
 import { newRecordingCollector } from "@kk-forge/artel-collector/testing";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { mock } from "vitest-mock-extended";
 
 import { collectLogs, silentSink } from "@guessir/logger/testing";
+import { FakeApi } from "../../utils/fakeApi";
+import { fakeSystemTheme } from "../../utils/fakeSystemTheme";
+import { FakeClipboard } from "../../utils/fakeClipboard";
 import { AnalyticsEvents } from "../../../src/entities/analytics/exports";
-import { GameApi } from "../../../src/features/gameLoading/exports";
 import { track } from "../../../src/shared/analytics";
 import { Logger, LogLevel } from "@guessir/logger";
 import { compose } from "../../../src/entrypoints/page/compose";
@@ -27,13 +28,17 @@ describe(compose, () => {
     const body = document.createElement("div");
     const themeButton = document.createElement("button");
     const analytics = newRecordingCollector();
+    const storedValues = new Map<string, string>();
 
     await compose({
-      api: mock<GameApi>(),
+      api: new FakeApi(),
       location: { origin: "https://guessir.test", search: "" },
-      clipboard: { writeText: vi.fn<(text: string) => Promise<void>>() },
-      storage: () => mock<Storage>(),
-      systemTheme: { matches: true, addEventListener: vi.fn<() => void>() },
+      clipboard: new FakeClipboard(),
+      storage: () => ({
+        getItem: (key) => storedValues.get(key) ?? null,
+        setItem: (key, value) => void storedValues.set(key, value),
+      }),
+      systemTheme: fakeSystemTheme(true),
       logSink: silentSink,
       analytics,
       config,

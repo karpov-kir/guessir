@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import type { SystemThemeQuery } from "./port";
+import { fakeSystemTheme } from "../../../tests/utils/fakeSystemTheme";
 import { newThemeUseCases, ThemeUseCases, type ThemeUseCasesOptions } from "./themeUseCases";
 
 let root: HTMLElement;
@@ -32,26 +32,12 @@ const createBrokenStorage = (): Storage =>
     },
   });
 
-const createSystemTheme = (matches: boolean) => {
-  const listeners: Array<() => void> = [];
-  const systemTheme: SystemThemeQuery & { change: (matches: boolean) => void } = {
-    matches,
-    addEventListener: (_type, listener) => void listeners.push(listener),
-    change: (nextMatches) => {
-      systemTheme.matches = nextMatches;
-      listeners.forEach((listener) => listener());
-    },
-  };
-
-  return systemTheme;
-};
-
 const initToggle = (options: Partial<ThemeUseCasesOptions> = {}) =>
   newThemeUseCases({
     button,
     root,
     getStorage: () => storage,
-    systemTheme: createSystemTheme(false),
+    systemTheme: fakeSystemTheme(false),
     ...options,
   }).attach();
 
@@ -70,7 +56,7 @@ describe(ThemeUseCases, () => {
   });
 
   it("should follow the system theme when nothing is stored", () => {
-    initToggle({ systemTheme: createSystemTheme(true) });
+    initToggle({ systemTheme: fakeSystemTheme(true) });
 
     expect(root.dataset.theme).toBeUndefined();
     expect(button.getAttribute("aria-pressed")).toBe("true");
@@ -79,7 +65,7 @@ describe(ThemeUseCases, () => {
   it("should apply the stored theme", () => {
     storage.setItem("guessir.theme", "light");
 
-    initToggle({ systemTheme: createSystemTheme(true) });
+    initToggle({ systemTheme: fakeSystemTheme(true) });
 
     expect(root.dataset.theme).toBe("light");
     expect(button.getAttribute("aria-pressed")).toBe("false");
@@ -111,7 +97,7 @@ describe(ThemeUseCases, () => {
   });
 
   it("should keep following the system theme while the user has not picked one", () => {
-    const systemTheme = createSystemTheme(false);
+    const systemTheme = fakeSystemTheme(false);
 
     initToggle({ systemTheme });
     systemTheme.change(true);
@@ -124,7 +110,7 @@ describe(ThemeUseCases, () => {
   });
 
   it("should not follow the system theme once the user has picked one", () => {
-    const systemTheme = createSystemTheme(false);
+    const systemTheme = fakeSystemTheme(false);
 
     initToggle({ systemTheme });
     button.click();

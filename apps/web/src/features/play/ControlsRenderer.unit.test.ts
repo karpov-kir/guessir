@@ -95,14 +95,17 @@ describe(ControlsRenderer, () => {
       controlsRenderer.getElement(),
     );
 
+    // The test places the controls in the document, so the input can take focus. The browser moves
+    // focus only to an element in the document.
+    document.body.replaceChildren(controlsRenderer.getElement());
     controlsRenderer.announce("No new words for this guess");
-    const focus = vi.spyOn(guessInputElement, "focus");
     typeGuess(guessInputElement, "test");
+    guessButtonElement.focus();
 
     guessButtonElement.click();
 
     expect(guessInputElement.value).toBe("test");
-    expect(focus).toHaveBeenCalled();
+    expect(document.activeElement).toBe(guessInputElement);
     expect(guessButtonElement.disabled).toBe(true);
     expect(statusElement.textContent).toBe("No new words for this guess");
   });

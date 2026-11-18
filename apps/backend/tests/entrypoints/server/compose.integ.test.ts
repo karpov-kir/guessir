@@ -1,7 +1,7 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { collectLogs } from "@guessir/logger/testing";
-import { fakeTextRows } from "../../utils/fakeTextRows.js";
+import { fakeTextRows, type FakeTextRows } from "../../utils/fakeTextRows.js";
 import { testConfig } from "../../utils/testConfig.js";
 import { Text } from "../../../src/features/texts/exports.js";
 import { QueryError } from "../../../src/infra/db/exports.js";
@@ -16,7 +16,7 @@ const text: Text = {
   allowShowingFirstLetters: true,
   allowShowingText: true,
 };
-let textRows: ReturnType<typeof fakeTextRows>;
+let textRows: FakeTextRows;
 let logs: ReturnType<typeof collectLogs>;
 
 describe("the texts API over HTTP", () => {
@@ -31,14 +31,10 @@ describe("the texts API over HTTP", () => {
   beforeAll(async () => {
     textRows = fakeTextRows([text, { ...text, id: "locked", allowShowingText: false }]);
     logs = collectLogs();
-    server = await compose({ textRows, config: testConfig(), logSink: logs.sink });
+    server = await compose({ textRows, env: {}, config: testConfig(), logSink: logs.sink });
   });
 
   afterAll(() => server.stop());
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
 
   it("should create a text and answer only its id", async () => {
     const response = await request("POST", "/texts", {
@@ -105,7 +101,8 @@ describe("the texts API over HTTP", () => {
   });
 
   it("should answer and log a failed query without the text it carried", async () => {
-    textRows.insert.mockRejectedValueOnce(
+    textRows.failOnce(
+      "insert",
       new QueryError({ message: "value too long", query: 'INSERT INTO "texts"' }),
     );
 
@@ -223,7 +220,7 @@ describe("the texts API over HTTP", () => {
     ["description", "", "Invalid string: must not be blank"],
     ["description", "  ", "Invalid string: must not be blank"],
   ])("should refuse the %s %j and store nothing", async (field, value, problem) => {
-    textRows.insert.mockClear();
+    const storedCount = textRows.texts.size;
 
     const response = await request("POST", "/texts", {
       title: "Title",
@@ -233,7 +230,7 @@ describe("the texts API over HTTP", () => {
 
     expect(response.statusCode).toBe(400);
     expect(response.json<{ message: string[] }>().message).toEqual([`${field}: ${problem}`]);
-    expect(textRows.insert).not.toHaveBeenCalled();
+    expect(textRows.texts.size).toBe(storedCount);
   });
 
   it("should store a text sent without flags as one that shows no hints", async () => {
@@ -253,6 +250,7 @@ describe("the server's log", () => {
     const logs = collectLogs();
     const server = await compose({
       textRows: fakeTextRows([]),
+      env: {},
       config: { ...testConfig(), log: { ...testConfig().log, level: LogLevel.Warn } },
       logSink: logs.sink,
     });
@@ -260,10 +258,8 @@ describe("the server's log", () => {
     await server.handle({ method: "GET", url: "/health" });
     await server.stop();
 
-    // The server logs the env file read before it parses the config, so the default level keeps
-    // that line.
-    expect(logs.lines()).toEqual([
-      expect.objectContaining({ args: [expect.stringMatching(/^Read the env file /)] }),
-    ]);
+    // The server logs which env file it read before it parses the config, so the default level
+    // keeps that line.
+    expect(logs.lines()).toEqual([expect.objectContaining({ args: ["Read no env file"] })]);
   });
 });
