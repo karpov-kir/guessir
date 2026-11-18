@@ -1,6 +1,6 @@
 import { textSkeletonSchema } from "@guessir/game";
 
-import { GameApi } from "./GameApi";
+import { GameApi } from "./port";
 import { RemoteGame } from "./RemoteGame";
 
 /**

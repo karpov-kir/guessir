@@ -1,6 +1,4 @@
-import * as LexemeAnalyzer from "../lexemeAnalyzer/LexemeAnalyzer.js";
-import * as LexemeNormalizer from "../lexemeAnalyzer/LexemeNormalizer.js";
-import { LexemeAnalysis } from "../lexemeAnalyzer/types.js";
+import { analyze, isLexemeOtherCharacter, type LexemeAnalysis } from "../lexemeAnalyzer/exports.js";
 import { RevealedWord, SkeletonLexeme } from "./types.js";
 
 /**
@@ -12,7 +10,7 @@ export class TextGame {
   private readonly lexemesByWordLike: LexemeAnalysis["lexemesByWordLike"];
 
   constructor(text: string) {
-    const lexemeAnalysis = LexemeAnalyzer.analyze(text);
+    const lexemeAnalysis = analyze(text);
 
     this.wordCount = lexemeAnalysis.wordLikeCount;
     this.lexemesByIndex = lexemeAnalysis.lexemes;
@@ -25,7 +23,7 @@ export class TextGame {
    */
   public lexemes(): SkeletonLexeme[] {
     return Array.from(this.lexemesByIndex, ([index, lexeme]) =>
-      LexemeNormalizer.isLexemeOtherCharacter(lexeme)
+      isLexemeOtherCharacter(lexeme)
         ? { index, character: lexeme.normalized }
         : { index, length: lexeme.normalized.length },
     );
@@ -48,7 +46,7 @@ export class TextGame {
   public reveal(index: number): RevealedWord | undefined {
     const lexeme = this.lexemesByIndex.get(index);
 
-    if (!lexeme || LexemeNormalizer.isLexemeOtherCharacter(lexeme)) {
+    if (!lexeme || isLexemeOtherCharacter(lexeme)) {
       return undefined;
     }
 
@@ -60,9 +58,10 @@ export class TextGame {
     return this.words().map(({ index, word }) => ({ index, word: word[0] }));
   }
 
+  /** Returns every word of the text with its index, so it gives away the whole answer. */
   public words(): RevealedWord[] {
     return Array.from(this.lexemesByIndex)
-      .filter(([, lexeme]) => !LexemeNormalizer.isLexemeOtherCharacter(lexeme))
+      .filter(([, lexeme]) => !isLexemeOtherCharacter(lexeme))
       .map(([index, lexeme]) => ({ index, word: lexeme.normalized }));
   }
 }

@@ -3,7 +3,7 @@ import { CreateTextDto } from "@guessir/game";
 import { Game, LocalGame } from "../../entities/game/exports";
 import { parseTextId } from "../../entities/textLink/exports";
 import { Logger } from "@guessir/logger";
-import { GameApi } from "./GameApi";
+import { GameApi } from "./port";
 import { loadRemoteGame } from "./loadRemoteGame";
 
 const logger = Logger.root.scope("gameLoading");

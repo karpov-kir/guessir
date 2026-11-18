@@ -1,7 +1,11 @@
 import type { Collector } from "@kk-forge/artel-collector";
 import { trackPageViews } from "@kk-forge/artel-collector/web";
 
-import { newThemeUseCases, type SystemThemeQuery } from "../../features/theme/exports";
+import {
+  newThemeUseCases,
+  type SystemThemeQuery,
+  type ThemeStorage,
+} from "../../features/theme/exports";
 import {
   browserStorage,
   pageLocation,
@@ -26,7 +30,7 @@ export type PageOverrides = Partial<
     analytics: Collector<"anonymous">;
     /** Stands in for the config the build's environment holds. */
     config: PageConfig;
-    storage: () => Storage;
+    storage: () => ThemeStorage;
     systemTheme: SystemThemeQuery;
     /** Takes the log records in place of the console, so a test can read or drop them. */
     logSink: LogSink;

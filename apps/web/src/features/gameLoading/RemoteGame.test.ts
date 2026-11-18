@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { mock, MockProxy } from "vitest-mock-extended";
 
 import { newTextSkeleton } from "../../../tests/utils/textSkeleton";
-import { GameApi } from "./GameApi";
+import { GameApi } from "./port";
 import { RemoteGame } from "./RemoteGame";
 
 const textPath = "texts/text-id";

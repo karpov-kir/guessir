@@ -1,11 +1,4 @@
-export {
-  type CreateTextDto,
-  createTextDtoSchema,
-  type CreateTextDtoResponse,
-  createTextDtoResponseSchema,
-  createTextLimits,
-} from "./createText.js";
-export { TextGame } from "./game/TextGame.js";
+export { TextGame } from "./TextGame.js";
 export {
   type GuessDto,
   guessDtoSchema,
@@ -18,4 +11,4 @@ export {
   type SkeletonLexeme,
   type TextSkeleton,
   textSkeletonSchema,
-} from "./game/types.js";
+} from "./types.js";

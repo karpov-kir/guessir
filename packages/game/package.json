@@ -4,8 +4,8 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/exports.d.ts",
-      "default": "./dist/exports.js"
+      "types": "./dist/shared/exports.d.ts",
+      "default": "./dist/shared/exports.js"
     }
   },
   "scripts": {

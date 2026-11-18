@@ -1,11 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import {
-  newThemeUseCases,
-  SystemThemeQuery,
-  ThemeUseCases,
-  type ThemeUseCasesOptions,
-} from "./themeUseCases";
+import type { SystemThemeQuery } from "./port";
+import { newThemeUseCases, ThemeUseCases, type ThemeUseCasesOptions } from "./themeUseCases";
 
 let root: HTMLElement;
 let button: HTMLButtonElement;

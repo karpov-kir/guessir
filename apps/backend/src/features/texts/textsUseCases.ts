@@ -6,16 +6,20 @@ import {
   TextSkeleton,
 } from "@guessir/game";
 
+import type { IdGenerator } from "../../shared/IdGenerator.js";
 import { LruCache } from "../../shared/LruCache.js";
-import { createText } from "./createText.js";
-import type { Text } from "./port.js";
-import {
-  HintNotAllowedError,
-  NewText,
-  TextNotFoundError,
-  TextsUseCasesOptions,
-  WordNotFoundError,
-} from "./types.js";
+import type { Text, TextRows } from "./port.js";
+import { HintNotAllowedError, NewText, TextNotFoundError, WordNotFoundError } from "./types.js";
+
+export type TextsUseCasesOptions = {
+  /** Holds the stored texts. */
+  rows: TextRows;
+  /** Makes the id of a new text. */
+  ids: IdGenerator;
+};
+
+/** The length of a text's id. The `texts` table stores it in a CHAR(20) column. */
+const idLength = 20;
 
 type PlayedText = { text: Text; textGame: TextGame };
 
@@ -39,8 +43,12 @@ export class TextsUseCases {
   }
 
   /** Stores a new text and returns its id. */
-  public create(newText: NewText): Promise<CreateTextDtoResponse> {
-    return createText(this.deps, newText);
+  public async create(newText: NewText): Promise<CreateTextDtoResponse> {
+    const id = this.deps.ids.newId(idLength);
+
+    await this.deps.rows.insert({ ...newText, id });
+
+    return { id };
   }
 
   public async findSkeleton(id: string): Promise<TextSkeleton> {
