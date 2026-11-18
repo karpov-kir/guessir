@@ -6,14 +6,13 @@ import { checkOptions, isTestKey, Platform } from "@kk-forge/artel-collector";
 import { describe, expect, it } from "vitest";
 
 /**
- * Returns the analytics channel a build of `mode` gets: Vite reads `.env`, then the mode's file
- * over it. The test reads the files, since Vite's own loader would answer with the test run's
- * values.
+ * Returns the analytics channel a build of `mode` gets from the mode's file in `env/`. The test
+ * reads the files, since Vite's own loader would answer with the test run's values.
  */
 function analyticsOf(mode: string) {
-  const read = (file: string) =>
-    parseEnv(readFileSync(path.join(import.meta.dirname, "../../..", file), "utf8"));
-  const env = { ...read(".env"), ...(mode === "production" ? read(".env.production") : {}) };
+  const env = parseEnv(
+    readFileSync(path.join(import.meta.dirname, "../../../env", `.env.${mode}`), "utf8"),
+  );
 
   return { key: env.GUESSIR_ARTEL_KEY ?? "", endpoint: env.GUESSIR_ARTEL_URL ?? "" };
 }

@@ -1,6 +1,87 @@
 [tools]
 node = "26"
 
+[vars]
+# Postgres takes a random host port, so several services run at once. Every task that reaches it reads the
+# port here.
+read_database_port = """addr=$(docker compose -f docker/docker-compose.yml port database 5432) || exit; export DATABASE_HOST=${addr%:*} DATABASE_PORT=${addr##*:}"""
+# Starts the local Postgres, stops it when the task ends, builds the backend and migrates the database.
+start_database = """
+compose=(docker compose -f docker/docker-compose.yml)
+trap '"${compose[@]}" stop' EXIT
+# bash leaves SIGTERM (an IDE's stop button, kill) at its default, which skips the EXIT trap.
+trap 'exit 143' TERM
+"${compose[@]}" up -d --wait
+npm run build
+mise run backend:db:migrate
+"""
+
+[tasks."backend:start"]
+description = "Run the built server"
+dir = "apps/backend"
+run = "npm start"
+
+[tasks."backend:start:dev"]
+description = "Run the server on the local Postgres, recompiling and restarting it on each change"
+dir = "apps/backend"
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+{{vars.start_database}}
+{{vars.read_database_port}}
+npm run dev:watch
+'''
+
+[tasks."backend:start:dev:debug"]
+description = "backend:start:dev without the watch, waiting for a debugger before it starts"
+dir = "apps/backend"
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+{{vars.start_database}}
+{{vars.read_database_port}}
+npm run dev:run:debug
+'''
+
+[tasks."backend:db:migrate"]
+description = "Apply the migrations the local database lacks, from the built backend"
+dir = "apps/backend"
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+{{vars.read_database_port}}
+npm run db:migrate
+'''
+
+[tasks."backend:build"]
+dir = "apps/backend"
+run = "npm run build"
+
+[tasks."backend:docker:build"]
+description = "Build the backend's image locally. Only CI pushes one"
+run = "docker build --platform linux/amd64 -f apps/backend/docker/Dockerfile -t guessir-backend:local ."
+
+[tasks."game:build"]
+dir = "packages/game"
+run = "npm run build"
+
+[tasks."logger:build"]
+dir = "packages/logger"
+run = "npm run build"
+
+[tasks."web:start:dev"]
+description = "Run the Vite dev server and the type check in watch mode"
+dir = "apps/web"
+run = "npm run start:dev"
+
+[tasks."web:build"]
+dir = "apps/web"
+run = "npm run build"
+
+[tasks."web:docker:build"]
+description = "Build the web's image locally. Only CI pushes one"
+run = "docker build --platform linux/amd64 -f apps/web/docker/Dockerfile -t guessir-web:local ."
+
 [tasks."backend:version"]
 description = "Print the backend's version from its package.json, which a release tags"
 dir = "apps/backend"
@@ -25,6 +106,9 @@ depends = ["lint", "build", "test:ci"]
 
 [tasks.lint]
 run = "npm run lint"
+
+[tasks."lint:fix"]
+run = "npm run lint:fix"
 
 [tasks.build]
 run = "npm run build"

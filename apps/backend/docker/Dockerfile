@@ -2,7 +2,10 @@ FROM node:26-alpine AS base
 
 WORKDIR /app
 
-FROM base AS build
+# The build runs natively on the builder: its output is JavaScript, the same on every platform
+FROM --platform=$BUILDPLATFORM node:26-alpine AS build
+
+WORKDIR /app
 
 COPY . .
 

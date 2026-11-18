@@ -18,14 +18,10 @@
     "lint:stylelint:fix": "npm run lint:stylelint -- --fix",
     "lint": "run-p -c lint:oxlint lint:format lint:tsc lint:stylelint",
     "lint:fix": "run-s -c lint:oxlint:fix lint:stylelint:fix lint:format:fix",
-    "start:dev:backend": "npm run start:dev -w @guessir/backend",
-    "start:dev:web": "npm run start:dev -w @guessir/web",
-    "start:backend": "npm run start -w @guessir/backend",
     "test": "vitest run",
     "test:ci": "vitest run --coverage",
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
-    "test:watch": "vitest watch",
-    "build:docker": "npm run build:docker --workspaces --if-present"
+    "test:watch": "vitest watch"
   },
   "devDependencies": {
     "@kk-forge/oxlint-config": "^9.0.0",

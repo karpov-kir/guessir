@@ -1,11 +1,12 @@
-# The local Postgres for `npm run start:dev`
+# The local Postgres for `mise run backend:start:dev`
 name: guessir
 
 services:
   database:
     image: postgres:18
     ports:
-      - "127.0.0.1:5432:5432"
+      # A random host port, so several services run at once. mise reads it with `docker compose port`
+      - "127.0.0.1::5432"
     environment:
       POSTGRES_USER: guessir
       POSTGRES_PASSWORD_FILE: /run/secrets/database-password
@@ -22,7 +23,7 @@ services:
 secrets:
   # The backend reads the same file, through DATABASE_PASSWORD_FILE in env/.env.development
   database-password:
-    file: env/database-password.development
+    file: ../env/database-password.development
 
 volumes:
   database-18:
