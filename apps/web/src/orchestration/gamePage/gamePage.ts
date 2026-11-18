@@ -1,13 +1,17 @@
 import "./gamePage.css";
 import { newPlayUseCases } from "../../features/play/exports";
-import { CreateTextApi, newCreateTextUseCases } from "../../features/createText/exports";
+import {
+  type ClipboardWriter,
+  CreateTextApi,
+  newCreateTextUseCases,
+} from "../../features/createText/exports";
 import { GameApi, newGameLoadingUseCases } from "../../features/gameLoading/exports";
 import type { Clock } from "../../shared/Clock";
 
 export type GamePageDependencies = {
   api: GameApi & CreateTextApi;
   location: Pick<Location, "origin" | "search">;
-  clipboard: Pick<Clipboard, "writeText">;
+  clipboard: ClipboardWriter;
   clock: Pick<Clock, "schedule">;
 };
 

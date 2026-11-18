@@ -1,4 +1,4 @@
-import type { ServerConfig } from "../../src/entrypoints/server/config.js";
+import type { Config } from "../../src/infra/env/exports.js";
 import type { DbSettings } from "../../src/infra/db/exports.js";
 import { LogFormat } from "../../src/infra/logger/exports.js";
 import { LogLevel } from "@guessir/logger";
@@ -8,7 +8,7 @@ import { LogLevel } from "@guessir/logger";
  * or else a placeholder that no test connects to, for a test whose server never reaches its
  * database.
  */
-export function testConfig(db?: DbSettings): ServerConfig {
+export function testConfig(db?: DbSettings): Config {
   return {
     host: "127.0.0.1",
     port: 0,
