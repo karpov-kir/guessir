@@ -24,8 +24,9 @@ RUN npm ci --omit=dev -w @guessir/backend
 
 FROM base AS runner
 
-# Only what the backend runs: no sources, no dev dependencies, no env files
+# Only what the backend runs: no sources, no dev dependencies, and of the env files only production's
 COPY --from=deps /app .
+COPY apps/backend/env/.env.production apps/backend/env/
 COPY --from=build /app/packages/game/dist packages/game/dist
 COPY --from=build /app/packages/logger/dist packages/logger/dist
 COPY --from=build /app/apps/backend/dist apps/backend/dist

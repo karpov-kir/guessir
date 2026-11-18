@@ -39,10 +39,11 @@ export function compose(overrides: MigrateOverrides = {}): MigrateHandle {
 
   const sinkOf = (format: LogFormat) =>
     overrides.logSink ?? overrides.logSinks?.[format] ?? newLogSink(format, { clock });
-  const env = readEnv();
+  const { env, file } = readEnv();
 
   // The first sink takes the records until the config parses, so a config error is logged
   Logger.install(sinkOf(logFormatOf(env)), LogLevel.Info);
+  logger.info(file ? `Read the env file ${file}` : "Read no env file");
   const config = overrides.config ?? parseConfig(env);
   Logger.install(sinkOf(config.log.format), config.log.level);
 

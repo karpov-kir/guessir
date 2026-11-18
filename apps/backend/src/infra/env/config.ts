@@ -4,12 +4,22 @@ import type { DbSettings } from "../db/exports.js";
 import { LogFormat } from "../logger/exports.js";
 import { LogLevel } from "@guessir/logger";
 
+export enum Environment {
+  Development = "development",
+  Staging = "staging",
+  Production = "production",
+}
+
 export type Config = {
+  /** The environment ENV names, whose env file `readEnv` reads. */
+  environment: Environment;
   /** The address the server listens on. */
   host: string;
   port: number;
   db: DbSettings;
   log: { format: LogFormat; level: LogLevel };
+  /** The web origins whose pages may call the API. */
+  corsOrigins: string[];
 };
 
 // A variable that is empty or only whitespace counts as unset, so a default or the "required" error
@@ -36,7 +46,13 @@ const defaultLogFormat = LogFormat.Pretty;
 
 const logFormat = z.preprocess(unsetIfBlank, z.enum(LogFormat).default(defaultLogFormat));
 
+const environment = z.preprocess(
+  unsetIfBlank,
+  z.enum(Environment).default(Environment.Development),
+);
+
 const envSchema = z.object({
+  ENV: environment,
   HOST: z.preprocess(unsetIfBlank, z.string().default("0.0.0.0")),
   PORT: portNumber(3020),
   DATABASE_HOST: required,
@@ -48,7 +64,24 @@ const envSchema = z.object({
   DATABASE_NAME: required,
   LOG_FORMAT: logFormat,
   LOG_LEVEL: z.preprocess(unsetIfBlank, z.enum(logLevelNames).default("info")),
+  // A comma-separated list. The default is the production web's origin
+  CORS_ORIGINS: z
+    .preprocess(unsetIfBlank, z.string().default("https://guessir.kk-forge.com"))
+    .transform((value) =>
+      value
+        .split(",")
+        .map((origin) => origin.trim())
+        .filter(Boolean),
+    ),
 });
+
+/**
+ * Returns the environment ENV names, or development when ENV is unset. Returns undefined when ENV
+ * is invalid, and `parseConfig` then rejects it.
+ */
+export const environmentOf = (
+  env: Readonly<Record<string, string | undefined>>,
+): Environment | undefined => environment.safeParse(env.ENV).data;
 
 /**
  * Returns the log format `env` names, or `defaultLogFormat` when LOG_FORMAT is unset or invalid.
@@ -69,6 +102,7 @@ export function parseConfig(env: Readonly<Record<string, string | undefined>>): 
   }
 
   const {
+    ENV,
     HOST,
     PORT,
     DATABASE_HOST,
@@ -78,9 +112,11 @@ export function parseConfig(env: Readonly<Record<string, string | undefined>>): 
     DATABASE_NAME,
     LOG_FORMAT,
     LOG_LEVEL,
+    CORS_ORIGINS,
   } = parsed.data;
 
   return {
+    environment: ENV,
     host: HOST,
     port: PORT,
     db: {
@@ -91,5 +127,6 @@ export function parseConfig(env: Readonly<Record<string, string | undefined>>): 
       database: DATABASE_NAME,
     },
     log: { format: LOG_FORMAT, level: logLevels[LOG_LEVEL] },
+    corsOrigins: CORS_ORIGINS,
   };
 }

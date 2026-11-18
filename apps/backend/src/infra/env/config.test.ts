@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { LogFormat } from "../logger/exports.js";
 import { LogLevel } from "@guessir/logger";
-import { logFormatOf, parseConfig } from "./config.js";
+import { Environment, environmentOf, logFormatOf, parseConfig } from "./config.js";
 
 const env = {
   DATABASE_HOST: "guessir_database",
@@ -12,8 +12,9 @@ const env = {
 };
 
 describe(parseConfig, () => {
-  it("should read the database settings and default the ports, the host and the log", () => {
+  it("should read the database settings and default the rest", () => {
     expect(parseConfig(env)).toEqual({
+      environment: Environment.Development,
       host: "0.0.0.0",
       port: 3020,
       db: {
@@ -24,6 +25,16 @@ describe(parseConfig, () => {
         database: "guessir-production",
       },
       log: { format: LogFormat.Pretty, level: LogLevel.Info },
+      corsOrigins: ["https://guessir.kk-forge.com"],
+    });
+  });
+
+  it("should take ENV, and split CORS_ORIGINS at commas", () => {
+    expect(
+      parseConfig({ ...env, ENV: "production", CORS_ORIGINS: "http://a.test, http://b.test," }),
+    ).toMatchObject({
+      environment: Environment.Production,
+      corsOrigins: ["http://a.test", "http://b.test"],
     });
   });
 
@@ -37,6 +48,7 @@ describe(parseConfig, () => {
   it.each([
     ["LOG_FORMAT", "text"],
     ["LOG_LEVEL", "verbose"],
+    ["ENV", "prod"],
   ])("should throw on the %s %j", (name, value) => {
     expect(() => parseConfig({ ...env, [name]: value })).toThrow(name);
   });
@@ -76,6 +88,17 @@ describe(parseConfig, () => {
     expect(() => parseConfig({ PORT: "port" })).toThrow(
       /PORT[\s\S]*DATABASE_HOST[\s\S]*DATABASE_USER[\s\S]*DATABASE_PASSWORD_FILE[\s\S]*DATABASE_NAME/,
     );
+  });
+});
+
+describe(environmentOf, () => {
+  it.each([
+    [{ ENV: "staging" }, Environment.Staging],
+    [{ ENV: " " }, Environment.Development],
+    [{}, Environment.Development],
+    [{ ENV: "../secrets" }, undefined],
+  ])("should read %j as the environment %s", (env, environment) => {
+    expect(environmentOf(env)).toBe(environment);
   });
 });
 

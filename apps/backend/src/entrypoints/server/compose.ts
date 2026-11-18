@@ -84,18 +84,20 @@ const exitOnDbLost = (error: unknown) => {
 
 /**
  * Builds the HTTP server and the texts feature over the database, or over `overrides.textRows`.
- * Waits until the database answers. Throws when the database stays silent, lacks a migration, or
- * holds a contract migration that the server does not know. Returns the handle without listening.
+ * Waits until the database answers. Throws when the config is invalid, the database stays silent,
+ * lacks a migration, or holds a contract migration that the server does not know. Returns the
+ * handle without listening.
  */
 export async function compose(overrides: ServerOverrides = {}): Promise<ServerHandle> {
   const clock = overrides.clock ?? systemClock;
 
   const sinkOf = (format: LogFormat) =>
     overrides.logSink ?? overrides.logSinks?.[format] ?? newLogSink(format, { clock });
-  const env = readEnv();
+  const { env, file } = readEnv();
 
   // The first sink takes the records until the config parses, so a config error is logged
   Logger.install(sinkOf(logFormatOf(env)), LogLevel.Info);
+  logger.info(file ? `Read the env file ${file}` : "Read no env file");
   const config = overrides.config ?? parseConfig(env);
   Logger.install(sinkOf(config.log.format), config.log.level);
 
@@ -104,7 +106,7 @@ export async function compose(overrides: ServerOverrides = {}): Promise<ServerHa
   let db: Db | undefined;
 
   logger.info(
-    `Config: listens on ${config.host}:${config.port}, ` +
+    `Config: ${config.environment}, listens on ${config.host}:${config.port}, ` +
       `DB ${config.db.username}@${config.db.host}:${config.db.port}/${config.db.database}`,
   );
 
@@ -129,7 +131,7 @@ export async function compose(overrides: ServerOverrides = {}): Promise<ServerHa
     })
     class ServerModule {}
 
-    const app = await newApp({ module: ServerModule });
+    const app = await newApp({ module: ServerModule, allowedOrigins: config.corsOrigins });
     const watch = new AbortController();
 
     await app.init();

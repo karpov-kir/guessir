@@ -13,18 +13,16 @@ const requestLogger = Logger.root.scope("http");
 export type AppOptions = {
   /** The Nest module that holds the controllers and their providers. */
   module: IEntryNestModule;
+  /** The web origins whose pages may call the API. */
+  allowedOrigins: string[];
 };
 
 /**
- * Creates the HTTP app of `module` with the server's headers, CORS, request log and query error
- * handling, and returns it without listening.
+ * Creates the HTTP app of `module` with the server's headers, CORS, request log and error filters,
+ * and returns it without listening.
  */
-export async function newApp({ module }: AppOptions) {
-  const allowedOrigins = new Set([
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://guessir.kk-forge.com",
-  ]);
+export async function newApp({ module, ...options }: AppOptions) {
+  const allowedOrigins = new Set(options.allowedOrigins);
   const app = await NestFactory.create<NestFastifyApplication>(
     module,
     new FastifyAdapter({
