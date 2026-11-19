@@ -2,12 +2,12 @@ import { textSkeletonSchema } from "@guessir/game";
 import { describe, expect, it, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 
-import { getElementText } from "../../../tests/utils/dom";
-import { newManualClock } from "../../../tests/utils/manualClock";
-import { newTextSkeleton } from "../../../tests/utils/textSkeleton";
-import { CreateTextApi } from "../../features/createText/exports";
-import { GameApi } from "../../features/gameLoading/exports";
-import { mountGamePage } from "./gamePage";
+import { getElementText } from "../../utils/dom";
+import { newManualClock } from "../../utils/manualClock";
+import { newTextSkeleton } from "../../utils/textSkeleton";
+import { CreateTextApi } from "../../../src/features/createText/exports";
+import { GameApi } from "../../../src/features/gameLoading/exports";
+import { mountGamePage } from "../../../src/orchestration/gamePage/exports";
 
 const clipboard = { writeText: vi.fn<(text: string) => Promise<void>>() };
 

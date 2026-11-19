@@ -116,5 +116,15 @@ run = "npm run build"
 [tasks.test]
 run = "npm test"
 
+[tasks."test:unit"]
+run = "npm run test:unit"
+
+[tasks."test:integration"]
+run = "npm run test:integration"
+
+[tasks."test:infra"]
+description = "The tests against a real Postgres, which runs in Docker"
+run = "npm run test:infra"
+
 [tasks."test:ci"]
 run = "npm run test:ci"

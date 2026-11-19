@@ -1,16 +1,16 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { silentSink } from "@guessir/logger/testing";
-import { startMigratedPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
-import { testConfig } from "../../../tests/utils/testConfig.js";
-import { compose, ServerHandle } from "./compose.js";
+import { newMigratedTestDatabase, TestDatabase } from "../../utils/postgres.js";
+import { testConfig } from "../../utils/testConfig.js";
+import { compose, ServerHandle } from "../../../src/entrypoints/server/compose.js";
 
 describe("the server over Postgres", () => {
-  let postgres: TestPostgres;
+  let postgres: TestDatabase;
   let server: ServerHandle;
 
   beforeAll(async () => {
-    postgres = await startMigratedPostgres();
+    postgres = await newMigratedTestDatabase();
     server = await compose({ config: testConfig(postgres.settings), logSink: silentSink });
     // The test config's port 0 lets the system pick a free port
     await server.start();
@@ -18,7 +18,7 @@ describe("the server over Postgres", () => {
 
   afterAll(async () => {
     await server?.stop();
-    await postgres?.stop();
+    await postgres?.drop();
   });
 
   it("should store a text and play it back", async () => {

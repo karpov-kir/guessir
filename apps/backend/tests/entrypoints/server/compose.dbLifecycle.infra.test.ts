@@ -1,21 +1,21 @@
 import { afterEach, describe, expect, it } from "vitest";
 
 import { silentSink } from "@guessir/logger/testing";
-import { startMigratedPostgres, TestPostgres } from "../../../tests/utils/postgres.js";
-import { steppingClock } from "../../../tests/utils/steppingClock.js";
-import { testConfig } from "../../../tests/utils/testConfig.js";
-import { unreachableDbConfig } from "../../../tests/utils/unreachableDbConfig.js";
-import { systemClock } from "../../infra/systemClock.js";
-import { compose, ServerHandle } from "./compose.js";
+import { newMigratedTestDatabase, TestDatabase } from "../../utils/postgres.js";
+import { steppingClock } from "../../utils/steppingClock.js";
+import { testConfig } from "../../utils/testConfig.js";
+import { unreachableDbConfig } from "../../utils/unreachableDbConfig.js";
+import { systemClock } from "../../../src/infra/systemClock.js";
+import { compose, ServerHandle } from "../../../src/entrypoints/server/compose.js";
 
 describe("the server's database lifecycle", () => {
-  let postgres: TestPostgres | undefined;
+  let postgres: TestDatabase | undefined;
   let server: ServerHandle | undefined;
   let unreachable: ReturnType<typeof unreachableDbConfig> | undefined;
 
   afterEach(async () => {
     await server?.stop();
-    await postgres?.stop();
+    await postgres?.drop();
     unreachable?.remove();
     server = undefined;
     postgres = undefined;
@@ -32,11 +32,11 @@ describe("the server's database lifecycle", () => {
   });
 
   it("should report the database lost once it has been gone for the limit", async () => {
-    postgres = await startMigratedPostgres();
-    let isDbStopped = false;
+    postgres = await newMigratedTestDatabase();
+    let isDbGone = false;
     let reportLost: (error: unknown) => void = () => {};
-    const lost = new Promise<{ error: unknown; isDbStopped: boolean }>((resolve) => {
-      reportLost = (error) => resolve({ error, isDbStopped });
+    const lost = new Promise<{ error: unknown; isDbGone: boolean }>((resolve) => {
+      reportLost = (error) => resolve({ error, isDbGone });
     });
     server = await compose({
       config: testConfig(postgres.settings),
@@ -46,19 +46,21 @@ describe("the server's database lifecycle", () => {
     });
     await server.start();
 
-    isDbStopped = true;
-    await postgres.stop();
+    isDbGone = true;
+    // Dropping the database closes the server's connections and fails every later ping, as a lost
+    // database does
+    await postgres.drop();
     postgres = undefined;
 
     const loss = await lost;
 
     // The loss comes only once the database is gone
-    expect(loss.isDbStopped).toBe(true);
+    expect(loss.isDbGone).toBe(true);
     expect(loss.error).toBeInstanceOf(Error);
   }, 120_000);
 
   it("should not report the database lost after the server has stopped", async () => {
-    postgres = await startMigratedPostgres();
+    postgres = await newMigratedTestDatabase();
     let lostCount = 0;
     server = await compose({
       config: testConfig(postgres.settings),
@@ -72,7 +74,7 @@ describe("the server's database lifecycle", () => {
 
     await server.stop();
     server = undefined;
-    await postgres.stop();
+    await postgres.drop();
     postgres = undefined;
     // The real wait spans more than the 30s loss limit on the stepping clock, about 1.5 real
     // seconds, so a watch left running would have reported the loss
