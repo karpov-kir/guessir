@@ -9,6 +9,8 @@ import { waitForDbAtStart } from "../../shared/dbWatch.js";
 const logger = Logger.root.scope("migrate");
 
 export type MigrateOverrides = {
+  /** Stands in for the process environment, so `compose` reads no env file. */
+  env?: Readonly<Record<string, string | undefined>>;
   /** Stands in for the config the environment holds. */
   config?: Config;
   clock?: Clock;
@@ -39,7 +41,7 @@ export function compose(overrides: MigrateOverrides = {}): MigrateHandle {
 
   const sinkOf = (format: LogFormat) =>
     overrides.logSink ?? overrides.logSinks?.[format] ?? newLogSink(format, { clock });
-  const { env, file } = readEnv();
+  const { env, file } = overrides.env ? { env: overrides.env, file: undefined } : readEnv();
 
   // The first sink takes the records until the config parses, so a config error is logged
   Logger.install(sinkOf(logFormatOf(env)), LogLevel.Info);

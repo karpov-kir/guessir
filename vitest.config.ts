@@ -11,7 +11,6 @@ export default defineConfig({
     reporters: ["default", ["vitest-sonar-reporter", { outputFile: "coverage/test-report.xml" }]],
     coverage: {
       include: ["{apps,packages}/*/src/**/*.ts"],
-      exclude: ["**/migrations/**"],
       reporter: ["text-summary", "lcovonly"],
       thresholds: { lines: 80, branches: 80, functions: 80, statements: 80 },
     },

@@ -1,40 +1,48 @@
-import { revealedWordsSchema, textSkeletonSchema } from "@guessir/game";
+import { CreateTextDto } from "@guessir/game";
 import { beforeEach, describe, expect, it } from "vitest";
-import { mock, MockProxy } from "vitest-mock-extended";
 
-import { newTextSkeleton } from "../../../tests/utils/textSkeleton";
-import { GameApi } from "./port";
+import { FakeApi } from "../../../tests/utils/fakeApi";
 import { loadRemoteGame } from "./loadRemoteGame";
 
-const skeleton = newTextSkeleton();
-let api: MockProxy<GameApi>;
+const text: CreateTextDto = {
+  title: "Title",
+  text: "One",
+  allowShowingFirstLetters: true,
+  allowShowingText: true,
+};
+let api: FakeApi;
 
 describe(loadRemoteGame, () => {
   beforeEach(() => {
-    api = mock<GameApi>();
+    api = new FakeApi();
   });
 
   it("should load the skeleton and play the game at the same text path", async () => {
-    api.get.mockResolvedValue(skeleton);
-    api.post.mockResolvedValue({ words: [] });
+    api.storeText(text, "text-id");
 
     const game = await loadRemoteGame(api, "text-id");
-    await game.guess("one");
 
-    expect(game.skeleton).toEqual(skeleton);
-    expect(api.get).toHaveBeenCalledWith("texts/text-id", textSkeletonSchema);
-    expect(api.post).toHaveBeenCalledWith(
-      "texts/text-id/guesses",
-      { word: "one" },
-      revealedWordsSchema,
-    );
+    await expect(game.guess("one")).resolves.toEqual([{ index: 0, word: "One" }]);
+    expect(game.skeleton).toEqual({
+      title: "Title",
+      allowShowingFirstLetters: true,
+      allowShowingText: true,
+      wordCount: 1,
+      lexemes: [{ index: 0, length: 3 }],
+    });
+    expect(api.requests).toEqual([
+      { method: "GET", path: "texts/text-id" },
+      { method: "POST", path: "texts/text-id/guesses" },
+    ]);
   });
 
   it("should keep an id from the page URL to one path segment", async () => {
-    api.get.mockResolvedValue(skeleton);
+    api.storeText(text, "../admin?x#y");
 
-    await loadRemoteGame(api, "../admin?x#y");
-
-    expect(api.get).toHaveBeenCalledWith("texts/..%2Fadmin%3Fx%23y", textSkeletonSchema);
+    await expect(loadRemoteGame(api, "../admin?x#y")).resolves.toHaveProperty(
+      "skeleton.title",
+      "Title",
+    );
+    expect(api.requests).toEqual([{ method: "GET", path: "texts/..%2Fadmin%3Fx%23y" }]);
   });
 });

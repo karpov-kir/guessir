@@ -1,11 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
+import { FakeGame } from "../../utils/fakeGame";
 import { recordTrackedEvents } from "../../utils/trackedEvents";
-import { LocalGame } from "../../../src/entities/game/exports";
 import { newPlayUseCases, PlayUseCases } from "../../../src/features/play/exports";
 import { requireElement } from "../../../src/shared/dom";
 
-let game: LocalGame;
+let game: FakeGame;
 let gameElement: HTMLElement;
 let trackedEvents: ReturnType<typeof recordTrackedEvents>;
 
@@ -44,7 +44,7 @@ const getWordTexts = () =>
 
 describe(PlayUseCases, () => {
   beforeEach(() => {
-    game = new LocalGame({
+    game = new FakeGame({
       title: "Title",
       text: "One two",
       allowShowingFirstLetters: true,
@@ -80,7 +80,7 @@ describe(PlayUseCases, () => {
   });
 
   it("should announce a word that could not be revealed", async () => {
-    vi.spyOn(game, "reveal").mockRejectedValue(new Error("Test"));
+    game.failMove("reveal");
 
     clickWord(0);
     await settle();
@@ -109,7 +109,7 @@ describe(PlayUseCases, () => {
   });
 
   it("should announce a guess that could not be checked, without counting it as a miss", async () => {
-    vi.spyOn(game, "guess").mockRejectedValue(new Error("Test"));
+    game.failMove("guess");
 
     submitGuess("one");
     await settle();
@@ -121,16 +121,12 @@ describe(PlayUseCases, () => {
   });
 
   it.each([
-    { outcome: "a miss", word: "unknown", mockGuess: () => undefined },
-    {
-      outcome: "a failure",
-      word: "one",
-      mockGuess: () => vi.spyOn(game, "guess").mockRejectedValue(new Error("Test")),
-    },
+    { outcome: "a miss", word: "unknown", prepareGame: () => undefined },
+    { outcome: "a failure", word: "one", prepareGame: () => game.failMove("guess") },
   ])(
     "should keep the guess in the input while it is checked and after $outcome",
-    async ({ word, mockGuess }) => {
-      mockGuess();
+    async ({ word, prepareGame }) => {
+      prepareGame();
 
       submitGuess(word);
       // The test checks the input before the server answers. An emptied input would show its
@@ -151,17 +147,13 @@ describe(PlayUseCases, () => {
   });
 
   it.each([
-    { outcome: "a hit", word: "one", mockGuess: () => undefined },
-    { outcome: "a miss", word: "unknown", mockGuess: () => undefined },
-    {
-      outcome: "a failure",
-      word: "one",
-      mockGuess: () => vi.spyOn(game, "guess").mockRejectedValue(new Error("Test")),
-    },
+    { outcome: "a hit", word: "one", prepareGame: () => undefined },
+    { outcome: "a miss", word: "unknown", prepareGame: () => undefined },
+    { outcome: "a failure", word: "one", prepareGame: () => game.failMove("guess") },
   ])(
     "should keep the word the player typed while the guess was checked, after $outcome",
-    async ({ word, mockGuess }) => {
-      mockGuess();
+    async ({ word, prepareGame }) => {
+      prepareGame();
 
       submitGuess(word);
       typeGuess("two");
@@ -172,15 +164,9 @@ describe(PlayUseCases, () => {
   );
 
   it("should keep a status announced while a hit was checked", async () => {
-    const guess = game.guess.bind(game);
-    const guessAnswer = Promise.withResolvers<undefined>();
+    const releaseGuess = game.holdNextMove("guess");
 
-    vi.spyOn(game, "guess").mockImplementationOnce(async (word) => {
-      await guessAnswer.promise;
-
-      return guess(word);
-    });
-    vi.spyOn(game, "reveal").mockRejectedValue(new Error("Test"));
+    game.failMove("reveal");
 
     submitGuess("one");
     clickWord(1);
@@ -188,7 +174,7 @@ describe(PlayUseCases, () => {
 
     expect(getStatus()).toBe("Could not open this word");
 
-    guessAnswer.resolve(undefined);
+    releaseGuess();
     await settle();
 
     expect(getStatus()).toBe("Could not open this word");
@@ -248,7 +234,7 @@ describe(PlayUseCases, () => {
   ] as const)(
     "should uncheck $hint and announce it when they fail to load, and show them on the next try",
     async ({ load, checkbox, status, shownClass }) => {
-      vi.spyOn(game, load).mockRejectedValueOnce(new Error("Test"));
+      game.failMove(load, 1);
 
       toggleCheckbox(checkbox);
       expect(getCheckbox(checkbox).checked).toBe(true);
@@ -279,7 +265,7 @@ describe(PlayUseCases, () => {
   });
 
   it("should not announce the failure of a hint the user left while it loaded", async () => {
-    vi.spyOn(game, "firstLetters").mockRejectedValue(new Error("Test"));
+    game.failMove("firstLetters");
 
     toggleCheckbox("#show-first-letters-checkbox");
     toggleCheckbox("#show-text-checkbox");
@@ -301,8 +287,8 @@ describe(PlayUseCases, () => {
     await settle();
     clickWord(1);
     await settle();
-    vi.spyOn(game, "guess").mockRejectedValue(new Error("Test"));
-    vi.spyOn(game, "reveal").mockRejectedValue(new Error("Test"));
+    game.failMove("guess");
+    game.failMove("reveal");
     submitGuess("two");
     clickWord(1);
     await settle();

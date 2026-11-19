@@ -1,34 +1,38 @@
-import { textSkeletonSchema } from "@guessir/game";
 import { beforeEach, describe, expect, it } from "vitest";
-import { mock, MockProxy } from "vitest-mock-extended";
 
-import { newTextSkeleton } from "../../../tests/utils/textSkeleton";
+import { FakeApi } from "../../../tests/utils/fakeApi";
 import { LocalGame } from "../../entities/game/exports";
-import { GameApi } from "./port";
 import { newGameLoadingUseCases } from "./gameLoadingUseCases";
 import { RemoteGame } from "./RemoteGame";
 
-const skeleton = newTextSkeleton();
-let api: MockProxy<GameApi>;
+let api: FakeApi;
 
 describe("GameLoadingUseCases.load", () => {
   beforeEach(() => {
-    api = mock<GameApi>();
+    api = new FakeApi();
   });
 
   it("should load the remote text the query string names", async () => {
-    api.get.mockResolvedValue(skeleton);
+    api.storeText(
+      { title: "Title", text: "One", allowShowingFirstLetters: true, allowShowingText: false },
+      "text-id",
+    );
 
     const game = await newGameLoadingUseCases({ api }).load("?textId=text-id");
 
-    expect(api.get).toHaveBeenCalledWith("texts/text-id", textSkeletonSchema);
+    expect(api.requests).toEqual([{ method: "GET", path: "texts/text-id" }]);
     expect(game).toBeInstanceOf(RemoteGame);
-    expect(game.skeleton).toEqual(skeleton);
+    expect(game.skeleton).toEqual({
+      title: "Title",
+      allowShowingFirstLetters: true,
+      allowShowingText: false,
+      wordCount: 1,
+      lexemes: [{ index: 0, length: 3 }],
+    });
   });
 
   it("should give an error text if loading the remote text fails", async () => {
-    api.get.mockRejectedValue(new Error("Test"));
-
+    // The fake API stores no text, so it answers the load with a 404.
     const game = await newGameLoadingUseCases({ api }).load("?textId=text-id");
 
     expect(game).toBeInstanceOf(LocalGame);
@@ -51,7 +55,7 @@ describe("GameLoadingUseCases.load", () => {
   it("should give the default text if the query string names no text", async () => {
     const game = await newGameLoadingUseCases({ api }).load("");
 
-    expect(api.get).not.toHaveBeenCalled();
+    expect(api.requests).toEqual([]);
     expect(game).toBeInstanceOf(LocalGame);
     expect(game.skeleton.title).toBe("Hello!");
     await expect(game.guess("order")).resolves.toEqual([{ index: 2, word: "order" }]);

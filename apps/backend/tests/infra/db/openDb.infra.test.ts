@@ -1,3 +1,7 @@
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
 import { Logger, LogLevel } from "@guessir/logger";
 import { collectLogs } from "@guessir/logger/testing";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -20,6 +24,40 @@ describe("the database on Postgres", () => {
   afterAll(async () => {
     await db?.close();
     await postgres?.drop();
+  });
+
+  describe("password file", () => {
+    let passwordDir: string;
+
+    beforeAll(() => {
+      passwordDir = mkdtempSync(join(tmpdir(), "guessir-password-"));
+    });
+
+    afterAll(() => {
+      rmSync(passwordDir, { recursive: true, force: true });
+    });
+
+    it("should connect with the password from its file, trimmed of the line end", async () => {
+      const passwordFile = join(passwordDir, "password");
+      writeFileSync(passwordFile, `${readFileSync(postgres.settings.passwordFile, "utf8")}\n`);
+      const trimmed = await openDb({ ...postgres.settings, passwordFile });
+
+      try {
+        expect(await trimmed.query<{ answer: number }[]>("SELECT 1 AS answer")).toEqual([
+          { answer: 1 },
+        ]);
+      } finally {
+        await trimmed.close();
+      }
+    });
+
+    it("should throw when the password file cannot be read", async () => {
+      const passwordFile = join(passwordDir, "missing");
+
+      await expect(openDb({ ...postgres.settings, passwordFile })).rejects.toThrow(
+        `Failed to read the database password file (${passwordFile})`,
+      );
+    });
   });
 
   it("should answer a query with its rows", async () => {

@@ -1,20 +1,21 @@
-import { revealedWordSchema, revealedWordsSchema } from "@guessir/game";
 import { beforeEach, describe, expect, it } from "vitest";
-import { mock, MockProxy } from "vitest-mock-extended";
 
+import { FakeApi } from "../../../tests/utils/fakeApi";
 import { newTextSkeleton } from "../../../tests/utils/textSkeleton";
-import { GameApi } from "./port";
 import { RemoteGame } from "./RemoteGame";
 
 const textPath = "texts/text-id";
 const skeleton = newTextSkeleton();
-const words = [{ index: 0, word: "One" }];
-let api: MockProxy<GameApi>;
+let api: FakeApi;
 let remoteGame: RemoteGame;
 
 describe(RemoteGame, () => {
   beforeEach(() => {
-    api = mock<GameApi>();
+    api = new FakeApi();
+    api.storeText(
+      { title: "Title", text: "One, one", allowShowingFirstLetters: true, allowShowingText: true },
+      "text-id",
+    );
     remoteGame = new RemoteGame({ api, textPath, skeleton });
   });
 
@@ -23,56 +24,52 @@ describe(RemoteGame, () => {
   });
 
   it("should ask the server about a guess", async () => {
-    api.post.mockResolvedValue({ words });
-
-    await expect(remoteGame.guess("one")).resolves.toEqual(words);
-    expect(api.post).toHaveBeenCalledWith(
-      `${textPath}/guesses`,
-      { word: "one" },
-      revealedWordsSchema,
-    );
+    await expect(remoteGame.guess("one")).resolves.toEqual([
+      { index: 0, word: "One" },
+      { index: 3, word: "one" },
+    ]);
+    expect(api.requests).toEqual([{ method: "POST", path: `${textPath}/guesses` }]);
   });
 
   it("should ask the server to reveal a word", async () => {
-    api.post.mockResolvedValue(words[0]);
-
-    await expect(remoteGame.reveal(0)).resolves.toEqual(words[0]);
-    expect(api.post).toHaveBeenCalledWith(`${textPath}/reveals`, { index: 0 }, revealedWordSchema);
+    await expect(remoteGame.reveal(3)).resolves.toEqual({ index: 3, word: "one" });
+    expect(api.requests).toEqual([{ method: "POST", path: `${textPath}/reveals` }]);
   });
 
   it("should ask the server for the first letters", async () => {
-    api.get.mockResolvedValue({ words });
-
-    await expect(remoteGame.firstLetters()).resolves.toEqual(words);
-    expect(api.get).toHaveBeenCalledWith(`${textPath}/first-letters`, revealedWordsSchema);
+    await expect(remoteGame.firstLetters()).resolves.toEqual([
+      { index: 0, word: "O" },
+      { index: 3, word: "o" },
+    ]);
+    expect(api.requests).toEqual([{ method: "GET", path: `${textPath}/first-letters` }]);
   });
 
   it("should ask the server for the words", async () => {
-    api.get.mockResolvedValue({ words });
-
-    await expect(remoteGame.words()).resolves.toEqual(words);
-    expect(api.get).toHaveBeenCalledWith(`${textPath}/words`, revealedWordsSchema);
+    await expect(remoteGame.words()).resolves.toEqual([
+      { index: 0, word: "One" },
+      { index: 3, word: "one" },
+    ]);
+    expect(api.requests).toEqual([{ method: "GET", path: `${textPath}/words` }]);
   });
 
   it.each(["firstLetters", "words"] as const)(
     "should ask the server for %s once and answer later calls from that answer",
     async (read) => {
-      api.get.mockResolvedValue({ words });
+      const answer = await remoteGame[read]();
 
-      await remoteGame[read]();
-      await expect(remoteGame[read]()).resolves.toEqual(words);
-      expect(api.get).toHaveBeenCalledTimes(1);
+      await expect(remoteGame[read]()).resolves.toEqual(answer);
+      expect(api.requests).toHaveLength(1);
     },
   );
 
   it.each(["firstLetters", "words"] as const)(
     "should ask the server for %s again after a failed read",
     async (read) => {
-      api.get.mockRejectedValueOnce(new Error("Test")).mockResolvedValue({ words });
+      api.failNextRequest(new Error("Test"));
 
       await expect(remoteGame[read]()).rejects.toThrow("Test");
-      await expect(remoteGame[read]()).resolves.toEqual(words);
-      expect(api.get).toHaveBeenCalledTimes(2);
+      await expect(remoteGame[read]()).resolves.toHaveLength(2);
+      expect(api.requests).toHaveLength(2);
     },
   );
 });
