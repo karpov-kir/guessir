@@ -6,7 +6,7 @@ The game is for English texts. Expand only English contractions, such as `don't`
 
 ## Usage statistics
 
-The web app sends anonymous usage statistics through `@kk-forge/artel-collector`, to the Guessir product's `site` channel in the idea-packer admin. `apps/web/src/entities/analytics/analytics.ts` lists the events. The channel's allowlist holds the same names, params and values, so a change to one needs the same change to the other. `apps/web/env/.env.development` holds the channel's test key, and `apps/web/env/.env.production` its live key.
+The web app sends anonymous usage statistics through `@kk-forge/artel-collector`, to the Guessir product's `site` channel in the Artel admin. `apps/web/src/entities/analytics/analytics.ts` lists the events. The channel's allowlist holds the same names, params and values, so a change to one needs the same change to the other. `apps/web/env/.env.development` holds the channel's test key, and `apps/web/env/.env.production` its live key.
 
 ## Database migrations
 
