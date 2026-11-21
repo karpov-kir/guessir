@@ -4,7 +4,7 @@ import { parseConfig } from "./config";
 
 const env = {
   GUESSIR_API_BASE_URL: "https://guessir-api.kk-forge.com",
-  GUESSIR_ARTEL_URL: "https://idea-packer-api.kk-forge.com/v1/public/relay",
+  GUESSIR_ARTEL_URL: "https://artel-api.kk-forge.com/v1/public/relay",
   GUESSIR_ARTEL_KEY: "site-aaaaaaaaaa",
   GUESSIR_VERSION: "1.2.3",
 };
@@ -15,7 +15,7 @@ describe(parseConfig, () => {
       apiBaseUrl: "https://guessir-api.kk-forge.com",
       analytics: {
         key: "site-aaaaaaaaaa",
-        endpoint: "https://idea-packer-api.kk-forge.com/v1/public/relay",
+        endpoint: "https://artel-api.kk-forge.com/v1/public/relay",
         version: "1.2.3",
       },
     });
