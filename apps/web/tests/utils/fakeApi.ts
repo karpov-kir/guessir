@@ -35,7 +35,7 @@ export class FakeApi implements GameApi, CreateTextApi {
 
   /** Stores `text` under `id`, or under the next free id, and returns the id. */
   storeText(text: CreateTextDto, id = `text-${this.storedTexts.size + 1}`): string {
-    this.storedTexts.set(id, { text, textGame: new TextGame(text.text) });
+    this.storedTexts.set(id, { text, textGame: new TextGame({ text: text.text }) });
 
     return id;
   }

@@ -4,11 +4,13 @@ import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 import { getElements, TextRenderer } from "./TextRenderer";
 import { WordHint } from "./WordRenderer";
 
-const textGame = new TextGame(`
+const textGame = new TextGame({
+  text: `
   One
   
   one, @ she's we'd!
-`);
+`,
+});
 const lexemes = textGame.lexemes();
 let onRevealRequest: Mock<(index: number) => void>;
 let textRenderer: TextRenderer;
@@ -54,7 +56,7 @@ describe(TextRenderer, () => {
   });
 
   it("should bind opening punctuation to the next word and leave other characters breakable", () => {
-    const game = new TextGame('He said "hi" (twice), see a/b.');
+    const game = new TextGame({ text: 'He said "hi" (twice), see a/b.' });
     const lexemesElement = new TextRenderer({ lexemes: game.lexemes(), onRevealRequest })
       .getElement()
       .querySelector("#lexemes");
@@ -82,7 +84,7 @@ describe(TextRenderer, () => {
   });
 
   it("should close a word with a quote that follows its punctuation and leave a standalone dash breakable", () => {
-    const game = new TextGame("He said \"go,\" and 'no,' - fast.");
+    const game = new TextGame({ text: "He said \"go,\" and 'no,' - fast." });
     const lexemesElement = new TextRenderer({ lexemes: game.lexemes(), onRevealRequest })
       .getElement()
       .querySelector("#lexemes");
