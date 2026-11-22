@@ -72,7 +72,7 @@ const NORMALIZED_CONTRACTION_TO_NORMALIZED_NORMAL = new Map<
  * Returns `newNormalizedLexeme` with its first letter in upper case when `originalLexeme` starts
  * with that letter in upper case.
  */
-export function syncCase(
+function syncCase(
   originalLexeme: PrimitiveLexemeNominal | NormalizedPrimitiveLexemeNominal,
   newNormalizedLexeme: NormalizedPrimitiveLexemeNominal,
 ) {
@@ -141,16 +141,14 @@ export function isWordCharacter(normalizedPrimitiveLexeme: NormalizedPrimitiveLe
   return isLetter(normalizedPrimitiveLexeme) || isWordHelpingCharacter(normalizedPrimitiveLexeme);
 }
 
-export function isLetter(normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal) {
+function isLetter(normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal) {
   return (
     LETTER_RE.test(normalizedPrimitiveLexeme) &&
     !VARIATION_SELECTOR_RE.test(normalizedPrimitiveLexeme)
   );
 }
 
-export function isWordHelpingCharacter(
-  normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal,
-) {
+function isWordHelpingCharacter(normalizedPrimitiveLexeme: NormalizedPrimitiveLexemeNominal) {
   return (
     NORMALIZED_CONTRACTION_CHARACTERS.has(normalizedPrimitiveLexeme) ||
     NORMALIZED_WORD_SEPARATION_CHARACTERS.has(normalizedPrimitiveLexeme)

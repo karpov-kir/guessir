@@ -56,7 +56,7 @@ const connectionOptions = ({ host, port, username, passwordFile, database }: DbS
 });
 
 /** Returns TypeORM's options for the database `settings` names, reading its password file. */
-export const getTypeOrmConfig = (settings: DbSettings): DataSourceOptions => ({
+const getTypeOrmConfig = (settings: DbSettings): DataSourceOptions => ({
   ...connectionOptions(settings),
   // Umzug migrations in `applyDbMigrations` own the schema, so TypeORM must not.
   synchronize: false,
