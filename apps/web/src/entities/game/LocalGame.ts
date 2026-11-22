@@ -8,7 +8,7 @@ export class LocalGame implements Game {
   private readonly textGame: TextGame;
 
   constructor({ text, ...details }: CreateTextDto) {
-    this.textGame = new TextGame(text);
+    this.textGame = new TextGame({ text });
     this.skeleton = {
       ...details,
       wordCount: this.textGame.wordCount,

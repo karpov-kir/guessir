@@ -116,7 +116,7 @@ export class TextsUseCases {
       throw new TextNotFoundError(id);
     }
 
-    const playedText = { text, textGame: new TextGame(text.text) };
+    const playedText = { text, textGame: new TextGame({ text: text.text }) };
 
     this.playedTexts.set(id, playedText);
 

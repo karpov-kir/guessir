@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { TextGame } from "./TextGame.js";
 
-const textGame = new TextGame("One, she's\none!");
+const textGame = new TextGame({ text: "One, she's\none!" });
 
 describe(TextGame, () => {
   it("should give the length of every word and the character of every other lexeme", () => {
@@ -18,7 +18,7 @@ describe(TextGame, () => {
   });
 
   it("should keep at most two line breaks and one space in a row, and no space before a break", () => {
-    expect(new TextGame("One  \n\n\n\ntwo   three").lexemes()).toEqual([
+    expect(new TextGame({ text: "One  \n\n\n\ntwo   three" }).lexemes()).toEqual([
       { index: 0, length: 3 },
       { index: 1, character: "\n" },
       { index: 2, character: "\n" },
@@ -29,7 +29,7 @@ describe(TextGame, () => {
   });
 
   it("should start the text at its first word and drop the space before punctuation and at the end", () => {
-    expect(new TextGame("  ^One , two .\n ").lexemes()).toEqual([
+    expect(new TextGame({ text: "  ^One , two .\n " }).lexemes()).toEqual([
       { index: 0, length: 3 },
       { index: 1, character: "," },
       { index: 2, character: " " },
@@ -39,14 +39,14 @@ describe(TextGame, () => {
   });
 
   it("should read an em dash inside a word as a hyphen and a lone i as I", () => {
-    expect(new TextGame("re—g i").words()).toEqual([
+    expect(new TextGame({ text: "re—g i" }).words()).toEqual([
       { index: 0, word: "re-g" },
       { index: 2, word: "I" },
     ]);
   });
 
   it("should split a contraction into its words with a space, and keep a lone hyphen out of the words", () => {
-    expect(new TextGame("So don't - go").lexemes()).toEqual([
+    expect(new TextGame({ text: "So don't - go" }).lexemes()).toEqual([
       { index: 0, length: 2 },
       { index: 1, character: " " },
       { index: 2, length: 2 },
@@ -60,7 +60,9 @@ describe(TextGame, () => {
   });
 
   it("should reveal a contraction with 'd by its first word", () => {
-    expect(new TextGame("So she'd go").guess("she")).toEqual([{ index: 2, word: "she'd" }]);
+    expect(new TextGame({ text: "So she'd go" }).guess("she")).toEqual([
+      { index: 2, word: "she'd" },
+    ]);
   });
 
   it("should count the words", () => {
@@ -83,7 +85,7 @@ describe(TextGame, () => {
   });
 
   it("should reveal nothing for a blank guess, even next to a bare contraction ending", () => {
-    expect(new TextGame("The boy 's here").guess(" ")).toEqual([]);
+    expect(new TextGame({ text: "The boy 's here" }).guess(" ")).toEqual([]);
   });
 
   it("should reveal a word by its index", () => {
@@ -114,7 +116,7 @@ describe(TextGame, () => {
 describe("an English text with words from other languages", () => {
   /** Returns the words of `text` and what each guess finds. */
   const play = (text: string, guesses: string[]) => {
-    const game = new TextGame(text);
+    const game = new TextGame({ text });
 
     return {
       words: game.words().map(({ word }) => word),
@@ -130,9 +132,9 @@ describe("an English text with words from other languages", () => {
   });
 
   it("should read a letter typed as a base and a combining mark as the one letter a guess types", () => {
-    const game = new TextGame("A cafe\u0301 here");
+    const game = new TextGame({ text: "A cafe\u0301 here" });
 
-    expect(game.lexemes()).toEqual(new TextGame("A café here").lexemes());
+    expect(game.lexemes()).toEqual(new TextGame({ text: "A café here" }).lexemes());
     expect(game.guess("café")).toEqual([{ index: 2, word: "café" }]);
     expect(game.guess("cafe\u0301")).toEqual([{ index: 2, word: "café" }]);
   });
@@ -145,12 +147,15 @@ describe("an English text with words from other languages", () => {
   });
 
   it("should keep an emoji's variation selector and keycap mark out of words, as before", () => {
-    expect(new TextGame("I ❤️ NY").words().map(({ word }) => word)).toEqual(["I", "Ny"]);
-    expect(new TextGame("Press 1️⃣ now").words().map(({ word }) => word)).toEqual(["Press", "now"]);
+    expect(new TextGame({ text: "I ❤️ NY" }).words().map(({ word }) => word)).toEqual(["I", "Ny"]);
+    expect(new TextGame({ text: "Press 1️⃣ now" }).words().map(({ word }) => word)).toEqual([
+      "Press",
+      "now",
+    ]);
   });
 
   it("should leave digits out of words, as before", () => {
-    expect(new TextGame("In 2026").lexemes()).toEqual([
+    expect(new TextGame({ text: "In 2026" }).lexemes()).toEqual([
       { index: 0, length: 2 },
       { index: 1, character: " " },
       { index: 2, character: "2" },
@@ -187,7 +192,7 @@ describe("a text with contractions", () => {
     ["they've", "they have"],
     ["they'll", "they will"],
   ])("should spell %s as %s", (contraction, words) => {
-    expect(new TextGame(`So ${contraction} go`).words().map(({ word }) => word)).toEqual([
+    expect(new TextGame({ text: `So ${contraction} go` }).words().map(({ word }) => word)).toEqual([
       "So",
       ...words.split(" "),
       "go",
@@ -202,7 +207,7 @@ describe("a text that starts with a contraction", () => {
     ["We'll", ["We", "will"]],
     ["They're", ["They", "are"]],
   ])("should capitalise only the first word of %s", (contraction, words) => {
-    expect(new TextGame(`${contraction} go`).words().map(({ word }) => word)).toEqual([
+    expect(new TextGame({ text: `${contraction} go` }).words().map(({ word }) => word)).toEqual([
       ...words,
       "go",
     ]);
