@@ -1,5 +1,5 @@
 import type { Collector } from "@kk-forge/artel-collector";
-import { trackPageViews } from "@kk-forge/artel-collector/web";
+import { trackPageViews } from "@kk-forge/artel-collector/infra";
 
 import {
   newThemeUseCases,

@@ -1,5 +1,5 @@
 import { type Collector, Mode } from "@kk-forge/artel-collector";
-import { newWebCollector } from "@kk-forge/artel-collector/web";
+import { newWebCollector } from "@kk-forge/artel-collector/infra";
 import { Logger } from "@guessir/logger";
 
 const logger = Logger.root.scope("analytics");

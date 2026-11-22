@@ -1,6 +1,6 @@
 {
   "name": "@guessir/web",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "type": "module",
   "scripts": {
     "build": "npm run clean && vite build",
@@ -12,7 +12,7 @@
   "dependencies": {
     "@guessir/game": "*",
     "@guessir/logger": "*",
-    "@kk-forge/artel-collector": "^0.5.0",
+    "@kk-forge/artel-collector": "^0.6.0",
     "url-join": "^6.0.0",
     "zod": "^4.6.7"
   }
