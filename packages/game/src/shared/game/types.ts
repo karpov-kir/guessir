@@ -9,7 +9,7 @@ const index = z.number().int().nonnegative();
  * character. The server sends no word text here, so a player cannot read the hidden words in the
  * browser.
  */
-export const skeletonLexemeSchema = z.union([
+const skeletonLexemeSchema = z.union([
   z.object({ index, length: z.number().int().positive() }),
   z.object({ index, character: z.string() }),
 ]);
