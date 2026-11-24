@@ -1,4 +1,4 @@
-import type { Clock } from "#/shared/Clock.js";
+import type { Clock } from "#src/shared/Clock.js";
 import type { LogSink } from "@guessir/logger";
 import { newConsoleSink } from "@guessir/logger/infra";
 

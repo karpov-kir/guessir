@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { getElementText } from "#tests/utils/dom.js";
 import { ScoreRenderer } from "./ScoreRenderer";
-import { requireElement } from "#/shared/dom.js";
+import { requireElement } from "#src/shared/dom.js";
 
 let scoreRenderer: ScoreRenderer;
 

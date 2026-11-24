@@ -1,7 +1,7 @@
 import { RevealedWord, SkeletonLexeme } from "@guessir/game";
 
-import { newElement, requireElement } from "#/shared/dom.js";
-import { ChildRenderer } from "#/features/play/ChildRenderer.js";
+import { newElement, requireElement } from "#src/shared/dom.js";
+import { ChildRenderer } from "#src/features/play/ChildRenderer.js";
 import { WordHint, WordRenderer } from "./WordRenderer";
 
 type TextRendererOptions = {

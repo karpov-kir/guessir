@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import type { DbSettings } from "#/infra/db/exports.js";
-import { LogFormat } from "#/infra/logger/exports.js";
+import type { DbSettings } from "#src/infra/db/exports.js";
+import { LogFormat } from "#src/infra/logger/exports.js";
 import { LogLevel } from "@guessir/logger";
 
 export enum Environment {

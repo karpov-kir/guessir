@@ -1,4 +1,4 @@
-import { type LogLevel, type LogRecord, type LogSink } from "#/shared/Logger.js";
+import { type LogLevel, type LogRecord, type LogSink } from "#src/shared/Logger.js";
 
 type LogLine = Extract<LogRecord, { kind: "line" }>;
 

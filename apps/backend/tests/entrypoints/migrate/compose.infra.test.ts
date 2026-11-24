@@ -6,8 +6,8 @@ import { steppingClock } from "#tests/utils/steppingClock.js";
 import { testConfig } from "#tests/utils/testConfig.js";
 import { unreachableDbConfig } from "#tests/utils/unreachableDbConfig.js";
 import { LogLevel, type LogSink } from "@guessir/logger";
-import { compose as composeServer, ServerHandle } from "#/entrypoints/server/compose.js";
-import { compose } from "#/entrypoints/migrate/compose.js";
+import { compose as composeServer, ServerHandle } from "#src/entrypoints/server/compose.js";
+import { compose } from "#src/entrypoints/migrate/compose.js";
 
 describe("the migrate step", () => {
   let postgres: TestDatabase | undefined;

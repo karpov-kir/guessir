@@ -2,7 +2,7 @@
   "name": "@guessir/logger",
   "type": "module",
   "imports": {
-    "#/*": {
+    "#src/*": {
       "source": "./src/*",
       "default": "./dist/*"
     }

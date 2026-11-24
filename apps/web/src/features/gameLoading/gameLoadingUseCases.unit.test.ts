@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { FakeApi } from "#tests/utils/fakeApi.js";
-import { LocalGame } from "#/entities/game/exports.js";
+import { LocalGame } from "#src/entities/game/exports.js";
 import { newGameLoadingUseCases } from "./gameLoadingUseCases";
 import { RemoteGame } from "./RemoteGame";
 

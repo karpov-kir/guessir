@@ -5,8 +5,8 @@ import { newMigratedTestDatabase, TestDatabase } from "#tests/utils/postgres.js"
 import { steppingClock } from "#tests/utils/steppingClock.js";
 import { testConfig } from "#tests/utils/testConfig.js";
 import { unreachableDbConfig } from "#tests/utils/unreachableDbConfig.js";
-import { systemClock } from "#/infra/systemClock.js";
-import { compose, ServerHandle } from "#/entrypoints/server/compose.js";
+import { systemClock } from "#src/infra/systemClock.js";
+import { compose, ServerHandle } from "#src/entrypoints/server/compose.js";
 
 describe("the server's database lifecycle", () => {
   let postgres: TestDatabase | undefined;

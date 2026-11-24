@@ -2,7 +2,7 @@
   "name": "@guessir/game",
   "type": "module",
   "imports": {
-    "#/*": {
+    "#src/*": {
       "source": "./src/*",
       "default": "./dist/*"
     }

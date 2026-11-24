@@ -1,4 +1,4 @@
-import { type MigrationFn, MigrationKind } from "#/infra/db/migrationFile.js";
+import { type MigrationFn, MigrationKind } from "#src/infra/db/migrationFile.js";
 
 // This migration changes rows and no column, and the earlier code reads the texts that remain as
 // before

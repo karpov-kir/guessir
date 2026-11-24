@@ -2,15 +2,15 @@ import { createTextLimits } from "@guessir/game";
 
 import "./CreateTextRenderer.css";
 import copyIcon from "./copyIcon.svg?raw";
-import { newElement, onChangeAndEnter } from "#/shared/dom.js";
-import { icon } from "#/shared/icon.js";
-import { AnalyticsEvents } from "#/entities/analytics/exports.js";
-import { track } from "#/shared/analytics.js";
-import { textUrl } from "#/entities/textLink/exports.js";
+import { newElement, onChangeAndEnter } from "#src/shared/dom.js";
+import { icon } from "#src/shared/icon.js";
+import { AnalyticsEvents } from "#src/entities/analytics/exports.js";
+import { track } from "#src/shared/analytics.js";
+import { textUrl } from "#src/entities/textLink/exports.js";
 import { createText } from "./createText";
 import { getElements } from "./formElements";
 import type { ClipboardWriter, CreateTextApi } from "./port";
-import type { Clock } from "#/shared/Clock.js";
+import type { Clock } from "#src/shared/Clock.js";
 import { Logger } from "@guessir/logger";
 
 const logger = Logger.root.scope("createText");

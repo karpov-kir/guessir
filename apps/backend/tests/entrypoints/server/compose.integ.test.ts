@@ -3,11 +3,11 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { collectLogs } from "@guessir/logger/testing";
 import { fakeTextRows, type FakeTextRows } from "#tests/utils/fakeTextRows.js";
 import { testConfig } from "#tests/utils/testConfig.js";
-import { Text } from "#/features/texts/exports.js";
-import { QueryError } from "#/infra/db/exports.js";
-import { version } from "#/infra/version.js";
+import { Text } from "#src/features/texts/exports.js";
+import { QueryError } from "#src/infra/db/exports.js";
+import { version } from "#src/infra/version.js";
 import { LogLevel } from "@guessir/logger";
-import { compose, ServerHandle } from "#/entrypoints/server/compose.js";
+import { compose, ServerHandle } from "#src/entrypoints/server/compose.js";
 
 const text: Text = {
   id: "text-id",

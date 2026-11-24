@@ -7,7 +7,7 @@ import { collectLogs } from "@guessir/logger/testing";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { newMigratedTestDatabase, TestDatabase } from "#tests/utils/postgres.js";
-import { Db, newDbPing, openDb, QueryError } from "#/infra/db/exports.js";
+import { Db, newDbPing, openDb, QueryError } from "#src/infra/db/exports.js";
 
 const hiddenTitle = "the hidden text";
 const hiddenTextId = "hidden".padEnd(20, "x");

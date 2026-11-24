@@ -3,7 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { silentSink } from "@guessir/logger/testing";
 import { newMigratedTestDatabase, TestDatabase } from "#tests/utils/postgres.js";
 import { testConfig } from "#tests/utils/testConfig.js";
-import { compose, ServerHandle } from "#/entrypoints/server/compose.js";
+import { compose, ServerHandle } from "#src/entrypoints/server/compose.js";
 
 describe("the server over Postgres", () => {
   let postgres: TestDatabase;

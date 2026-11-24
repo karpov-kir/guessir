@@ -5,7 +5,7 @@ import { createServer, type IncomingMessage, type Server } from "node:http";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { z } from "zod";
 
-import { FetchHttpClient } from "#/infra/fetchHttp.js";
+import { FetchHttpClient } from "#src/infra/fetchHttp.js";
 
 const idSchema = z.object({ id: z.string() });
 const wordsSchema = z.object({ words: z.array(z.string()) });

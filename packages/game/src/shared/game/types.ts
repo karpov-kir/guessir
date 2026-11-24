@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { codePointString } from "#/shared/strings.js";
+import { codePointString } from "#src/shared/strings.js";
 
 const index = z.number().int().nonnegative();
 

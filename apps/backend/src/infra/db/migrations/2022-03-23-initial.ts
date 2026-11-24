@@ -1,4 +1,4 @@
-import { type MigrationFn, MigrationKind } from "#/infra/db/migrationFile.js";
+import { type MigrationFn, MigrationKind } from "#src/infra/db/migrationFile.js";
 
 // This migration only creates the table and its index
 export const kind = MigrationKind.Expand;

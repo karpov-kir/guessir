@@ -1,4 +1,4 @@
-import type { SystemThemeQuery } from "#/features/theme/exports.js";
+import type { SystemThemeQuery } from "#src/features/theme/exports.js";
 
 /** Means the system's theme, which a test switches with `change`. */
 export type FakeSystemTheme = SystemThemeQuery & { change(matches: boolean): void };

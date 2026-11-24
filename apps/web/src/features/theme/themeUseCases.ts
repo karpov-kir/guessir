@@ -1,6 +1,6 @@
 import moonIcon from "./moonIcon.svg?raw";
 import sunIcon from "./sunIcon.svg?raw";
-import { icon } from "#/shared/icon.js";
+import { icon } from "#src/shared/icon.js";
 import type { SystemThemeQuery, ThemeStorage } from "./port";
 
 const Theme = {
