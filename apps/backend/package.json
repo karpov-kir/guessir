@@ -3,11 +3,14 @@
   "version": "1.0.16",
   "type": "module",
   "imports": {
-    "#/*": "./src/*",
+    "#/*": {
+      "source": "./src/*",
+      "default": "./dist/*"
+    },
     "#tests/*": "./tests/*"
   },
   "scripts": {
-    "build": "npm run clean && tsc -b tsconfig.build.json && node ../../writeDistImports.ts dist ../../packages/game/dist ../../packages/logger/dist",
+    "build": "npm run clean && tsc -b tsconfig.build.json",
     "clean": "del-cli ./dist ./tsconfig.build.tsbuildinfo",
     "start": "node ./dist/entrypoints/server/start.js",
     "db:migrate": "node ./dist/entrypoints/migrate/start.js",

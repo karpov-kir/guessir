@@ -1,1 +1,1 @@
-export { newConsoleSink } from "./logger/consoleSink.js";
+export { newConsoleSink } from "./logger/exports.js";

@@ -2,7 +2,10 @@
   "name": "@guessir/logger",
   "type": "module",
   "imports": {
-    "#/*": "./src/*"
+    "#/*": {
+      "source": "./src/*",
+      "default": "./dist/*"
+    }
   },
   "exports": {
     ".": {
@@ -22,7 +25,7 @@
     }
   },
   "scripts": {
-    "build": "npm run clean && tsc -b tsconfig.build.json && node ../../writeDistImports.ts",
+    "build": "npm run clean && tsc -b tsconfig.build.json",
     "clean": "del-cli ./dist ./tsconfig.build.tsbuildinfo"
   }
 }
