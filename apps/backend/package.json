@@ -7,7 +7,7 @@
     "#tests/*": "./tests/*"
   },
   "scripts": {
-    "build": "npm run clean && tsc -b tsconfig.build.json",
+    "build": "npm run clean && tsc -b tsconfig.build.json && node ../../writeDistImports.ts dist ../../packages/game/dist ../../packages/logger/dist",
     "clean": "del-cli ./dist ./tsconfig.build.tsbuildinfo",
     "start": "node ./dist/entrypoints/server/start.js",
     "db:migrate": "node ./dist/entrypoints/migrate/start.js",

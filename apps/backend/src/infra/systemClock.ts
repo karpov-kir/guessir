@@ -1,6 +1,6 @@
 import { setTimeout } from "node:timers/promises";
 
-import type { Clock } from "../shared/Clock.js";
+import type { Clock } from "#/shared/Clock.js";
 
 /** Tells the system time and waits on Node's timers. */
 export const systemClock: Clock = {

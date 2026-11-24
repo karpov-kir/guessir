@@ -6,7 +6,9 @@ The game is for English texts. Expand only English contractions, such as `don't`
 
 ## Imports
 
-Each app and package names its own `src/` as `#/` through `imports` in its `package.json`, and an app names its `tests/` as `#tests/`. Such an import ends in `.js`, since a subpath pattern gets no extension added. The web, which Vite bundles, imports that way everywhere. The backend, `game` and `logger` run as the tsc output in `dist/`, where Node would resolve `#/` into `src/`, so their source keeps relative imports and only their tests use `#/` and `#tests/`.
+Each app and package names its own `src/` as `#/` through `imports` in its `package.json`, and an app names its `tests/` as `#tests/`. Such an import ends in `.js`, since a subpath pattern gets no extension added. A file reaches another folder only that way, and its own folder through `./`.
+
+The backend, `game` and `logger` run in Node as the tsc output in `dist/`. Each build writes `dist/package.json` with `"#/*": "./*"`, so `#/` there names `dist/`. Each export of a package points at `dist/`, and its `source` condition at `src/`. tsc, Vite and Vitest ask for `source`, so a type check, the web build and the tests need no package build.
 
 ## Usage statistics
 

@@ -2,11 +2,8 @@
   "compilerOptions": {
     "noEmit": true,
     "noImplicitReturns": true,
-    "paths": {
-      "@guessir/game": ["./packages/game/src/shared/exports.ts"],
-      "@guessir/logger": ["./packages/logger/src/shared/exports.ts"],
-      "@guessir/logger/infra": ["./packages/logger/src/infra/exports.ts"],
-      "@guessir/logger/testing": ["./packages/logger/src/testing/exports.ts"]
-    }
+    // Resolves the repository's packages to their sources, through the "source" condition of
+    // their exports, so a type check needs no package build
+    "customConditions": ["source"]
   }
 }

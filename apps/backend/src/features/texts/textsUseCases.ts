@@ -6,8 +6,8 @@ import {
   TextSkeleton,
 } from "@guessir/game";
 
-import type { IdGenerator } from "../../shared/IdGenerator.js";
-import { LruCache } from "../../shared/LruCache.js";
+import type { IdGenerator } from "#/shared/IdGenerator.js";
+import { LruCache } from "#/shared/LruCache.js";
 import type { Text, TextRows } from "./port.js";
 import { HintNotAllowedError, NewText, TextNotFoundError, WordNotFoundError } from "./types.js";
 
