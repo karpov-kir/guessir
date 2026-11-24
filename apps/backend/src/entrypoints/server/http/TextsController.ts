@@ -13,7 +13,7 @@ import {
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from "@nestjs/common";
 
 import { ZodBodyPipe } from "./ZodBodyPipe.js";
-import { TextsUseCases } from "#/features/texts/exports.js";
+import { TextsUseCases } from "#src/features/texts/exports.js";
 
 /**
  * Serves the texts over HTTP. The game rules live in the texts feature; this controller maps routes

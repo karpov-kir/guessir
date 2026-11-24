@@ -2,7 +2,7 @@
 // tests cover the server, and dbWatch's tests cover the waiting.
 /* v8 ignore start */
 
-import { errorText } from "#/shared/errorText.js";
+import { errorText } from "#src/shared/errorText.js";
 import { Logger } from "@guessir/logger";
 import { compose, type ServerHandle } from "./compose.js";
 import { stopOnSignals } from "./stopOnSignals.js";

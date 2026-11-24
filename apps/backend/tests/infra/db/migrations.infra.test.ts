@@ -2,8 +2,8 @@ import { createTextDtoSchema } from "@guessir/game";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { newTestDatabase, TestDatabase } from "#tests/utils/postgres.js";
-import { Db, openDb, QueryError } from "#/infra/db/exports.js";
-import { errorText } from "#/shared/errorText.js";
+import { Db, openDb, QueryError } from "#src/infra/db/exports.js";
+import { errorText } from "#src/shared/errorText.js";
 
 interface Row {
   id: string;

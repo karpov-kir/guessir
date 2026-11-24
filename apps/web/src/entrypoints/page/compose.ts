@@ -5,17 +5,22 @@ import {
   newThemeUseCases,
   type SystemThemeQuery,
   type ThemeStorage,
-} from "#/features/theme/exports.js";
-import { browserStorage, pageLocation, systemClipboard, systemDarkTheme } from "#/infra/browser.js";
-import { newAnalytics } from "#/infra/analytics.js";
-import { readEnv } from "#/infra/env.js";
-import { FetchHttpClient } from "#/infra/fetchHttp.js";
-import { systemClock } from "#/infra/systemClock.js";
-import type { Clock } from "#/shared/Clock.js";
-import { bindTrack } from "#/shared/analytics.js";
+} from "#src/features/theme/exports.js";
+import {
+  browserStorage,
+  pageLocation,
+  systemClipboard,
+  systemDarkTheme,
+} from "#src/infra/browser.js";
+import { newAnalytics } from "#src/infra/analytics.js";
+import { readEnv } from "#src/infra/env.js";
+import { FetchHttpClient } from "#src/infra/fetchHttp.js";
+import { systemClock } from "#src/infra/systemClock.js";
+import type { Clock } from "#src/shared/Clock.js";
+import { bindTrack } from "#src/shared/analytics.js";
 import { Logger, LogLevel, type LogSink } from "@guessir/logger";
 import { newConsoleSink } from "@guessir/logger/infra";
-import { type GamePageDependencies, mountGamePage } from "#/orchestration/gamePage/exports.js";
+import { type GamePageDependencies, mountGamePage } from "#src/orchestration/gamePage/exports.js";
 import { type PageConfig, parseConfig } from "./config";
 
 export type PageOverrides = Partial<

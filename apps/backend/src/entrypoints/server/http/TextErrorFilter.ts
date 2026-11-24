@@ -5,7 +5,7 @@ import {
   HintNotAllowedError,
   TextNotFoundError,
   WordNotFoundError,
-} from "#/features/texts/exports.js";
+} from "#src/features/texts/exports.js";
 
 /** Answers the texts feature's errors with the HTTP status each one means. */
 @Catch(TextNotFoundError, WordNotFoundError, HintNotAllowedError)

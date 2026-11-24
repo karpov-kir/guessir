@@ -5,7 +5,7 @@ import { join } from "node:path";
 
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 
-import type { DbSettings } from "#/infra/db/exports.js";
+import type { DbSettings } from "#src/infra/db/exports.js";
 
 // The same Postgres major as the server's stack
 const image = "postgres:18";

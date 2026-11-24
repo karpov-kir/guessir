@@ -5,10 +5,10 @@ import { collectLogs, silentSink } from "@guessir/logger/testing";
 import { FakeApi } from "#tests/utils/fakeApi.js";
 import { fakeSystemTheme } from "#tests/utils/fakeSystemTheme.js";
 import { FakeClipboard } from "#tests/utils/fakeClipboard.js";
-import { AnalyticsEvents } from "#/entities/analytics/exports.js";
-import { track } from "#/shared/analytics.js";
+import { AnalyticsEvents } from "#src/entities/analytics/exports.js";
+import { track } from "#src/shared/analytics.js";
 import { Logger, LogLevel } from "@guessir/logger";
-import { compose } from "#/entrypoints/page/compose.js";
+import { compose } from "#src/entrypoints/page/compose.js";
 
 const config = {
   apiBaseUrl: "https://api.guessir.test",
