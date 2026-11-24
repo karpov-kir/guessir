@@ -1,4 +1,4 @@
-import type { IdGenerator } from "../../src/shared/IdGenerator.js";
+import type { IdGenerator } from "#/shared/IdGenerator.js";
 
 /** Makes ids from a counter, padded to the length asked for, so a test can predict each one. */
 export function fakeIds(): IdGenerator {

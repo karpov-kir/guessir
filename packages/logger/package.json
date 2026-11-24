@@ -1,16 +1,25 @@
 {
   "name": "@guessir/logger",
   "type": "module",
+  "imports": {
+    "#/*": {
+      "source": "./src/*",
+      "default": "./dist/*"
+    }
+  },
   "exports": {
     ".": {
+      "source": "./src/shared/exports.ts",
       "types": "./dist/shared/exports.d.ts",
       "default": "./dist/shared/exports.js"
     },
     "./infra": {
+      "source": "./src/infra/exports.ts",
       "types": "./dist/infra/exports.d.ts",
       "default": "./dist/infra/exports.js"
     },
     "./testing": {
+      "source": "./src/testing/exports.ts",
       "types": "./dist/testing/exports.d.ts",
       "default": "./dist/testing/exports.js"
     }

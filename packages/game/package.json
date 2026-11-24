@@ -1,8 +1,15 @@
 {
   "name": "@guessir/game",
   "type": "module",
+  "imports": {
+    "#/*": {
+      "source": "./src/*",
+      "default": "./dist/*"
+    }
+  },
   "exports": {
     ".": {
+      "source": "./src/shared/exports.ts",
       "types": "./dist/shared/exports.d.ts",
       "default": "./dist/shared/exports.js"
     }

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { getElementText } from "../../utils/dom";
-import { FakeApi } from "../../utils/fakeApi";
-import { FakeClipboard } from "../../utils/fakeClipboard";
-import { newManualClock } from "../../utils/manualClock";
-import { mountGamePage } from "../../../src/orchestration/gamePage/exports";
+import { getElementText } from "#tests/utils/dom.js";
+import { FakeApi } from "#tests/utils/fakeApi.js";
+import { FakeClipboard } from "#tests/utils/fakeClipboard.js";
+import { newManualClock } from "#tests/utils/manualClock.js";
+import { mountGamePage } from "#/orchestration/gamePage/exports.js";
 
 describe(mountGamePage, () => {
   it("should render the game into the page's main column, with the create-text form below it", async () => {

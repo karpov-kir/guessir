@@ -1,5 +1,5 @@
-import type { Db } from "../../../infra/db/exports.js";
-import type { Text, TextRows } from "../port.js";
+import type { Db } from "#/infra/db/exports.js";
+import type { Text, TextRows } from "#/features/texts/port.js";
 
 /** Means one row of the `texts` table, without the columns the database fills in itself. */
 type TextRow = {

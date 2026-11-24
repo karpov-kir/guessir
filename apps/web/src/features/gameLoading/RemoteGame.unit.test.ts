@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { FakeApi } from "../../../tests/utils/fakeApi";
-import { newTextSkeleton } from "../../../tests/utils/textSkeleton";
+import { FakeApi } from "#tests/utils/fakeApi.js";
+import { newTextSkeleton } from "#tests/utils/textSkeleton.js";
 import { RemoteGame } from "./RemoteGame";
 
 const textPath = "texts/text-id";

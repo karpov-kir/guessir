@@ -1,7 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from "@nestjs/common";
 import type { FastifyReply } from "fastify";
 
-import { QueryError } from "../../../infra/db/exports.js";
+import { QueryError } from "#/infra/db/exports.js";
 import { Logger } from "@guessir/logger";
 
 /**

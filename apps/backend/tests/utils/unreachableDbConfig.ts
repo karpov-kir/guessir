@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import type { Config } from "../../src/infra/env/exports.js";
+import type { Config } from "#/infra/env/exports.js";
 import { testConfig } from "./testConfig.js";
 
 /**

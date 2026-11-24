@@ -1,4 +1,4 @@
-import type { Clock } from "../../src/shared/Clock";
+import type { Clock } from "#/shared/Clock.js";
 
 /** Returns a clock whose time moves only when a test calls `advance`, which runs the timers due. */
 export function newManualClock(start = 0): { clock: Clock; advance(ms: number): void } {

@@ -1,4 +1,8 @@
-import { analyze, isLexemeOtherCharacter, type LexemeAnalysis } from "../lexemeAnalyzer/exports.js";
+import {
+  analyze,
+  isLexemeOtherCharacter,
+  type LexemeAnalysis,
+} from "#/shared/lexemeAnalyzer/exports.js";
 import { RevealedWord, SkeletonLexeme } from "./types.js";
 
 /** Holds the raw text a game is played over, which the game trims and normalizes itself. */

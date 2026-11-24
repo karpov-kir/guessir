@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 import { WordHint, WordRenderer } from "./WordRenderer";
-import { requireElement } from "../../../shared/dom";
+import { requireElement } from "#/shared/dom.js";
 
 let onRevealRequest: Mock<(index: number) => void>;
 let wordRenderer: WordRenderer;

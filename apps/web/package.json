@@ -2,6 +2,10 @@
   "name": "@guessir/web",
   "version": "1.1.1",
   "type": "module",
+  "imports": {
+    "#/*": "./src/*",
+    "#tests/*": "./tests/*"
+  },
   "scripts": {
     "build": "npm run clean && vite build",
     "clean": "del-cli ./dist",
