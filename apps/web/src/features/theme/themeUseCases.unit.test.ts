@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { fakeSystemTheme } from "../../../tests/utils/fakeSystemTheme";
+import { fakeSystemTheme } from "#tests/utils/fakeSystemTheme.js";
 import { newThemeUseCases, ThemeUseCases, type ThemeUseCasesOptions } from "./themeUseCases";
 
 let root: HTMLElement;

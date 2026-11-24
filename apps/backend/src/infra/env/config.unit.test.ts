@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { LogFormat } from "../logger/exports.js";
+import { LogFormat } from "#/infra/logger/exports.js";
 import { LogLevel } from "@guessir/logger";
 import { Environment, environmentOf, logFormatOf, parseConfig } from "./config.js";
 

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { fakeIds } from "../../../tests/utils/fakeIds.js";
-import { fakeTextRows, type FakeTextRows } from "../../../tests/utils/fakeTextRows.js";
+import { fakeIds } from "#tests/utils/fakeIds.js";
+import { fakeTextRows, type FakeTextRows } from "#tests/utils/fakeTextRows.js";
 import {
   HintNotAllowedError,
   Text,

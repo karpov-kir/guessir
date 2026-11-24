@@ -2,8 +2,8 @@ import { Logger, LogLevel } from "@guessir/logger";
 import { collectLogs } from "@guessir/logger/testing";
 import { describe, expect, it } from "vitest";
 
-import { LogFormat } from "../../infra/logger/exports.js";
-import { compose as composeMigrate, type MigrateOverrides } from "../migrate/compose.js";
+import { LogFormat } from "#/infra/logger/exports.js";
+import { compose as composeMigrate, type MigrateOverrides } from "#/entrypoints/migrate/compose.js";
 import { compose as composeServer, type ServerOverrides } from "./compose.js";
 
 describe("a config that fails to parse", () => {

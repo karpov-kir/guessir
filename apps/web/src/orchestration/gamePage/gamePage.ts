@@ -1,12 +1,12 @@
 import "./gamePage.css";
-import { newPlayUseCases } from "../../features/play/exports";
+import { newPlayUseCases } from "#/features/play/exports.js";
 import {
   type ClipboardWriter,
   CreateTextApi,
   newCreateTextUseCases,
-} from "../../features/createText/exports";
-import { GameApi, newGameLoadingUseCases } from "../../features/gameLoading/exports";
-import type { Clock } from "../../shared/Clock";
+} from "#/features/createText/exports.js";
+import { GameApi, newGameLoadingUseCases } from "#/features/gameLoading/exports.js";
+import type { Clock } from "#/shared/Clock.js";
 
 export type GamePageDependencies = {
   api: GameApi & CreateTextApi;

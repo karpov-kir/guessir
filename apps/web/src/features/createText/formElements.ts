@@ -1,4 +1,4 @@
-import { requireElement } from "../../shared/dom";
+import { requireElement } from "#/shared/dom.js";
 
 export function getElements(containerElement: HTMLElement) {
   const titleInputElement = requireElement({

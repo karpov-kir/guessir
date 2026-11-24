@@ -1,9 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { newMigratedTestDatabase, TestDatabase } from "../../../utils/postgres.js";
-import { Db, openDb, QueryError } from "../../../../src/infra/db/exports.js";
-import type { Text, TextRows } from "../../../../src/features/texts/exports.js";
-import { newTextStore } from "../../../../src/features/texts/infra/exports.js";
+import { newMigratedTestDatabase, TestDatabase } from "#tests/utils/postgres.js";
+import { Db, openDb, QueryError } from "#/infra/db/exports.js";
+import type { Text, TextRows } from "#/features/texts/exports.js";
+import { newTextStore } from "#/features/texts/infra/exports.js";
 
 const text: Text = {
   id: "aaaaaaaaaaaaaaaaaaaa",

@@ -1,6 +1,9 @@
 {
   "name": "@guessir/game",
   "type": "module",
+  "imports": {
+    "#/*": "./src/*"
+  },
   "exports": {
     ".": {
       "types": "./dist/shared/exports.d.ts",

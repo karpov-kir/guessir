@@ -8,8 +8,8 @@ import {
 } from "@guessir/game";
 import type { ZodType } from "zod";
 
-import type { CreateTextApi } from "../../src/features/createText/exports";
-import type { GameApi } from "../../src/features/gameLoading/exports";
+import type { CreateTextApi } from "#/features/createText/exports.js";
+import type { GameApi } from "#/features/gameLoading/exports.js";
 
 /** Names a request the fake API received. */
 type ApiRequest = { method: "GET" | "POST"; path: string };

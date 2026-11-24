@@ -4,6 +4,10 @@
 
 The game is for English texts. Expand only English contractions, such as `don't` into `do not`, from the table in `packages/game/src/shared/lexemeAnalyzer/LexemeNormalizer.ts`. Support another language only as far as its words appear in an English text. Count a letter of any script, and a mark that joins one, as part of a word, so `Café`, `naïve` or `İstanbul` stays one word to guess.
 
+## Imports
+
+Each app and package names its own `src/` as `#/` through `imports` in its `package.json`, and an app names its `tests/` as `#tests/`. Such an import ends in `.js`, since a subpath pattern gets no extension added. The web, which Vite bundles, imports that way everywhere. The backend, `game` and `logger` run as the tsc output in `dist/`, where Node would resolve `#/` into `src/`, so their source keeps relative imports and only their tests use `#/` and `#tests/`.
+
 ## Usage statistics
 
 The web app sends anonymous usage statistics through `@kk-forge/artel-collector`, to the Guessir product's `site` channel in the idea-packer admin. `apps/web/src/entities/analytics/analytics.ts` lists the events. The channel's allowlist holds the same names, params and values, so a change to one needs the same change to the other. `apps/web/env/.env.development` holds the channel's test key, and `apps/web/env/.env.production` its live key.

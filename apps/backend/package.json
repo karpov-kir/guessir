@@ -2,6 +2,10 @@
   "name": "@guessir/backend",
   "version": "1.0.16",
   "type": "module",
+  "imports": {
+    "#/*": "./src/*",
+    "#tests/*": "./tests/*"
+  },
   "scripts": {
     "build": "npm run clean && tsc -b tsconfig.build.json",
     "clean": "del-cli ./dist ./tsconfig.build.tsbuildinfo",

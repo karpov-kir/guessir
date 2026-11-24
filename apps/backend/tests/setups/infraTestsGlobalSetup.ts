@@ -1,6 +1,6 @@
 import type { TestProject } from "vitest/node";
 
-import type { DbSettings } from "../../src/infra/db/exports.js";
+import type { DbSettings } from "#/infra/db/exports.js";
 import { InfraTestsSetup } from "./InfraTestsSetup.js";
 
 declare module "vitest" {

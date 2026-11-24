@@ -1,4 +1,4 @@
-import { newElement, requireElement } from "../../shared/dom";
+import { newElement, requireElement } from "#/shared/dom.js";
 import { ChildRenderer } from "./ChildRenderer";
 
 type ScoreRendererOptions = {
