@@ -2,7 +2,7 @@
 // tests cover the migration.
 /* v8 ignore start */
 
-import { errorText } from "../../shared/errorText.js";
+import { errorText } from "#src/shared/errorText.js";
 import { Logger } from "@guessir/logger";
 import { compose } from "./compose.js";
 

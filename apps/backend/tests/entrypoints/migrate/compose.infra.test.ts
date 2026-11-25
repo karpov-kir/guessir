@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, it } from "vitest";
 
 import { collectLogs, silentSink } from "@guessir/logger/testing";
-import { newTestDatabase, TestDatabase } from "../../utils/postgres.js";
-import { steppingClock } from "../../utils/steppingClock.js";
-import { testConfig } from "../../utils/testConfig.js";
-import { unreachableDbConfig } from "../../utils/unreachableDbConfig.js";
+import { newTestDatabase, TestDatabase } from "#tests/utils/postgres.js";
+import { steppingClock } from "#tests/utils/steppingClock.js";
+import { testConfig } from "#tests/utils/testConfig.js";
+import { unreachableDbConfig } from "#tests/utils/unreachableDbConfig.js";
 import { LogLevel, type LogSink } from "@guessir/logger";
-import { compose as composeServer, ServerHandle } from "../../../src/entrypoints/server/compose.js";
-import { compose } from "../../../src/entrypoints/migrate/compose.js";
+import { compose as composeServer, ServerHandle } from "#src/entrypoints/server/compose.js";
+import { compose } from "#src/entrypoints/migrate/compose.js";
 
 describe("the migrate step", () => {
   let postgres: TestDatabase | undefined;

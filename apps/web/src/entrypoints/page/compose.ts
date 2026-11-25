@@ -1,26 +1,26 @@
 import type { Collector } from "@kk-forge/artel-collector";
-import { trackPageViews } from "@kk-forge/artel-collector/web";
+import { trackPageViews } from "@kk-forge/artel-collector/infra";
 
 import {
   newThemeUseCases,
   type SystemThemeQuery,
   type ThemeStorage,
-} from "../../features/theme/exports";
+} from "#src/features/theme/exports.js";
 import {
   browserStorage,
   pageLocation,
   systemClipboard,
   systemDarkTheme,
-} from "../../infra/browser";
-import { newAnalytics } from "../../infra/analytics";
-import { readEnv } from "../../infra/env";
-import { FetchHttpClient } from "../../infra/fetchHttp";
-import { systemClock } from "../../infra/systemClock";
-import type { Clock } from "../../shared/Clock";
-import { bindTrack } from "../../shared/analytics";
+} from "#src/infra/browser.js";
+import { newAnalytics } from "#src/infra/analytics.js";
+import { readEnv } from "#src/infra/env.js";
+import { FetchHttpClient } from "#src/infra/fetchHttp.js";
+import { systemClock } from "#src/infra/systemClock.js";
+import type { Clock } from "#src/shared/Clock.js";
+import { bindTrack } from "#src/shared/analytics.js";
 import { Logger, LogLevel, type LogSink } from "@guessir/logger";
 import { newConsoleSink } from "@guessir/logger/infra";
-import { type GamePageDependencies, mountGamePage } from "../../orchestration/gamePage/exports";
+import { type GamePageDependencies, mountGamePage } from "#src/orchestration/gamePage/exports.js";
 import { type PageConfig, parseConfig } from "./config";
 
 export type PageOverrides = Partial<

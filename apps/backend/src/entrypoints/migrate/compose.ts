@@ -1,10 +1,10 @@
-import { newDbPing, openDb } from "../../infra/db/exports.js";
-import { logFormatOf, parseConfig, readEnv, type Config } from "../../infra/env/exports.js";
-import { LogFormat, newLogSink } from "../../infra/logger/exports.js";
-import { systemClock } from "../../infra/systemClock.js";
-import type { Clock } from "../../shared/Clock.js";
+import { newDbPing, openDb } from "#src/infra/db/exports.js";
+import { logFormatOf, parseConfig, readEnv, type Config } from "#src/infra/env/exports.js";
+import { LogFormat, newLogSink } from "#src/infra/logger/exports.js";
+import { systemClock } from "#src/infra/systemClock.js";
+import type { Clock } from "#src/shared/Clock.js";
 import { Logger, LogLevel, type LogSink } from "@guessir/logger";
-import { waitForDbAtStart } from "../../shared/dbWatch.js";
+import { waitForDbAtStart } from "#src/shared/dbWatch.js";
 
 const logger = Logger.root.scope("migrate");
 

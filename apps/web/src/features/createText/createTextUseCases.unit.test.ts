@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { FakeApi } from "../../../tests/utils/fakeApi";
-import { FakeClipboard } from "../../../tests/utils/fakeClipboard";
-import { newManualClock } from "../../../tests/utils/manualClock";
-import { recordTrackedEvents } from "../../../tests/utils/trackedEvents";
+import { FakeApi } from "#tests/utils/fakeApi.js";
+import { FakeClipboard } from "#tests/utils/fakeClipboard.js";
+import { newManualClock } from "#tests/utils/manualClock.js";
+import { recordTrackedEvents } from "#tests/utils/trackedEvents.js";
 import { CreateTextUseCases, newCreateTextUseCases } from "./createTextUseCases";
 import { getElements } from "./formElements";
 

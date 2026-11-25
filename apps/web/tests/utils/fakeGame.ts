@@ -1,6 +1,6 @@
 import type { CreateTextDto, RevealedWord } from "@guessir/game";
 
-import { type Game, LocalGame } from "../../src/entities/game/exports";
+import { type Game, LocalGame } from "#src/entities/game/exports.js";
 
 /** Names a move of the game: a method that asks the game for words. */
 type GameMove = "guess" | "reveal" | "firstLetters" | "words";

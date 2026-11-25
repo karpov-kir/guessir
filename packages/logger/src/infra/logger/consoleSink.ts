@@ -2,7 +2,7 @@
 // Changed here: the sink declares its own `Clock`, whose `now` returns milliseconds, because a
 // package imports no app.
 
-import { LogLevel, type LogRecord, type LogSink } from "../../shared/Logger.js";
+import { LogLevel, type LogRecord, type LogSink } from "#src/shared/Logger.js";
 
 /** Tells the time the sink stamps each line with, in milliseconds since the Unix epoch. */
 type Clock = { now(): number };

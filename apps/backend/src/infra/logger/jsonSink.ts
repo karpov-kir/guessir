@@ -2,7 +2,7 @@ import { inspect } from "node:util";
 
 import { type DestinationStream, destination as fileDestination, pino } from "pino";
 
-import type { Clock } from "../../shared/Clock.js";
+import type { Clock } from "#src/shared/Clock.js";
 import { LogLevel, type LogRecord, type LogSink } from "@guessir/logger";
 
 type JsonSinkOptions = {

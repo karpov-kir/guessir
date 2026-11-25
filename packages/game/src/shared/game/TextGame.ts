@@ -1,5 +1,12 @@
-import { analyze, isLexemeOtherCharacter, type LexemeAnalysis } from "../lexemeAnalyzer/exports.js";
+import {
+  analyze,
+  isLexemeOtherCharacter,
+  type LexemeAnalysis,
+} from "#src/shared/lexemeAnalyzer/exports.js";
 import { RevealedWord, SkeletonLexeme } from "./types.js";
+
+/** Holds the raw text a game is played over, which the game trims and normalizes itself. */
+type TextGameOptions = { text: string };
 
 /**
  * Answers the moves of a word guessing game over one text, giving out only the words a move opens.
@@ -9,7 +16,7 @@ export class TextGame {
   private readonly lexemesByIndex: LexemeAnalysis["lexemes"];
   private readonly lexemesByWordLike: LexemeAnalysis["lexemesByWordLike"];
 
-  constructor(text: string) {
+  constructor({ text }: TextGameOptions) {
     const lexemeAnalysis = analyze(text);
 
     this.wordCount = lexemeAnalysis.wordLikeCount;

@@ -1,4 +1,4 @@
-import { Text, TextRows } from "../../src/features/texts/exports.js";
+import { Text, TextRows } from "#src/features/texts/exports.js";
 
 /** Means stored texts kept in memory, which a test can inspect and make fail. */
 export type FakeTextRows = TextRows & {

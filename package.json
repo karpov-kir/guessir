@@ -8,7 +8,6 @@
   "type": "module",
   "scripts": {
     "build": "npm run build --workspaces --if-present",
-    "clean": "npm run clean --workspaces --if-present",
     "lint:oxlint": "oxlint",
     "lint:oxlint:fix": "oxlint --fix",
     "lint:format": "oxfmt --check",
@@ -22,12 +21,10 @@
     "test:unit": "vitest run --config vitest.unit.config.ts",
     "test:integration": "vitest run --config vitest.integ.config.ts",
     "test:infra": "vitest run --config vitest.infra.config.ts",
-    "test:ci": "vitest run --coverage",
-    "test:debug": "vitest --inspect-brk --no-file-parallelism",
-    "test:watch": "vitest watch"
+    "test:ci": "vitest run --coverage"
   },
   "devDependencies": {
-    "@kk-forge/oxlint-config": "^11.0.0",
+    "@kk-forge/oxlint-config": "^15.0.0",
     "@kk-forge/stylelint-config": "^1.1.0",
     "@types/node": "^26.6.6",
     "@vitest/coverage-v8": "^5.0.5",

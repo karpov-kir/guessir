@@ -9,7 +9,7 @@ import { compose } from "./compose";
 // The page imports the utilities after the modules that `./compose` pulls in. So a utility
 // class wins a tie of equal specificity against the styles of every module.
 import "./styles/utilities.css";
-import { requireElement } from "../../shared/dom";
+import { requireElement } from "#src/shared/dom.js";
 
 const logger = Logger.root.scope("page");
 

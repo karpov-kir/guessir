@@ -2,7 +2,7 @@ import { RevealedWord, revealedWordSchema, revealedWordsSchema, TextSkeleton } f
 import urlJoin from "url-join";
 
 import { GameApi } from "./port";
-import { Game } from "../../entities/game/exports";
+import { Game } from "#src/entities/game/exports.js";
 
 export type RemoteGameOptions = { api: GameApi; textPath: string; skeleton: TextSkeleton };
 

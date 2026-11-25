@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { FakeGame } from "../../utils/fakeGame";
-import { recordTrackedEvents } from "../../utils/trackedEvents";
-import { newPlayUseCases, PlayUseCases } from "../../../src/features/play/exports";
-import { requireElement } from "../../../src/shared/dom";
+import { FakeGame } from "#tests/utils/fakeGame.js";
+import { recordTrackedEvents } from "#tests/utils/trackedEvents.js";
+import { newPlayUseCases, PlayUseCases } from "#src/features/play/exports.js";
+import { requireElement } from "#src/shared/dom.js";
 
 let game: FakeGame;
 let gameElement: HTMLElement;

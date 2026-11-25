@@ -1,7 +1,7 @@
 import { CreateTextDto } from "@guessir/game";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { FakeApi } from "../../../tests/utils/fakeApi";
+import { FakeApi } from "#tests/utils/fakeApi.js";
 import { loadRemoteGame } from "./loadRemoteGame";
 
 const text: CreateTextDto = {

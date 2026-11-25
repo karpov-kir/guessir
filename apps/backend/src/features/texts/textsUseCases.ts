@@ -6,8 +6,8 @@ import {
   TextSkeleton,
 } from "@guessir/game";
 
-import type { IdGenerator } from "../../shared/IdGenerator.js";
-import { LruCache } from "../../shared/LruCache.js";
+import type { IdGenerator } from "#src/shared/IdGenerator.js";
+import { LruCache } from "#src/shared/LruCache.js";
 import type { Text, TextRows } from "./port.js";
 import { HintNotAllowedError, NewText, TextNotFoundError, WordNotFoundError } from "./types.js";
 
@@ -116,7 +116,7 @@ export class TextsUseCases {
       throw new TextNotFoundError(id);
     }
 
-    const playedText = { text, textGame: new TextGame(text.text) };
+    const playedText = { text, textGame: new TextGame({ text: text.text }) };
 
     this.playedTexts.set(id, playedText);
 

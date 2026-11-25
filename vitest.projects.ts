@@ -1,4 +1,8 @@
+import { defaultServerConditions } from "vite";
 import type { TestProjectInlineConfiguration } from "vitest/config";
+
+/** Resolves the packages' `source` condition, so their tests run on `src/` and need no build. */
+const packageSources = { ssr: { resolve: { conditions: ["source", ...defaultServerConditions] } } };
 
 /** Names a test level by the suffix its files take, as in `*.unit.test.ts`. */
 export type Level = "unit" | "integ" | "infra";
@@ -41,7 +45,7 @@ export function projectsOf(levels: Level[]): TestProjectInlineConfiguration[] {
       extends: "./apps/web/vite.config.ts",
       test: { name: "@guessir/web", root: "./apps/web", include },
     },
-    { test: { name: "@guessir/game", root: "./packages/game", include } },
-    { test: { name: "@guessir/logger", root: "./packages/logger", include } },
+    { ...packageSources, test: { name: "@guessir/game", root: "./packages/game", include } },
+    { ...packageSources, test: { name: "@guessir/logger", root: "./packages/logger", include } },
   ];
 }

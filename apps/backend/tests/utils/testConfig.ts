@@ -1,8 +1,8 @@
-import type { Config } from "../../src/infra/env/exports.js";
-import type { DbSettings } from "../../src/infra/db/exports.js";
-import { LogFormat } from "../../src/infra/logger/exports.js";
+import type { Config } from "#src/infra/env/exports.js";
+import type { DbSettings } from "#src/infra/db/exports.js";
+import { LogFormat } from "#src/infra/logger/exports.js";
 import { LogLevel } from "@guessir/logger";
-import { Environment } from "../../src/infra/env/exports.js";
+import { Environment } from "#src/infra/env/exports.js";
 
 /**
  * Returns a server config for a test, with the server on a free local port. The database is `db`,

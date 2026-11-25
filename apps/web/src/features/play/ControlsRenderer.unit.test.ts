@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { ControlsRenderer, getElements } from "./ControlsRenderer";
-import { requireElement } from "../../shared/dom";
+import { requireElement } from "#src/shared/dom.js";
 
 const typeGuess = (guessInputElement: HTMLInputElement, word: string) => {
   guessInputElement.value = word;

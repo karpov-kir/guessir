@@ -1,4 +1,4 @@
-import { ChildRenderer } from "../ChildRenderer";
+import { ChildRenderer } from "#src/features/play/ChildRenderer.js";
 
 export enum WordHint {
   None = "none",

@@ -8,8 +8,8 @@ import {
 } from "@guessir/game";
 import type { ZodType } from "zod";
 
-import type { CreateTextApi } from "../../src/features/createText/exports";
-import type { GameApi } from "../../src/features/gameLoading/exports";
+import type { CreateTextApi } from "#src/features/createText/exports.js";
+import type { GameApi } from "#src/features/gameLoading/exports.js";
 
 /** Names a request the fake API received. */
 type ApiRequest = { method: "GET" | "POST"; path: string };
@@ -35,7 +35,7 @@ export class FakeApi implements GameApi, CreateTextApi {
 
   /** Stores `text` under `id`, or under the next free id, and returns the id. */
   storeText(text: CreateTextDto, id = `text-${this.storedTexts.size + 1}`): string {
-    this.storedTexts.set(id, { text, textGame: new TextGame(text.text) });
+    this.storedTexts.set(id, { text, textGame: new TextGame({ text: text.text }) });
 
     return id;
   }

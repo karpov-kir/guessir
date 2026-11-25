@@ -2,7 +2,7 @@
 import { readFileSync } from "node:fs";
 import { parseEnv } from "node:util";
 
-import { defineConfig } from "vite";
+import { defaultClientConditions, defineConfig } from "vite";
 import { z } from "zod";
 
 const { version } = z
@@ -16,9 +16,9 @@ export default defineConfig({
   envPrefix: "GUESSIR_",
   // The build bakes in the `package.json` version, because each analytics envelope carries it.
   define: { "import.meta.env.GUESSIR_VERSION": JSON.stringify(version) },
-  // Vite resolves the imports of the repository's packages through the tsconfig paths. Those paths
-  // point at the packages' sources, so the bundle and the tests do not wait for a package build.
-  resolve: { tsconfigPaths: true },
+  // The "source" condition of the repository's packages' exports points at their sources, so the
+  // bundle and the tests do not wait for a package build.
+  resolve: { conditions: ["source", ...defaultClientConditions] },
   // The dev server takes the port `env/.env.development` fixes, whatever the shell sets, and fails
   // when another service holds it, so the backend's CORS list keeps matching the web's origin.
   server: { port: Number(PORT), strictPort: true },

@@ -1,6 +1,6 @@
 import arrowIcon from "./arrowIcon.svg?raw";
-import { newElement, onChangeAndEnter, onEnter, requireElement } from "../../shared/dom";
-import { icon } from "../../shared/icon";
+import { newElement, onChangeAndEnter, onEnter, requireElement } from "#src/shared/dom.js";
+import { icon } from "#src/shared/icon.js";
 import { ChildRenderer } from "./ChildRenderer";
 
 type ControlsRendererOptions = {

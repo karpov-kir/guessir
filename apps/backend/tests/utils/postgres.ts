@@ -2,8 +2,8 @@ import { randomUUID } from "node:crypto";
 
 import { inject } from "vitest";
 
-import { compose as composeMigrate } from "../../src/entrypoints/migrate/compose.js";
-import { type Db, type DbSettings, openDb } from "../../src/infra/db/exports.js";
+import { compose as composeMigrate } from "#src/entrypoints/migrate/compose.js";
+import { type Db, type DbSettings, openDb } from "#src/infra/db/exports.js";
 import { silentSink } from "@guessir/logger/testing";
 import { testConfig } from "./testConfig.js";
 

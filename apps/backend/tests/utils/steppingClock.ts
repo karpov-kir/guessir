@@ -1,5 +1,5 @@
-import { systemClock } from "../../src/infra/systemClock.js";
-import type { Clock } from "../../src/shared/Clock.js";
+import { systemClock } from "#src/infra/systemClock.js";
+import type { Clock } from "#src/shared/Clock.js";
 
 /**
  * How many times faster than real time the stepping clock runs. At 20, the server's 30-second
